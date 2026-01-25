@@ -36,8 +36,9 @@ describe('WizardShell', () => {
       </WizardShell>
     )
 
-    expect(screen.getByText('Atrás')).toBeInTheDocument()
-    expect(screen.getByText('Siguiente')).toBeInTheDocument()
+    // Desktop + mobile sticky footer = 2 buttons each
+    expect(screen.getAllByText('Atrás').length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByText('Siguiente').length).toBeGreaterThanOrEqual(1)
   })
 
   it('should use custom next label', () => {
@@ -51,7 +52,8 @@ describe('WizardShell', () => {
       </WizardShell>
     )
 
-    expect(screen.getByText('Generar aventura')).toBeInTheDocument()
+    // Desktop + mobile sticky footer = 2 buttons
+    expect(screen.getAllByText('Generar aventura').length).toBeGreaterThanOrEqual(1)
   })
 
   it('should render brand name Entretemps', () => {

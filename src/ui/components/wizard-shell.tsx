@@ -14,8 +14,8 @@ interface WizardShellProps {
 }
 
 const benefits = [
-  { icon: Compass, text: 'Aventura personalizada para tu familia' },
-  { icon: Sparkles, text: 'Retos adaptados a la edad de los niños' },
+  { icon: Sparkles, text: 'Aventura personalizada para tu familia' },
+  { icon: Compass, text: 'Retos adaptados a la edad de los niños' },
   { icon: Map, text: 'Guía paso a paso para montar la experiencia' },
   { icon: Package, text: 'Pack descargable listo para imprimir' },
 ]
@@ -32,18 +32,17 @@ export function WizardShell({
   const progressValue = (currentStep / totalSteps) * 100
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-slate-50/80 lg:bg-slate-100/50">
       {/* Mobile: single column / Desktop: 2 columns */}
       <div className="lg:grid lg:grid-cols-2 lg:min-h-screen">
 
         {/* Left column - Context (hidden on mobile, visible on lg+) */}
-        <div className="hidden lg:flex lg:flex-col lg:justify-center lg:px-12 xl:px-20 bg-gradient-to-br from-primary/5 via-background to-accent/5 relative overflow-hidden">
-          {/* Decorative shapes */}
-          <div className="absolute top-20 left-10 w-32 h-32 bg-primary/10 rounded-full blur-3xl" />
-          <div className="absolute bottom-32 right-10 w-40 h-40 bg-accent/10 rounded-full blur-3xl" />
-          <div className="absolute top-1/2 left-1/3 w-24 h-24 bg-primary/5 rounded-full blur-2xl" />
+        <div className="hidden lg:flex lg:flex-col lg:justify-center lg:px-10 xl:px-16 bg-gradient-to-br from-primary/10 via-primary/5 to-accent/5 relative overflow-hidden">
+          {/* Decorative blobs */}
+          <div className="absolute top-1/4 -left-20 w-80 h-80 bg-primary/20 rounded-full blur-3xl" />
+          <div className="absolute bottom-1/3 -right-16 w-72 h-72 bg-accent/15 rounded-full blur-3xl" />
 
-          <div className="relative z-10 max-w-md">
+          <div className="relative z-10 max-w-md py-12">
             {/* Logo */}
             <div className="mb-8">
               <h1 className="text-3xl font-bold tracking-tight">
@@ -71,7 +70,7 @@ export function WizardShell({
             <ul className="space-y-4">
               {benefits.map((benefit, index) => (
                 <li key={index} className="flex items-center gap-3">
-                  <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-white/60 shadow-sm flex items-center justify-center">
                     <benefit.icon className="w-5 h-5 text-primary" />
                   </div>
                   <span className="text-sm text-foreground/80">{benefit.text}</span>
@@ -82,11 +81,11 @@ export function WizardShell({
         </div>
 
         {/* Right column - Form */}
-        <div className="flex flex-col min-h-screen lg:min-h-0">
-          {/* Header with progress - visible on all screens */}
-          <div className="p-4 lg:p-8 lg:pb-0">
+        <div className="flex flex-col min-h-screen lg:min-h-0 lg:bg-white lg:py-12">
+          {/* Header with progress */}
+          <div className="px-6 pt-6 lg:px-10 xl:px-12 lg:pt-0 lg:pb-0">
             {/* Mobile logo */}
-            <div className="lg:hidden mb-6">
+            <div className="lg:hidden mb-5">
               <h1 className="text-xl font-bold tracking-tight">
                 <span className="text-primary">Entre</span>
                 <span className="text-foreground">temps</span>
@@ -99,42 +98,40 @@ export function WizardShell({
                 <span className="text-muted-foreground">
                   Paso {currentStep} de {totalSteps}
                 </span>
-                <span className="text-primary font-medium">
+                <span className="text-accent font-semibold">
                   {Math.round(progressValue)}%
                 </span>
               </div>
-              <Progress value={progressValue} className="h-2" />
+              <Progress value={progressValue} className="h-2 bg-muted [&>div]:bg-accent" />
             </div>
           </div>
 
-          {/* Form content */}
-          <div className="flex-1 flex flex-col p-4 lg:p-8 lg:pt-6">
-            <div className="flex-1 max-w-md mx-auto w-full lg:max-w-none">
+          {/* Form content - extra bottom padding on mobile for sticky footer */}
+          <div className="flex-1 flex flex-col px-6 pt-6 pb-32 lg:px-10 xl:px-12 lg:pt-8 lg:pb-4">
+            <div className="flex-1 max-w-md mx-auto w-full lg:max-w-none space-y-6">
               {children}
             </div>
 
-            {/* Navigation buttons */}
-            <div className="max-w-md mx-auto w-full lg:max-w-none pt-6">
+            {/* Desktop navigation buttons (hidden on mobile) */}
+            <div className="hidden lg:block max-w-md mx-auto w-full lg:max-w-none pt-8">
               <div className="flex gap-3">
                 {prevHref ? (
-                  <Button variant="outline" asChild className="flex-1 lg:flex-none lg:px-8">
+                  <Button variant="outline" asChild className="px-8 rounded-xl">
                     <Link href={prevHref}>Atrás</Link>
                   </Button>
-                ) : (
-                  <div className="flex-1 lg:hidden" />
-                )}
-                <div className="flex-1 lg:flex-1 lg:flex lg:justify-end">
+                ) : null}
+                <div className="flex-1 flex justify-end">
                   {nextHref ? (
                     <Button
                       asChild
-                      className="w-full lg:w-auto lg:px-8"
+                      className="px-8 rounded-xl shadow-md shadow-primary/25"
                       disabled={nextDisabled}
                     >
                       <Link href={nextDisabled ? '#' : nextHref}>{nextLabel}</Link>
                     </Button>
                   ) : (
                     <Button
-                      className="w-full lg:w-auto lg:px-8"
+                      className="px-8 rounded-xl shadow-md shadow-primary/25"
                       disabled={nextDisabled}
                     >
                       {nextLabel}
@@ -142,6 +139,37 @@ export function WizardShell({
                   )}
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile sticky footer (hidden on desktop) */}
+      <div className="fixed bottom-0 left-0 right-0 lg:hidden bg-white/90 backdrop-blur-xl border-t border-border/40 shadow-[0_-4px_20px_-4px_rgba(0,0,0,0.05)]">
+        <div className="px-6 py-4 pb-8 max-w-md mx-auto">
+          <div className="flex gap-3">
+            {prevHref ? (
+              <Button variant="outline" asChild className="flex-1 h-12 rounded-xl">
+                <Link href={prevHref}>Atrás</Link>
+              </Button>
+            ) : null}
+            <div className={prevHref ? 'flex-1' : 'w-full'}>
+              {nextHref ? (
+                <Button
+                  asChild
+                  className="w-full h-12 rounded-xl shadow-lg shadow-primary/30"
+                  disabled={nextDisabled}
+                >
+                  <Link href={nextDisabled ? '#' : nextHref}>{nextLabel}</Link>
+                </Button>
+              ) : (
+                <Button
+                  className="w-full h-12 rounded-xl shadow-lg shadow-primary/30"
+                  disabled={nextDisabled}
+                >
+                  {nextLabel}
+                </Button>
+              )}
             </div>
           </div>
         </div>

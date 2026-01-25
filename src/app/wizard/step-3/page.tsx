@@ -1,15 +1,44 @@
+'use client'
+
+import { useState } from 'react'
 import { WizardShell } from '@/ui/components/wizard-shell'
 import { WizardStepCard } from '@/ui/components/wizard-step-card'
 import { Label } from '@/ui/components/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/ui/components/select'
+import { Textarea } from '@/ui/components/textarea'
+import { Button } from '@/ui/components/button'
+
+const SUGGESTED_CHIPS = [
+  'Superhéroes',
+  'Piratas',
+  'Dinosaurios',
+  'Princesas',
+  'Misterio',
+]
 
 export default function Step3Page() {
+  const [interests, setInterests] = useState('')
+
+  const handleChipClick = (chip: string) => {
+    if (interests.trim() === '') {
+      setInterests(chip)
+      return
+    }
+
+    // Parse existing terms (split by comma, trim whitespace)
+    const existingTerms = interests
+      .split(',')
+      .map((term) => term.trim().toLowerCase())
+      .filter((term) => term !== '')
+
+    // Check if chip already exists
+    if (existingTerms.includes(chip.toLowerCase())) {
+      return
+    }
+
+    // Add chip at the end
+    setInterests((prev) => `${prev}, ${chip}`)
+  }
+
   return (
     <WizardShell
       currentStep={3}
@@ -18,25 +47,38 @@ export default function Step3Page() {
       nextHref="/wizard/step-4"
     >
       <WizardStepCard
-        title="¿Qué tema os gustaría?"
-        description="Elige un tema para la narrativa de la aventura."
+        title="¿Qué le encanta al/la protagonista?"
+        description="Escribe personajes, hobbies o universos que le hagan ilusión. Cuanto más concreto, mejor."
       >
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="theme">Tema de la aventura</Label>
-            <Select>
-              <SelectTrigger id="theme" className="h-12">
-                <SelectValue placeholder="Selecciona un tema" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="pirates">Piratas y tesoros</SelectItem>
-                <SelectItem value="space">Exploradores del espacio</SelectItem>
-                <SelectItem value="magic">Mundo mágico</SelectItem>
-                <SelectItem value="dinosaurs">Era de los dinosaurios</SelectItem>
-                <SelectItem value="detectives">Detectives y misterios</SelectItem>
-                <SelectItem value="jungle">Aventura en la jungla</SelectItem>
-              </SelectContent>
-            </Select>
+            <Label htmlFor="interests">Intereses del protagonista</Label>
+            <Textarea
+              id="interests"
+              value={interests}
+              onChange={(e) => setInterests(e.target.value)}
+              placeholder="Ej: Superman, dinosaurios, Harry Potter, fútbol, la Oveja Dolly…"
+              className="min-h-28 resize-none"
+            />
+          </div>
+
+          {/* Suggested chips */}
+          <div className="space-y-2">
+            <p className="text-sm text-muted-foreground">Ideas para inspirarte:</p>
+            <div className="flex flex-wrap gap-2">
+              {SUGGESTED_CHIPS.map((chip) => (
+                <Button
+                  key={chip}
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => handleChipClick(chip)}
+                  className="rounded-full"
+                >
+                  {chip}
+                </Button>
+              ))}
+            </div>
           </div>
         </div>
       </WizardStepCard>

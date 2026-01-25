@@ -1,27 +1,43 @@
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/ui/components/card'
-
 interface WizardStepCardProps {
   title: string
   description?: string
+  badge?: string
   children: React.ReactNode
 }
 
-export function WizardStepCard({ title, description, children }: WizardStepCardProps) {
+export function WizardStepCard({
+  title,
+  description,
+  badge = "Modo creativo",
+  children
+}: WizardStepCardProps) {
   return (
-    <Card className="border-0 shadow-sm lg:shadow-none lg:bg-transparent">
-      <CardHeader className="px-0 lg:px-0 pt-0">
-        <CardTitle className="text-xl lg:text-2xl font-semibold">
+    <div className="space-y-6">
+      {/* Step header */}
+      <div className="space-y-3">
+        {/* Badge */}
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent/10 text-accent text-xs font-medium">
+          <span>✨</span>
+          {badge}
+        </span>
+
+        {/* Title */}
+        <h2 className="text-2xl font-semibold leading-tight tracking-tight text-foreground">
           {title}
-        </CardTitle>
+        </h2>
+
+        {/* Description */}
         {description && (
-          <CardDescription className="text-base">
+          <p className="text-base text-muted-foreground leading-relaxed">
             {description}
-          </CardDescription>
+          </p>
         )}
-      </CardHeader>
-      <CardContent className="px-0 lg:px-0">
+      </div>
+
+      {/* Card content */}
+      <div className="bg-white rounded-2xl p-5 shadow-sm border border-border/50">
         {children}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   )
 }
