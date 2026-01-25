@@ -146,3 +146,50 @@ El README debe incluir como mínimo:
 
 ❌ No generar documentación excesiva ni académica.
 
+
+## Testing (OBLIGATORIO)
+
+El proyecto utiliza **Vitest** para tests unitarios e integración y **Testing Library** para componentes UI.
+
+### Objetivo
+Asegurar que cada implementación nueva se verifica con tests y que el flujo del MVP no se rompe.
+
+### Reglas
+- Cada nueva funcionalidad relevante debe incluir tests.
+- Priorizar tests de:
+  - lógica de negocio (`application/`)
+  - validaciones (`domain/` y schemas)
+  - componentes UI críticos (`ui/`)
+- Antes de dar una tarea por terminada:
+  - los tests deben pasar
+  - no se deben romper tests existentes
+- Los tests se ejecutan con:
+  - `pnpm test:run` (ejecución completa)
+  - `pnpm test:watch` (durante desarrollo)
+
+### Ubicación de los tests
+Los tests se almacenan en un directorio independiente:
+tests/
+domain/
+application/
+ui/
+integration/
+
+
+Convención:
+- El nombre del test debe reflejar el archivo que prueba.
+- Sufijo obligatorio: `.test.ts` o `.test.tsx`.
+
+Ejemplos:
+- `src/application/generate-adventure-pack.ts` → `tests/application/generate-adventure-pack.test.ts`
+- `src/ui/components/WizardStep.tsx` → `tests/ui/WizardStep.test.tsx`
+
+### Qué debe entregar la IA cuando genere código
+- Crear/actualizar los tests necesarios.
+- Indicar qué tests se han añadido.
+- Explicar brevemente qué comprueban.
+- Mantener los tests **simples, deterministas y rápidos** (sin llamadas reales a red).
+
+
+
+
