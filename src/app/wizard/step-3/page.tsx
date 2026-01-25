@@ -19,24 +19,13 @@ export default function Step3Page() {
   const [interests, setInterests] = useState('')
 
   const handleChipClick = (chip: string) => {
-    if (interests.trim() === '') {
-      setInterests(chip)
-      return
-    }
-
-    // Parse existing terms (split by comma, trim whitespace)
-    const existingTerms = interests
-      .split(',')
-      .map((term) => term.trim().toLowerCase())
-      .filter((term) => term !== '')
-
-    // Check if chip already exists
-    if (existingTerms.includes(chip.toLowerCase())) {
-      return
-    }
-
-    // Add chip at the end
-    setInterests((prev) => `${prev}, ${chip}`)
+    setInterests((prev) => {
+      const newInterests = prev.split(', ').map((term) => term.toLowerCase())
+      if (!newInterests.includes(chip.toLowerCase())) {
+        return prev ? `${prev}, ${chip}` : chip
+      }
+      return prev
+    })
   }
 
   return (

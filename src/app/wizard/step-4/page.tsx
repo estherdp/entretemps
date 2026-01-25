@@ -1,15 +1,22 @@
+'use client'
+
+import { useState } from 'react'
 import { WizardShell } from '@/ui/components/wizard-shell'
 import { WizardStepCard } from '@/ui/components/wizard-step-card'
-import { Label } from '@/ui/components/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/ui/components/select'
+import { Home, Flower2, Trees, Building, Compass } from 'lucide-react'
+import { cn } from '@/lib/utils'
+
+const LOCATION_OPTIONS = [
+  { value: 'home', label: 'Casa', subtitle: 'Interior del hogar', icon: Home },
+  { value: 'garden', label: 'Jardín', subtitle: 'Terraza o patio', icon: Flower2 },
+  { value: 'park', label: 'Parque', subtitle: 'Espacio al aire libre', icon: Trees },
+  { value: 'indoor-venue', label: 'Interior', subtitle: 'Ludoteca o local', icon: Building },
+  { value: 'outdoor-trip', label: 'Exterior', subtitle: 'Excursión', icon: Compass },
+]
 
 export default function Step4Page() {
+  const [selected, setSelected] = useState<string | null>(null)
+
   return (
     <WizardShell
       currentStep={4}
@@ -21,22 +28,50 @@ export default function Step4Page() {
         title="¿Dónde será la aventura?"
         description="El lugar determina qué tipo de retos y escondites podemos sugerir."
       >
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="location">Lugar</Label>
-            <Select>
-              <SelectTrigger id="location" className="h-12">
-                <SelectValue placeholder="Selecciona el lugar" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="home-indoor">Casa (interior)</SelectItem>
-                <SelectItem value="home-outdoor">Casa (jardín/terraza)</SelectItem>
-                <SelectItem value="park">Parque</SelectItem>
-                <SelectItem value="school">Colegio</SelectItem>
-                <SelectItem value="other">Otro lugar</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
+          {LOCATION_OPTIONS.map((option) => {
+            const isSelected = selected === option.value
+            const Icon = option.icon
+
+            return (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => setSelected(option.value)}
+                className={cn(
+                  'flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all',
+                  'hover:border-primary/50 hover:bg-primary/5',
+                  'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50',
+                  isSelected
+                    ? 'border-primary bg-primary/10 shadow-md shadow-primary/20'
+                    : 'border-border bg-white'
+                )}
+                aria-pressed={isSelected}
+              >
+                <div
+                  className={cn(
+                    'w-11 h-11 rounded-full flex items-center justify-center transition-colors',
+                    isSelected ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
+                  )}
+                >
+                  <Icon className="w-5 h-5" />
+                </div>
+                <div className="text-center">
+                  <span
+                    className={cn(
+                      'block text-sm font-medium transition-colors',
+                      isSelected ? 'text-primary' : 'text-foreground'
+                    )}
+                  >
+                    {option.label}
+                  </span>
+                  <span className="block text-xs text-muted-foreground mt-0.5">
+                    {option.subtitle}
+                  </span>
+                </div>
+              </button>
+            )
+          })}
         </div>
       </WizardStepCard>
     </WizardShell>
