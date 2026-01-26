@@ -19,7 +19,7 @@ export default function Step1Page() {
   return (
     <WizardShell
       currentStep={1}
-      totalSteps={5}
+      totalSteps={6}
       nextHref="/wizard/step-2"
     >
       <WizardStepCard

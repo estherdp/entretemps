@@ -20,7 +20,7 @@ export default function Step4Page() {
   return (
     <WizardShell
       currentStep={4}
-      totalSteps={5}
+      totalSteps={6}
       prevHref="/wizard/step-3"
       nextHref="/wizard/step-5"
     >
