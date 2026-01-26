@@ -2,27 +2,32 @@ import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import Step5Page from '@/app/wizard/step-5/page'
+import { WizardProvider } from '@/ui/wizard/wizard-provider'
+
+const renderWithProvider = (ui: React.ReactElement) => {
+  return render(<WizardProvider>{ui}</WizardProvider>)
+}
 
 describe('Step5Page', () => {
   it('should render the step title', () => {
-    render(<Step5Page />)
+    renderWithProvider(<Step5Page />)
 
-    expect(screen.getByText('Demos forma a la història')).toBeInTheDocument()
+    expect(screen.getByText('Demos forma a la historia')).toBeInTheDocument()
   })
 
-  it('should mark "Misteri" card as selected when clicked', async () => {
+  it('should mark "Misterio" card as selected when clicked', async () => {
     const user = userEvent.setup()
-    render(<Step5Page />)
+    renderWithProvider(<Step5Page />)
 
-    const misteriCard = screen.getByRole('button', { name: /misteri/i })
+    const misterioCard = screen.getByRole('button', { name: /misterio/i })
 
     // Initially not selected
-    expect(misteriCard).toHaveAttribute('aria-pressed', 'false')
+    expect(misterioCard).toHaveAttribute('aria-pressed', 'false')
 
     // Click to select
-    await user.click(misteriCard)
+    await user.click(misterioCard)
 
     // Now selected
-    expect(misteriCard).toHaveAttribute('aria-pressed', 'true')
+    expect(misterioCard).toHaveAttribute('aria-pressed', 'true')
   })
 })

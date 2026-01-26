@@ -1,20 +1,23 @@
 'use client'
 
-import { useState } from 'react'
 import { WizardShell } from '@/ui/components/wizard-shell'
 import { WizardStepCard } from '@/ui/components/wizard-step-card'
-import { Cake, Users, PartyPopper, Mountain } from 'lucide-react'
+import { Cake, Users, PartyPopper, Mountain, LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-const OCCASION_OPTIONS = [
+import type { Occasion } from '@/domain/wizard-data'
+import { useWizard } from '@/ui/wizard/wizard-provider'
+
+const OCCASION_OPTIONS: { value: Occasion; label: string; icon: LucideIcon }[] = [
   { value: 'birthday', label: 'Cumpleaños', icon: Cake },
   { value: 'family-afternoon', label: 'Tarde en familia', icon: Users },
   { value: 'party', label: 'Fiesta', icon: PartyPopper },
   { value: 'excursion', label: 'Excursión', icon: Mountain },
 ]
-
+  
 export default function Step1Page() {
-  const [selected, setSelected] = useState<string | null>(null)
+  const {wizardData, setWizardData} = useWizard()
+  const selected = wizardData.occasion || null
 
   return (
     <WizardShell
@@ -35,7 +38,7 @@ export default function Step1Page() {
               <button
                 key={option.value}
                 type="button"
-                onClick={() => setSelected(option.value)}
+                onClick={() => setWizardData({ occasion: option.value })}
                 className={cn(
                   'flex flex-col items-center gap-3 p-4 rounded-xl border-2 transition-all',
                   'hover:border-primary/50 hover:bg-primary/5',

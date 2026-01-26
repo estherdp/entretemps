@@ -3,34 +3,40 @@
 import { useState } from 'react'
 import { WizardShell } from '@/ui/components/wizard-shell'
 import { WizardStepCard } from '@/ui/components/wizard-step-card'
-import { Search, Compass, Sparkles, Zap, Smile } from 'lucide-react'
+import { Search, Compass, Sparkles, Zap, Smile, LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-const ADVENTURE_TYPE_OPTIONS = [
-  { value: 'misterio', label: 'Misterio', icon: Search },
-  { value: 'aventura', label: 'Aventura', icon: Compass },
-  { value: 'fantasia', label: 'Fantasía', icon: Sparkles },
-  { value: 'accion', label: 'Acción', icon: Zap },
+import type {AdventureType, Tone, Difficulty} from '@/domain/wizard-data'
+import { useWizard } from '@/ui/wizard/wizard-provider'
+
+
+const ADVENTURE_TYPE_OPTIONS : { value: AdventureType; label: string; icon: LucideIcon }[] = [
+  { value: 'mystery', label: 'Misterio', icon: Search },
+  { value: 'adventure', label: 'Aventura', icon: Compass },
+  { value: 'fantasy', label: 'Fantasía', icon: Sparkles },
+  { value: 'action', label: 'Acción', icon: Zap },
   { value: 'humor', label: 'Humor', icon: Smile },
 ]
 
-const TONE_OPTIONS = [
-  { value: 'divertida', label: 'Divertida' },
-  { value: 'enigmatica', label: 'Enigmática' },
-  { value: 'emocionante', label: 'Emocionante' },
-  { value: 'tranquila', label: 'Tranquila' },
+const TONE_OPTIONS : { value: Tone; label: string }[]= [
+  { value: 'funny', label: 'Divertida' },
+  { value: 'enigmatic', label: 'Enigmática' },
+  { value: 'exciting', label: 'Emocionante' },
+  { value: 'calm', label: 'Tranquila' },
 ]
 
-const DIFFICULTY_OPTIONS = [
-  { value: 'facil', label: 'Fácil' },
-  { value: 'media', label: 'Media' },
-  { value: 'desafiante', label: 'Desafiante' },
+const DIFFICULTY_OPTIONS : { value: Difficulty; label: string }[] = [
+  { value: 'easy', label: 'Fácil' },
+  { value: 'medium', label: 'Media' },
+  { value: 'hard', label: 'Desafiante' },
 ]
 
 export default function Step5Page() {
-  const [selectedType, setSelectedType] = useState<string | null>(null)
-  const [selectedTone, setSelectedTone] = useState<string | null>(null)
-  const [selectedDifficulty, setSelectedDifficulty] = useState<string | null>(null)
+  const {wizardData, setWizardData} = useWizard()
+  const adventure = wizardData.adventureType || null
+  const tone = wizardData.tone || null
+  const difficulty = wizardData.difficulty || null
+
 
   return (
     <WizardShell
@@ -49,14 +55,14 @@ export default function Step5Page() {
             <h3 className="text-sm font-medium text-foreground">Tipo de aventura</h3>
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
               {ADVENTURE_TYPE_OPTIONS.map((option) => {
-                const isSelected = selectedType === option.value
+                const isSelected = adventure === option.value
                 const Icon = option.icon
 
                 return (
                   <button
                     key={option.value}
                     type="button"
-                    onClick={() => setSelectedType(option.value)}
+                    onClick={() => setWizardData({ adventureType: option.value })}
                     className={cn(
                       'flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all',
                       'hover:border-primary/50 hover:bg-primary/5',
@@ -94,13 +100,13 @@ export default function Step5Page() {
             <h3 className="text-sm font-medium text-foreground">Tono de la historia</h3>
             <div className="flex flex-wrap gap-2">
               {TONE_OPTIONS.map((option) => {
-                const isSelected = selectedTone === option.value
+                const isSelected = tone === option.value
 
                 return (
                   <button
                     key={option.value}
                     type="button"
-                    onClick={() => setSelectedTone(option.value)}
+                    onClick={() => setWizardData({ tone: option.value })}
                     className={cn(
                       'px-4 py-2 rounded-full text-sm font-medium transition-all',
                       'border-2',
@@ -124,13 +130,13 @@ export default function Step5Page() {
             <h3 className="text-sm font-medium text-foreground">Dificultad</h3>
             <div className="flex flex-wrap gap-2">
               {DIFFICULTY_OPTIONS.map((option) => {
-                const isSelected = selectedDifficulty === option.value
+                const isSelected = difficulty === option.value
 
                 return (
                   <button
                     key={option.value}
                     type="button"
-                    onClick={() => setSelectedDifficulty(option.value)}
+                    onClick={() => setWizardData({ difficulty: option.value })}
                     className={cn(
                       'px-5 py-2.5 rounded-lg text-sm font-medium transition-all',
                       'border-2',

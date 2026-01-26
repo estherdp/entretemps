@@ -3,19 +3,23 @@
 import { useState } from 'react'
 import { WizardShell } from '@/ui/components/wizard-shell'
 import { WizardStepCard } from '@/ui/components/wizard-step-card'
-import { Home, Flower2, Trees, Building, Compass } from 'lucide-react'
+import { Home, Flower2, Trees, Building, Compass, LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-const LOCATION_OPTIONS = [
+import type { Place } from '@/domain/wizard-data'
+import { useWizard } from '@/ui/wizard/wizard-provider'
+
+const LOCATION_OPTIONS :{ value: Place; label: string; subtitle: string; icon: LucideIcon }[] = [
   { value: 'home', label: 'Casa', subtitle: 'Interior del hogar', icon: Home },
   { value: 'garden', label: 'Jardín', subtitle: 'Terraza o patio', icon: Flower2 },
   { value: 'park', label: 'Parque', subtitle: 'Espacio al aire libre', icon: Trees },
-  { value: 'indoor-venue', label: 'Interior', subtitle: 'Ludoteca o local', icon: Building },
-  { value: 'outdoor-trip', label: 'Exterior', subtitle: 'Excursión', icon: Compass },
+  { value: 'indoor', label: 'Interior', subtitle: 'Ludoteca o local', icon: Building },
+  { value: 'outdoor', label: 'Exterior', subtitle: 'Excursión', icon: Compass },
 ]
 
 export default function Step4Page() {
-  const [selected, setSelected] = useState<string | null>(null)
+  const {wizardData, setWizardData} = useWizard()
+  const selected = wizardData.place || null
 
   return (
     <WizardShell
@@ -37,7 +41,7 @@ export default function Step4Page() {
               <button
                 key={option.value}
                 type="button"
-                onClick={() => setSelected(option.value)}
+                onClick={() => setWizardData({ place: option.value })}
                 className={cn(
                   'flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all',
                   'hover:border-primary/50 hover:bg-primary/5',

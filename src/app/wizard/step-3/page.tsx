@@ -7,6 +7,8 @@ import { Label } from '@/ui/components/label'
 import { Textarea } from '@/ui/components/textarea'
 import { Button } from '@/ui/components/button'
 
+import { useWizard } from '@/ui/wizard/wizard-provider'
+
 const SUGGESTED_CHIPS = [
   'Superhéroes',
   'Piratas',
@@ -15,17 +17,27 @@ const SUGGESTED_CHIPS = [
   'Misterio',
 ]
 
+function normalizeTerms(value: string): string[] {
+  return value
+    .split(',')
+    .map((t) => t.trim())
+    .filter(Boolean)
+    .map((t) => t.toLowerCase())
+}
+
 export default function Step3Page() {
-  const [interests, setInterests] = useState('')
+  const {wizardData, setWizardData} = useWizard()
+  const interests = wizardData.interests ?? ''
+
 
   const handleChipClick = (chip: string) => {
-    setInterests((prev) => {
-      const newInterests = prev.split(', ').map((term) => term.toLowerCase())
-      if (!newInterests.includes(chip.toLowerCase())) {
-        return prev ? `${prev}, ${chip}` : chip
-      }
-      return prev
-    })
+    const current = interests
+    const terms = normalizeTerms(current)
+
+    if (!terms.includes(chip.toLowerCase())) {
+      const next = current.trim() ? `${current.trim()}, ${chip}` : chip
+      setWizardData({ interests: next })
+    }
   }
 
   return (
@@ -45,7 +57,7 @@ export default function Step3Page() {
             <Textarea
               id="interests"
               value={interests}
-              onChange={(e) => setInterests(e.target.value)}
+              onChange={(e) => setWizardData({ interests: e.target.value })}
               placeholder="Ej: Superman, dinosaurios, Harry Potter, fútbol, la Oveja Dolly…"
               className="min-h-28 resize-none"
             />

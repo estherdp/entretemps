@@ -1,9 +1,18 @@
+'use client'
+
 import { WizardShell } from '@/ui/components/wizard-shell'
 import { WizardStepCard } from '@/ui/components/wizard-step-card'
 import { Label } from '@/ui/components/label'
 import { Input } from '@/ui/components/input'
 
+import {useWizard} from '@/ui/wizard/wizard-provider'
+
 export default function Step2Page() {
+  const {wizardData, setWizardData} = useWizard()
+  const ageMin = wizardData.ages?.min ?? ''
+  const ageMax = wizardData.ages?.max ?? ''
+  const numChildren = wizardData.kidsCount ?? ''  
+
   return (
     <WizardShell
       currentStep={2}
@@ -25,6 +34,16 @@ export default function Step2Page() {
               min={3}
               max={16}
               className="h-12"
+              value={ageMin}
+              onChange={(e) => {
+                const min = Number(e.target.value)
+                setWizardData({
+                  ages: {
+                    min,
+                    max: wizardData.ages?.max ?? min,
+                  },
+                })
+              }}
             />
           </div>
           <div className="space-y-2">
@@ -36,6 +55,16 @@ export default function Step2Page() {
               min={3}
               max={16}
               className="h-12"
+              value={ageMax}
+              onChange={(e) => {
+                const max = Number(e.target.value)
+                setWizardData({
+                  ages: {
+                    min: wizardData.ages?.min ?? max,
+                    max,
+                  },
+                })
+              }}
             />
           </div>
           <div className="space-y-2">
@@ -47,6 +76,10 @@ export default function Step2Page() {
               min={1}
               max={20}
               className="h-12"
+              value={numChildren}
+              onChange={(e) => {
+                setWizardData({ kidsCount: Number(e.target.value) })
+              }}
             />
           </div>
         </div>

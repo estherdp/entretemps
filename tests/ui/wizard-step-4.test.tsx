@@ -2,16 +2,21 @@ import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import Step4Page from '@/app/wizard/step-4/page'
+import { WizardProvider } from '@/ui/wizard/wizard-provider'
+
+const renderWithProvider = (ui: React.ReactElement) => {
+  return render(<WizardProvider>{ui}</WizardProvider>)
+}
 
 describe('Step4Page', () => {
   it('should render the step title', () => {
-    render(<Step4Page />)
+    renderWithProvider(<Step4Page />)
 
     expect(screen.getByText('¿Dónde será la aventura?')).toBeInTheDocument()
   })
 
   it('should render all location options', () => {
-    render(<Step4Page />)
+    renderWithProvider(<Step4Page />)
 
     expect(screen.getByText('Casa')).toBeInTheDocument()
     expect(screen.getByText('Jardín')).toBeInTheDocument()
@@ -21,7 +26,7 @@ describe('Step4Page', () => {
   })
 
   it('should render subtitles for each option', () => {
-    render(<Step4Page />)
+    renderWithProvider(<Step4Page />)
 
     expect(screen.getByText('Interior del hogar')).toBeInTheDocument()
     expect(screen.getByText('Terraza o patio')).toBeInTheDocument()
@@ -32,7 +37,7 @@ describe('Step4Page', () => {
 
   it('should mark "Casa" card as selected when clicked', async () => {
     const user = userEvent.setup()
-    render(<Step4Page />)
+    renderWithProvider(<Step4Page />)
 
     const casaCard = screen.getByRole('button', { name: /casa/i })
 
@@ -48,7 +53,7 @@ describe('Step4Page', () => {
 
   it('should only have one card selected at a time', async () => {
     const user = userEvent.setup()
-    render(<Step4Page />)
+    renderWithProvider(<Step4Page />)
 
     const casaCard = screen.getByRole('button', { name: /casa/i })
     const parqueCard = screen.getByRole('button', { name: /parque/i })
@@ -65,8 +70,8 @@ describe('Step4Page', () => {
   })
 
   it('should display correct step progress', () => {
-    render(<Step4Page />)
+    renderWithProvider(<Step4Page />)
 
-    expect(screen.getByText('Paso 4 de 5')).toBeInTheDocument()
+    expect(screen.getByText('Paso 4 de 6')).toBeInTheDocument()
   })
 })

@@ -2,16 +2,21 @@ import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import Step3Page from '@/app/wizard/step-3/page'
+import { WizardProvider } from '@/ui/wizard/wizard-provider'
+
+const renderWithProvider = (ui: React.ReactElement) => {
+  return render(<WizardProvider>{ui}</WizardProvider>)
+}
 
 describe('Step3Page', () => {
   it('should render the step title', () => {
-    render(<Step3Page />)
+    renderWithProvider(<Step3Page />)
 
     expect(screen.getByText('¿Qué le encanta al/la protagonista?')).toBeInTheDocument()
   })
 
   it('should render the textarea with placeholder', () => {
-    render(<Step3Page />)
+    renderWithProvider(<Step3Page />)
 
     const textarea = screen.getByRole('textbox')
     expect(textarea).toBeInTheDocument()
@@ -22,7 +27,7 @@ describe('Step3Page', () => {
   })
 
   it('should render the description', () => {
-    render(<Step3Page />)
+    renderWithProvider(<Step3Page />)
 
     expect(
       screen.getByText('Escribe personajes, hobbies o universos que le hagan ilusión. Cuanto más concreto, mejor.')
@@ -30,19 +35,19 @@ describe('Step3Page', () => {
   })
 
   it('should render the label for the textarea', () => {
-    render(<Step3Page />)
+    renderWithProvider(<Step3Page />)
 
     expect(screen.getByText('Intereses del protagonista')).toBeInTheDocument()
   })
 
   it('should display correct step progress', () => {
-    render(<Step3Page />)
+    renderWithProvider(<Step3Page />)
 
-    expect(screen.getByText('Paso 3 de 5')).toBeInTheDocument()
+    expect(screen.getByText('Paso 3 de 6')).toBeInTheDocument()
   })
 
   it('should render all suggested chips', () => {
-    render(<Step3Page />)
+    renderWithProvider(<Step3Page />)
 
     expect(screen.getByRole('button', { name: 'Superhéroes' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Piratas' })).toBeInTheDocument()
@@ -53,7 +58,7 @@ describe('Step3Page', () => {
 
   it('should add chip text to textarea when clicked', async () => {
     const user = userEvent.setup()
-    render(<Step3Page />)
+    renderWithProvider(<Step3Page />)
 
     const textarea = screen.getByRole('textbox')
     const piratasButton = screen.getByRole('button', { name: 'Piratas' })
@@ -70,7 +75,7 @@ describe('Step3Page', () => {
 
   it('should append chip with comma when textarea has content', async () => {
     const user = userEvent.setup()
-    render(<Step3Page />)
+    renderWithProvider(<Step3Page />)
 
     const textarea = screen.getByRole('textbox')
     const superheroesButton = screen.getByRole('button', { name: 'Superhéroes' })
@@ -87,7 +92,7 @@ describe('Step3Page', () => {
 
   it('should not duplicate chip when clicked twice', async () => {
     const user = userEvent.setup()
-    render(<Step3Page />)
+    renderWithProvider(<Step3Page />)
 
     const textarea = screen.getByRole('textbox')
     const piratasButton = screen.getByRole('button', { name: 'Piratas' })

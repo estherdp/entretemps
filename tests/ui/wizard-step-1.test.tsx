@@ -2,16 +2,21 @@ import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import Step1Page from '@/app/wizard/step-1/page'
+import { WizardProvider } from '@/ui/wizard/wizard-provider'
+
+const renderWithProvider = (ui: React.ReactElement) => {
+  return render(<WizardProvider>{ui}</WizardProvider>)
+}
 
 describe('Step1Page', () => {
   it('should render the step title', () => {
-    render(<Step1Page />)
+    renderWithProvider(<Step1Page />)
 
     expect(screen.getByText('¿Qué ocasión celebráis?')).toBeInTheDocument()
   })
 
   it('should render all occasion options', () => {
-    render(<Step1Page />)
+    renderWithProvider(<Step1Page />)
 
     expect(screen.getByText('Cumpleaños')).toBeInTheDocument()
     expect(screen.getByText('Tarde en familia')).toBeInTheDocument()
@@ -21,7 +26,7 @@ describe('Step1Page', () => {
 
   it('should mark card as selected when clicked', async () => {
     const user = userEvent.setup()
-    render(<Step1Page />)
+    renderWithProvider(<Step1Page />)
 
     const birthdayCard = screen.getByRole('button', { name: /cumpleaños/i })
 
@@ -37,7 +42,7 @@ describe('Step1Page', () => {
 
   it('should only have one card selected at a time', async () => {
     const user = userEvent.setup()
-    render(<Step1Page />)
+    renderWithProvider(<Step1Page />)
 
     const birthdayCard = screen.getByRole('button', { name: /cumpleaños/i })
     const partyCard = screen.getByRole('button', { name: /fiesta/i })
@@ -54,8 +59,8 @@ describe('Step1Page', () => {
   })
 
   it('should display correct step progress', () => {
-    render(<Step1Page />)
+    renderWithProvider(<Step1Page />)
 
-    expect(screen.getByText('Paso 1 de 5')).toBeInTheDocument()
+    expect(screen.getByText('Paso 1 de 6')).toBeInTheDocument()
   })
 })
