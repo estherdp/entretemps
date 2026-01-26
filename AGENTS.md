@@ -1,4 +1,4 @@
-# AGENTS.md — Entretemps (minimal)
+# AGENTS.md — ENTRETEMPS
 
 Stack: Next.js (App Router) + TypeScript + Tailwind + shadcn/ui + pnpm.
 BD/Auth: Supabase. Tests: Vitest (+ Testing Library).

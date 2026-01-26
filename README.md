@@ -1,36 +1,136 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Entretemps
 
-## Getting Started
+Generador de aventuras personalizadas para fiestas infantiles. Un wizard guía al usuario para configurar la aventura y genera un pack completo con historia, puzzles y materiales imprimibles.
 
-First, run the development server:
+## Stack
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **Framework**: Next.js 16 (App Router) + TypeScript
+- **Estilos**: Tailwind CSS + shadcn/ui
+- **BD/Auth**: Supabase
+- **Tests**: Vitest + Testing Library
+- **Package Manager**: pnpm
+
+## Estructura del proyecto
+
+```
+src/
+├── app/                    # Rutas Next.js (App Router)
+│   └── wizard/             # Wizard de configuración (steps 1-6)
+├── application/            # Casos de uso y DTOs
+│   └── dto/                # Data Transfer Objects
+├── domain/                 # Tipos e interfaces de dominio
+├── infrastructure/         # Supabase, IA, PDF
+├── lib/                    # Utilidades y configuración
+│   └── schemas/            # Schemas Zod para validación
+└── ui/                     # Componentes UI
+    ├── components/         # Componentes reutilizables
+    └── wizard/             # Componentes específicos del wizard
+
+tests/
+├── domain/                 # Tests de dominio y contratos
+├── application/            # Tests de casos de uso
+├── ui/                     # Tests de componentes
+└── integration/            # Tests de integración
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Wizard Flow
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+El wizard consta de 6 pasos:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. **Ocasión** - Tipo de evento (cumpleaños, fiesta, etc.)
+2. **Participantes** - Número y edades de los niños
+3. **Intereses** - Gustos del protagonista
+4. **Lugar** - Ubicación de la aventura
+5. **Creatividad** - Tipo de aventura, tono y dificultad
+6. **Resumen** - Revisión de selecciones
 
-## Learn More
+## Contratos de API
 
-To learn more about Next.js, take a look at the following resources:
+### GeneratePackRequest (entrada)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```typescript
+{
+  locale: "es",
+  wizardData: {
+    occasion?: "birthday" | "family-afternoon" | "party" | "excursion",
+    ages?: { min: number, max: number },
+    kidsCount?: number,
+    interests?: string,
+    place?: "home" | "garden" | "park" | "indoor" | "outdoor",
+    adventureType?: "mystery" | "adventure" | "fantasy" | "action" | "humor",
+    tone?: "funny" | "enigmatic" | "exciting" | "calm",
+    difficulty?: "easy" | "medium" | "hard"
+  },
+  constraints: {
+    phases: 3,
+    puzzlesPerPhase: 2,
+    screenFree: true
+  }
+}
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### AdventurePack (salida)
 
-## Deploy on Vercel
+```typescript
+{
+  meta: {
+    title: string,
+    createdAt: string  // ISO datetime
+  },
+  story: {
+    synopsis: string,
+    setting: string
+  },
+  characters: [{
+    name: string,
+    role: string,
+    description: string
+  }],
+  phases: [{  // Exactamente 3 fases
+    index: 1 | 2 | 3,
+    title: string,
+    objective: string,
+    puzzles: [{  // Exactamente 2 puzzles por fase
+      index: 1 | 2,
+      type: string,
+      statement: string,
+      solution: string,
+      hints: string[]
+    }]
+  }],
+  setupGuide: {
+    steps: string[],
+    materials: string[]
+  },
+  printables: [{
+    title: string,
+    content: string
+  }]
+}
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Scripts
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+# Desarrollo
+pnpm dev
+
+# Build
+pnpm build
+
+# Tests
+pnpm test:run      # Ejecutar todos los tests
+pnpm test:watch    # Tests en modo watch
+
+# Lint
+pnpm lint
+```
+
+## Convenciones
+
+- **camelCase** para funciones y variables
+- **PascalCase** para tipos y componentes
+- **kebab-case** para nombres de ficheros
+- TypeScript tipado (evitar `any`)
+- No lógica de negocio en UI
+- Tests para cada cambio
