@@ -31,3 +31,10 @@ Output:
 - Lista de ficheros modificados/creados.
 - Contenido completo SOLO de los ficheros modificados.
 - No reescribir ficheros no afectados.
+
+Arquitectura (muy importante):
+- En `src/app` y `src/ui` SOLO UI, estado local y handlers simples.
+- Las llamadas a red (fetch), construcción de requests y validación de contratos van en `src/application` (casos de uso) o `src/infrastructure` (adaptadores).
+- Las pages/steps NO deben llamar a endpoints directamente salvo que se pida explícitamente.
+- `domain` no depende de Next, React ni SDKs externos.
+
