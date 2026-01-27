@@ -11,6 +11,7 @@ interface WizardShellProps {
   nextHref?: string
   nextLabel?: string
   nextDisabled?: boolean
+  onNext?: () => void
 }
 
 const benefits = [
@@ -28,6 +29,7 @@ export function WizardShell({
   nextHref,
   nextLabel = 'Siguiente',
   nextDisabled = false,
+  onNext,
 }: WizardShellProps) {
   const progressValue = (currentStep / totalSteps) * 100
 
@@ -133,6 +135,7 @@ export function WizardShell({
                     <Button
                       className="px-8 rounded-xl shadow-md shadow-primary/25"
                       disabled={nextDisabled}
+                      onClick={onNext}
                     >
                       {nextLabel}
                     </Button>
@@ -166,6 +169,7 @@ export function WizardShell({
                 <Button
                   className="w-full h-12 rounded-xl shadow-lg shadow-primary/30"
                   disabled={nextDisabled}
+                  onClick={onNext}
                 >
                   {nextLabel}
                 </Button>

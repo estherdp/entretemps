@@ -1,5 +1,7 @@
 'use client'
 
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { WizardShell } from '@/ui/components/wizard-shell'
 import { WizardStepCard } from '@/ui/components/wizard-step-card'
 import { Card, CardContent } from '@/ui/components/card'
@@ -12,17 +14,37 @@ import {
   TONE_LABELS,
   DIFFICULTY_LABELS,
 } from '@/ui/wizard/labels'
+import { generatePack } from '@/application/generate-pack'
 
 export default function Step6Page() {
+  const router = useRouter()
   const { wizardData } = useWizard()
+  const [isLoading, setIsLoading] = useState(false)
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
+
+  const handleGenerate = async () => {
+    setIsLoading(true)
+    setMessage(null)
+
+    const result = await generatePack(wizardData)
+
+    if (result.ok && result.pack) {
+      sessionStorage.setItem('generated-adventure-pack', JSON.stringify(result.pack))
+      router.push('/pack/result')
+    } else {
+      setMessage({ type: 'error', text: result.error || 'Error desconocido.' })
+      setIsLoading(false)
+    }
+  }
 
   return (
     <WizardShell
       currentStep={6}
       totalSteps={6}
       prevHref="/wizard/step-5"
-      nextLabel="Generar aventura"
-      nextDisabled={true}
+      nextLabel={isLoading ? 'Generando...' : 'Generar aventura'}
+      nextDisabled={isLoading}
+      onNext={handleGenerate}
     >
       <WizardStepCard
         title="Resumen de tu aventura"
@@ -80,9 +102,17 @@ export default function Step6Page() {
             </CardContent>
           </Card>
 
-          <p className="text-xs text-muted-foreground text-center">
-            El botón estará activo cuando se implemente la generación con IA.
-          </p>
+          {message && (
+            <div
+              className={`p-4 rounded-lg text-sm ${
+                message.type === 'success'
+                  ? 'bg-green-50 text-green-800 border border-green-200'
+                  : 'bg-red-50 text-red-800 border border-red-200'
+              }`}
+            >
+              {message.text}
+            </div>
+          )}
         </div>
       </WizardStepCard>
     </WizardShell>
