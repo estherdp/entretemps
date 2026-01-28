@@ -69,7 +69,7 @@ export default function Step5Page() {
                       'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50',
                       isSelected
                         ? 'border-primary bg-primary/10 shadow-md shadow-primary/20'
-                        : 'border-border bg-white'
+                        : 'border-border bg-card'
                     )}
                     aria-pressed={isSelected}
                   >
@@ -114,7 +114,7 @@ export default function Step5Page() {
                       'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50',
                       isSelected
                         ? 'border-primary bg-primary/10 text-primary shadow-sm'
-                        : 'border-border bg-white text-foreground'
+                        : 'border-border bg-card text-foreground'
                     )}
                     aria-pressed={isSelected}
                   >

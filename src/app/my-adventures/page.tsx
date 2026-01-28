@@ -36,9 +36,9 @@ export default function MyAdventuresPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
-      <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
+      <div className="max-w-4xl mx-auto px-4 pt-20 pb-8 space-y-8">
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold">Mis Aventuras</h1>
+          <h1 className="text-3xl md:text-4xl font-bold">Mis Aventuras</h1>
           <Button onClick={() => router.push('/wizard/step-1')}>
             Nueva aventura
           </Button>

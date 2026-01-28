@@ -449,21 +449,12 @@ export default function AdventureDetailPage() {
               </Button>
             </>
           ) : (
-            <>
-              <Button
-                onClick={() => router.push('/my-adventures')}
-                variant="outline"
-                className="flex-1"
-              >
-                Volver a mis aventuras
-              </Button>
-              <Button
-                onClick={() => window.print()}
-                className="flex-1"
-              >
-                Imprimir Pack
-              </Button>
-            </>
+            <Button
+              onClick={() => window.print()}
+              className="w-full sm:w-auto"
+            >
+              Imprimir Pack
+            </Button>
           )}
         </div>
 

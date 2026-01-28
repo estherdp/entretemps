@@ -14,7 +14,7 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-gradient-to-b from-background to-muted/20">
       {/* Hero Section */}
-      <section className="px-4 py-12 md:py-16 text-center">
+      <section className="px-4 pt-20 pb-12 md:pt-24 md:pb-16 text-center">
         <h1 className="text-4xl md:text-5xl font-bold mb-4">
           Bienvenido a Entretemps
         </h1>
@@ -74,7 +74,7 @@ export default function Home() {
         )}
 
         {/* Plantillas */}
-        <section>
+        <section id="plantillas">
           <div className="mb-6">
             <h2 className="text-2xl md:text-3xl font-bold">Plantillas</h2>
             <p className="text-sm text-muted-foreground mt-1">

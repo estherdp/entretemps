@@ -228,9 +228,6 @@ export default function TemplateDetailPage() {
           )}
 
           <div className="flex flex-col sm:flex-row gap-4">
-            <Button onClick={() => router.push('/')} variant="outline" className="flex-1">
-              Volver al inicio
-            </Button>
             <Button
               onClick={handleSaveAsMyPack}
               disabled={isSaving}

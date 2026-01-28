@@ -22,7 +22,7 @@ export function WizardStepCard({
         </span>
 
         {/* Title */}
-        <h2 className="text-2xl font-semibold leading-tight tracking-tight text-foreground">
+        <h2 className="text-2xl md:text-3xl font-semibold leading-tight tracking-tight text-foreground">
           {title}
         </h2>
 
@@ -35,7 +35,7 @@ export function WizardStepCard({
       </div>
 
       {/* Card content */}
-      <div className="bg-white rounded-2xl p-5 shadow-sm border border-border/50">
+      <div className="bg-card rounded-2xl p-5 shadow-sm border border-border/50">
         {children}
       </div>
     </div>

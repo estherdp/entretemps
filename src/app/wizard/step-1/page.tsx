@@ -45,7 +45,7 @@ export default function Step1Page() {
                   'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50',
                   isSelected
                     ? 'border-primary bg-primary/10 shadow-md shadow-primary/20'
-                    : 'border-border bg-white'
+                    : 'border-border bg-card'
                 )}
                 aria-pressed={isSelected}
               >
