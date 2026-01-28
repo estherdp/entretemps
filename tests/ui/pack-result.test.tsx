@@ -3,6 +3,21 @@ import { render, screen } from '@testing-library/react'
 import PackResultPage from '@/app/pack/result/page'
 import type { GeneratedAdventurePack } from '@/domain/generated-adventure-pack'
 
+vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'https://test.supabase.co')
+vi.stubEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY', 'test-anon-key')
+
+vi.mock('@/infrastructure/supabase/auth', () => ({
+  getCurrentUser: vi.fn().mockResolvedValue(null),
+}))
+
+vi.mock('@/infrastructure/supabase/adventure-pack-repository', () => ({
+  AdventurePackRepository: vi.fn(),
+}))
+
+vi.mock('@/application/save-adventure-pack', () => ({
+  saveAdventurePack: vi.fn(),
+}))
+
 const mockPack: GeneratedAdventurePack = {
   id: 'pack-123',
   title: 'La Aventura de los Dinosaurios',

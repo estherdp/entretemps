@@ -1,58 +1,61 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useParams } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/components/card'
 import { Button } from '@/ui/components/button'
-import type { GeneratedAdventurePack } from '@/domain/generated-adventure-pack'
+import { SavedAdventurePack } from '@/domain/saved-adventure-pack'
+import { getCurrentUser } from '@/infrastructure/supabase/auth'
+import { AdventurePackRepository } from '@/infrastructure/supabase/adventure-pack-repository'
+import { getAdventurePackById } from '@/application/get-adventure-pack-by-id'
 import {
   ADVENTURE_TYPE_LABELS,
   TONE_LABELS,
   DIFFICULTY_LABELS,
   PLACE_LABELS,
 } from '@/ui/wizard/labels'
-import { getCurrentUser } from '@/infrastructure/supabase/auth'
-import { AdventurePackRepository } from '@/infrastructure/supabase/adventure-pack-repository'
-import { saveAdventurePack } from '@/application/save-adventure-pack'
 
-export default function PackResultPage() {
+export default function AdventureDetailPage() {
   const router = useRouter()
-  const [pack, setPack] = useState<GeneratedAdventurePack | null>(null)
+  const params = useParams()
+  const id = params.id as string
+
+  const [savedPack, setSavedPack] = useState<SavedAdventurePack | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-  const [isSaving, setIsSaving] = useState(false)
-  const [saved, setSaved] = useState(false)
-  const [saveError, setSaveError] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    const stored = sessionStorage.getItem('generated-adventure-pack')
-    if (stored) {
-      setPack(JSON.parse(stored))
-    }
-    setIsLoading(false)
-  }, [])
+    async function loadPack() {
+      try {
+        const user = await getCurrentUser()
+        if (!user) {
+          router.push('/login')
+          return
+        }
 
-  const handleSave = async () => {
-    if (!pack) return
+        const repository = new AdventurePackRepository()
+        const pack = await getAdventurePackById(id, repository)
 
-    setIsSaving(true)
-    setSaveError(null)
+        if (!pack) {
+          setError('Aventura no encontrada')
+          return
+        }
 
-    try {
-      const user = await getCurrentUser()
-      if (!user) {
-        router.push('/login')
-        return
+        if (pack.userId !== user.id) {
+          setError('No tienes permiso para ver esta aventura')
+          return
+        }
+
+        setSavedPack(pack)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Error al cargar la aventura')
+      } finally {
+        setIsLoading(false)
       }
-
-      const repository = new AdventurePackRepository()
-      await saveAdventurePack({ userId: user.id, pack }, repository)
-      setSaved(true)
-    } catch (err) {
-      setSaveError(err instanceof Error ? err.message : 'Error al guardar')
-    } finally {
-      setIsSaving(false)
     }
-  }
+
+    loadPack()
+  }, [id, router])
 
   if (isLoading) {
     return (
@@ -62,14 +65,18 @@ export default function PackResultPage() {
     )
   }
 
-  if (!pack) {
+  if (error || !savedPack) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4 p-4">
-        <p className="text-muted-foreground">No se encontró ninguna aventura generada.</p>
-        <Button onClick={() => router.push('/wizard/step-1')}>Crear nueva aventura</Button>
+        <p className="text-red-600">{error || 'Aventura no encontrada'}</p>
+        <Button onClick={() => router.push('/my-adventures')}>
+          Volver a mis aventuras
+        </Button>
       </div>
     )
   }
+
+  const pack = savedPack.pack
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
@@ -245,39 +252,26 @@ export default function PackResultPage() {
         {/* Actions */}
         <div className="flex flex-col sm:flex-row gap-4 pt-4">
           <Button
-            onClick={() => router.push('/wizard/step-1')}
+            onClick={() => router.push('/my-adventures')}
             variant="outline"
             className="flex-1"
           >
-            Crear nueva aventura
-          </Button>
-          <Button
-            onClick={handleSave}
-            disabled={isSaving || saved}
-            className="flex-1"
-          >
-            {saved ? '✓ Guardado' : isSaving ? 'Guardando...' : 'Guardar'}
+            Volver a mis aventuras
           </Button>
           <Button
             onClick={() => window.print()}
-            variant="outline"
             className="flex-1"
           >
             Imprimir Pack
           </Button>
         </div>
-        {saveError && (
-          <p className="text-sm text-red-600 text-center">{saveError}</p>
-        )}
 
         {/* Footer Info */}
         <p className="text-xs text-center text-muted-foreground pt-4">
-          Pack creado el {new Date(pack.createdAt).toLocaleDateString('es-ES', {
+          Pack guardado el {new Date(savedPack.createdAt).toLocaleDateString('es-ES', {
             year: 'numeric',
             month: 'long',
             day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
           })}
         </p>
       </div>

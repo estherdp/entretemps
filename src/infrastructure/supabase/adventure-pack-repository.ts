@@ -1,0 +1,78 @@
+import { supabase } from './supabase-client'
+import { GeneratedAdventurePack } from '@/domain/generated-adventure-pack'
+import { SavedAdventurePack } from '@/domain/saved-adventure-pack'
+
+export interface SaveAdventurePackParams {
+  userId: string
+  title: string
+  pack: GeneratedAdventurePack
+}
+
+export class AdventurePackRepository {
+  async save(params: SaveAdventurePackParams): Promise<SavedAdventurePack> {
+    const { data, error } = await supabase
+      .from('adventure_packs')
+      .insert({
+        user_id: params.userId,
+        title: params.title,
+        pack: params.pack,
+      })
+      .select()
+      .single()
+
+    if (error) {
+      throw new Error(`Error al guardar el pack: ${error.message}`)
+    }
+
+    return {
+      id: data.id,
+      userId: data.user_id,
+      title: data.title,
+      pack: data.pack,
+      createdAt: data.created_at,
+    }
+  }
+
+  async listByUserId(userId: string): Promise<SavedAdventurePack[]> {
+    const { data, error } = await supabase
+      .from('adventure_packs')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+
+    if (error) {
+      throw new Error(`Error al listar los packs: ${error.message}`)
+    }
+
+    return data.map((row) => ({
+      id: row.id,
+      userId: row.user_id,
+      title: row.title,
+      pack: row.pack,
+      createdAt: row.created_at,
+    }))
+  }
+
+  async getById(id: string): Promise<SavedAdventurePack | null> {
+    const { data, error } = await supabase
+      .from('adventure_packs')
+      .select('*')
+      .eq('id', id)
+      .single()
+
+    if (error) {
+      if (error.code === 'PGRST116') {
+        return null
+      }
+      throw new Error(`Error al obtener el pack: ${error.message}`)
+    }
+
+    return {
+      id: data.id,
+      userId: data.user_id,
+      title: data.title,
+      pack: data.pack,
+      createdAt: data.created_at,
+    }
+  }
+}
