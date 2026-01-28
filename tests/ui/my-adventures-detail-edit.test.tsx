@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import AdventureDetailPage from '@/app/my-adventures/[id]/page'
+import { RepositoryProvider } from '@/ui/providers/repository-provider'
 
 // Mock Next.js navigation
 const mockPush = vi.fn()
@@ -13,20 +14,39 @@ vi.mock('next/navigation', () => ({
 }))
 
 // Mock Supabase auth
-vi.mock('@/infrastructure/supabase/auth', () => ({
-  getCurrentUser: vi.fn().mockResolvedValue({ id: 'user-123', email: 'test@test.com' }),
+vi.mock('@/infrastructure/services/auth-service', () => ({
+  createAuthService: vi.fn(() => ({
+    getCurrentUser: vi.fn().mockResolvedValue({ id: 'user-123', email: 'test@test.com' }),
+  })),
+  SupabaseAuthService: vi.fn().mockImplementation(() => ({
+    getCurrentUser: vi.fn().mockResolvedValue({ id: 'user-123', email: 'test@test.com' }),
+  })),
 }))
 
 // Mock repository
 const mockGetById = vi.fn()
 const mockUpdatePackJson = vi.fn()
 
-vi.mock('@/infrastructure/supabase/adventure-pack-repository', () => ({
-  AdventurePackRepository: vi.fn().mockImplementation(() => ({
-    getById: mockGetById,
-    updatePackJson: mockUpdatePackJson,
-  })),
-}))
+vi.mock('@/infrastructure/supabase/adventure-pack-repository', () => {
+  // Necesitamos exportar una clase real, no solo una función
+  class MockAdventurePackRepository {
+    getById = mockGetById
+    updatePackJson = mockUpdatePackJson
+  }
+  
+  return {
+    AdventurePackRepository: MockAdventurePackRepository
+  }
+})
+
+// Helper to render with providers
+function renderWithProviders(component: React.ReactElement) {
+  return render(
+    <RepositoryProvider>
+      {component}
+    </RepositoryProvider>
+  )
+}
 
 describe('AdventureDetailPage - Edit Mode', () => {
   beforeEach(() => {
@@ -75,7 +95,7 @@ describe('AdventureDetailPage - Edit Mode', () => {
 
   it('should show textarea when edit mode is activated', async () => {
     const user = userEvent.setup()
-    render(<AdventureDetailPage />)
+    renderWithProviders(<AdventureDetailPage />)
 
     // Wait for pack to load
     await waitFor(() => {
@@ -119,7 +139,7 @@ describe('AdventureDetailPage - Edit Mode', () => {
 
   it('should hide edit button when in edit mode', async () => {
     const user = userEvent.setup()
-    render(<AdventureDetailPage />)
+    renderWithProviders(<AdventureDetailPage />)
 
     await waitFor(() => {
       expect(screen.getByText('Test Adventure')).toBeInTheDocument()
@@ -135,7 +155,7 @@ describe('AdventureDetailPage - Edit Mode', () => {
 
   it('should restore original values when cancel is clicked', async () => {
     const user = userEvent.setup()
-    render(<AdventureDetailPage />)
+    renderWithProviders(<AdventureDetailPage />)
 
     await waitFor(() => {
       expect(screen.getByText('Test Adventure')).toBeInTheDocument()
@@ -173,7 +193,7 @@ describe('AdventureDetailPage - Edit Mode', () => {
 
   it('should allow editing title and image URL', async () => {
     const user = userEvent.setup()
-    render(<AdventureDetailPage />)
+    renderWithProviders(<AdventureDetailPage />)
 
     await waitFor(() => {
       expect(screen.getByText('Test Adventure')).toBeInTheDocument()

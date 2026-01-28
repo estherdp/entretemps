@@ -1,41 +1,21 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/components/card'
 import { Button } from '@/ui/components/button'
-import { SavedAdventurePack } from '@/domain/saved-adventure-pack'
-import { getCurrentUser } from '@/infrastructure/supabase/auth'
-import { AdventurePackRepository } from '@/infrastructure/supabase/adventure-pack-repository'
-import { listMyAdventurePacks } from '@/application/list-my-adventure-packs'
+import { useMyAdventurePacks } from '@/ui/hooks/use-my-adventure-packs'
 
 export default function MyAdventuresPage() {
   const router = useRouter()
-  const [packs, setPacks] = useState<SavedAdventurePack[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const { packs, isLoading, error, needsAuth } = useMyAdventurePacks()
 
+  // Redirect if needs authentication
   useEffect(() => {
-    async function loadPacks() {
-      try {
-        const user = await getCurrentUser()
-        if (!user) {
-          router.push('/login')
-          return
-        }
-
-        const repository = new AdventurePackRepository()
-        const userPacks = await listMyAdventurePacks(user.id, repository)
-        setPacks(userPacks)
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Error al cargar packs')
-      } finally {
-        setIsLoading(false)
-      }
+    if (needsAuth) {
+      router.push('/login')
     }
-
-    loadPacks()
-  }, [router])
+  }, [needsAuth, router])
 
   if (isLoading) {
     return (

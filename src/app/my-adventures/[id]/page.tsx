@@ -7,9 +7,8 @@ import { Button } from '@/ui/components/button'
 import { Textarea } from '@/ui/components/textarea'
 import { Input } from '@/ui/components/input'
 import { SavedAdventurePack } from '@/domain/saved-adventure-pack'
-import { getCurrentUser } from '@/infrastructure/supabase/auth'
-import { AdventurePackRepository } from '@/infrastructure/supabase/adventure-pack-repository'
-import { getAdventurePackById } from '@/application/get-adventure-pack-by-id'
+import { useUserPackDetails } from '@/ui/hooks/use-user-pack-details'
+import { useRepositories } from '@/ui/providers/repository-provider'
 import { updateMyPackText, PackTextChanges } from '@/application/update-my-pack-text'
 import { duplicateMyPack } from '@/application/duplicate-my-pack'
 import {
@@ -23,10 +22,9 @@ export default function AdventureDetailPage() {
   const router = useRouter()
   const params = useParams()
   const id = params.id as string
-
-  const [savedPack, setSavedPack] = useState<SavedAdventurePack | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  
+  const { pack: savedPack, isLoading, error, needsAuth } = useUserPackDetails(id)
+  const { adventurePackRepository } = useRepositories()
 
   // Edit mode states
   const [isEditing, setIsEditing] = useState(false)
@@ -42,51 +40,29 @@ export default function AdventureDetailPage() {
   const [missionsStory, setMissionsStory] = useState<Record<number, string>>({})
   const [conclusionStory, setConclusionStory] = useState('')
 
+  // Redirect if needs authentication
   useEffect(() => {
-    async function loadPack() {
-      try {
-        const user = await getCurrentUser()
-        if (!user) {
-          router.push('/login')
-          return
-        }
-
-        const repository = new AdventurePackRepository()
-        const pack = await getAdventurePackById(id, repository)
-
-        if (!pack) {
-          setError('Aventura no encontrada')
-          return
-        }
-
-        if (pack.userId !== user.id) {
-          setError('No tienes permiso para ver esta aventura')
-          return
-        }
-
-        setSavedPack(pack)
-
-        // Initialize editable fields
-        setTitle(pack.pack.title)
-        setImageUrl(pack.pack.image.url)
-        setIntroStory(pack.pack.introduction.story)
-        setIntroSetupForParents(pack.pack.introduction.setupForParents)
-        setConclusionStory(pack.pack.conclusion.story)
-
-        const missionsMap: Record<number, string> = {}
-        pack.pack.missions.forEach((mission) => {
-          missionsMap[mission.order] = mission.story
-        })
-        setMissionsStory(missionsMap)
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Error al cargar la aventura')
-      } finally {
-        setIsLoading(false)
-      }
+    if (needsAuth) {
+      router.push('/login')
     }
+  }, [needsAuth, router])
 
-    loadPack()
-  }, [id, router])
+  // Initialize editable fields when pack is loaded
+  useEffect(() => {
+    if (savedPack) {
+      setTitle(savedPack.pack.title)
+      setImageUrl(savedPack.pack.image.url)
+      setIntroStory(savedPack.pack.introduction.story)
+      setIntroSetupForParents(savedPack.pack.introduction.setupForParents)
+      setConclusionStory(savedPack.pack.conclusion.story)
+
+      const missionsMap: Record<number, string> = {}
+      savedPack.pack.missions.forEach((mission) => {
+        missionsMap[mission.order] = mission.story
+      })
+      setMissionsStory(missionsMap)
+    }
+  }, [savedPack])
 
   const handleSaveChanges = async () => {
     if (!savedPack) return
@@ -94,12 +70,6 @@ export default function AdventureDetailPage() {
     try {
       setIsSaving(true)
       setSaveError(null)
-
-      const user = await getCurrentUser()
-      if (!user) {
-        router.push('/login')
-        return
-      }
 
       const changes: PackTextChanges = {
         title: title,
@@ -113,10 +83,14 @@ export default function AdventureDetailPage() {
         })),
       }
 
-      const repository = new AdventurePackRepository()
-      const updatedPack = await updateMyPackText(id, user.id, changes, repository)
+      const updatedPack = await updateMyPackText(
+        id,
+        savedPack.userId,
+        changes,
+        adventurePackRepository
+      )
 
-      setSavedPack(updatedPack)
+      // Refrescamos el estado (opcional: podrías recargar del hook)
       setIsEditing(false)
     } catch (err) {
       setSaveError(err instanceof Error ? err.message : 'Error al guardar los cambios')
@@ -132,14 +106,11 @@ export default function AdventureDetailPage() {
       setIsDuplicating(true)
       setSaveError(null)
 
-      const user = await getCurrentUser()
-      if (!user) {
-        router.push('/login')
-        return
-      }
-
-      const repository = new AdventurePackRepository()
-      const newPack = await duplicateMyPack(id, user.id, repository)
+      const newPack = await duplicateMyPack(
+        id,
+        savedPack.userId,
+        adventurePackRepository
+      )
 
       router.push(`/my-adventures/${newPack.id}`)
     } catch (err) {

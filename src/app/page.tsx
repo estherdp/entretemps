@@ -1,50 +1,15 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/ui/components/button'
 import { AdventureCard } from '@/ui/components/adventure-card'
-import { getCurrentUser } from '@/infrastructure/supabase/auth'
-import { listMyAdventurePacks } from '@/application/list-my-adventure-packs'
-import { AdventurePackRepository } from '@/infrastructure/supabase/adventure-pack-repository'
-import { listTemplates } from '@/application/list-templates'
-import type { SavedAdventurePack } from '@/domain/saved-adventure-pack'
-import type { TemplateListItem } from '@/application/list-templates'
+import { useHomeData } from '@/ui/hooks/use-home-data'
 
 export default function Home() {
   const router = useRouter()
-  const [myAdventures, setMyAdventures] = useState<SavedAdventurePack[]>([])
-  const [templates, setTemplates] = useState<TemplateListItem[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [hasUser, setHasUser] = useState(false)
+  const { data, isLoading } = useHomeData(6)
 
-  useEffect(() => {
-    const loadData = async () => {
-      setIsLoading(true)
-
-      // Cargar plantillas (siempre disponibles)
-      const templatesList = listTemplates()
-      setTemplates(templatesList)
-
-      // Cargar aventuras del usuario si está autenticado
-      try {
-        const user = await getCurrentUser()
-        if (user) {
-          setHasUser(true)
-          const repository = new AdventurePackRepository()
-          const adventures = await listMyAdventurePacks(user.id, repository)
-          // Mostrar solo las últimas 6
-          setMyAdventures(adventures.slice(0, 6))
-        }
-      } catch (error) {
-        console.error('Error al cargar aventuras:', error)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    loadData()
-  }, [])
+  const { templates, myAdventures, hasUser } = data
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-background to-muted/20">

@@ -5,9 +5,7 @@ import { useRouter, useParams } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/components/card'
 import { Button } from '@/ui/components/button'
 import { getTemplateById } from '@/application/get-template-by-id'
-import { saveTemplateAsMyPack } from '@/application/save-template-as-my-pack'
-import { getCurrentUser } from '@/infrastructure/supabase/auth'
-import { AdventurePackRepository } from '@/infrastructure/supabase/adventure-pack-repository'
+import { useSaveTemplateAsMyPack } from '@/ui/hooks/use-save-template'
 import type { GeneratedAdventurePack } from '@/domain/generated-adventure-pack'
 import {
   ADVENTURE_TYPE_LABELS,
@@ -21,8 +19,8 @@ export default function TemplateDetailPage() {
   const params = useParams()
   const [pack, setPack] = useState<GeneratedAdventurePack | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-  const [isSaving, setIsSaving] = useState(false)
-  const [saveError, setSaveError] = useState<string | null>(null)
+  
+  const { saveTemplate, isSaving, error: saveError } = useSaveTemplateAsMyPack()
 
   useEffect(() => {
     const templateId = params.id as string
@@ -34,26 +32,13 @@ export default function TemplateDetailPage() {
   const handleSaveAsMyPack = async () => {
     if (!pack) return
 
-    try {
-      setIsSaving(true)
-      setSaveError(null)
-
-      const user = await getCurrentUser()
-      if (!user) {
-        router.push('/login')
-        return
-      }
-
-      const repository = new AdventurePackRepository()
-      const savedPack = await saveTemplateAsMyPack(user.id, pack, repository)
-
+    const savedPack = await saveTemplate(pack)
+    
+    if (savedPack) {
       router.push(`/my-adventures/${savedPack.id}`)
-    } catch (error) {
-      setSaveError(
-        error instanceof Error ? error.message : 'Error al guardar la plantilla'
-      )
-    } finally {
-      setIsSaving(false)
+    } else if (!saveError) {
+      // Si no hay pack ni error explícito, probablemente necesita auth
+      router.push('/login')
     }
   }
 

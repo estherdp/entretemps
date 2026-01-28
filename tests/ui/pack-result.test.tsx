@@ -1,13 +1,19 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import PackResultPage from '@/app/pack/result/page'
+import { RepositoryProvider } from '@/ui/providers/repository-provider'
 import type { GeneratedAdventurePack } from '@/domain/generated-adventure-pack'
 
 vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'https://test.supabase.co')
 vi.stubEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY', 'test-anon-key')
 
-vi.mock('@/infrastructure/supabase/auth', () => ({
-  getCurrentUser: vi.fn().mockResolvedValue(null),
+vi.mock('@/infrastructure/services/auth-service', () => ({
+  createAuthService: vi.fn(() => ({
+    getCurrentUser: vi.fn().mockResolvedValue(null),
+  })),
+  SupabaseAuthService: vi.fn().mockImplementation(() => ({
+    getCurrentUser: vi.fn().mockResolvedValue(null),
+  })),
 }))
 
 vi.mock('@/infrastructure/supabase/adventure-pack-repository', () => ({
@@ -17,6 +23,15 @@ vi.mock('@/infrastructure/supabase/adventure-pack-repository', () => ({
 vi.mock('@/application/save-adventure-pack', () => ({
   saveAdventurePack: vi.fn(),
 }))
+
+// Helper to render with providers
+function renderWithProviders(component: React.ReactElement) {
+  return render(
+    <RepositoryProvider>
+      {component}
+    </RepositoryProvider>
+  )
+}
 
 const mockPack: GeneratedAdventurePack = {
   id: 'pack-123',
@@ -72,7 +87,7 @@ describe('PackResultPage', () => {
   })
 
   it('should show error message when no pack in storage', async () => {
-    render(<PackResultPage />)
+    renderWithProviders(<PackResultPage />)
 
     await screen.findByText('No se encontró ninguna aventura generada.')
     expect(screen.getByText('Crear nueva aventura')).toBeInTheDocument()
@@ -81,7 +96,7 @@ describe('PackResultPage', () => {
   it('should display pack title when pack is loaded', async () => {
     sessionStorage.setItem('generated-adventure-pack', JSON.stringify(mockPack))
 
-    render(<PackResultPage />)
+    renderWithProviders(<PackResultPage />)
 
     await screen.findByText('La Aventura de los Dinosaurios')
   })
@@ -89,7 +104,7 @@ describe('PackResultPage', () => {
   it('should display key information correctly', async () => {
     sessionStorage.setItem('generated-adventure-pack', JSON.stringify(mockPack))
 
-    render(<PackResultPage />)
+    renderWithProviders(<PackResultPage />)
 
     await screen.findByText('6-10 años')
     expect(screen.getByText('60 min')).toBeInTheDocument()
@@ -100,7 +115,7 @@ describe('PackResultPage', () => {
   it('should display introduction story', async () => {
     sessionStorage.setItem('generated-adventure-pack', JSON.stringify(mockPack))
 
-    render(<PackResultPage />)
+    renderWithProviders(<PackResultPage />)
 
     await screen.findByText('Érase una vez, en un mundo lleno de dinosaurios...')
   })
@@ -108,7 +123,7 @@ describe('PackResultPage', () => {
   it('should display all materials', async () => {
     sessionStorage.setItem('generated-adventure-pack', JSON.stringify(mockPack))
 
-    render(<PackResultPage />)
+    renderWithProviders(<PackResultPage />)
 
     await screen.findByText('Papel')
     expect(screen.getByText('Lápices')).toBeInTheDocument()
@@ -118,7 +133,7 @@ describe('PackResultPage', () => {
   it('should display missions in correct order', async () => {
     sessionStorage.setItem('generated-adventure-pack', JSON.stringify(mockPack))
 
-    render(<PackResultPage />)
+    renderWithProviders(<PackResultPage />)
 
     await screen.findByText('Descubrir el primer fósil')
     expect(screen.getByText('Resolver el enigma')).toBeInTheDocument()
@@ -127,7 +142,7 @@ describe('PackResultPage', () => {
   it('should display mission details', async () => {
     sessionStorage.setItem('generated-adventure-pack', JSON.stringify(mockPack))
 
-    render(<PackResultPage />)
+    renderWithProviders(<PackResultPage />)
 
     await screen.findByText('Los niños deben encontrar el primer fósil escondido.')
     expect(screen.getByText('Esconde el fósil en un lugar visible pero no obvio.')).toBeInTheDocument()
@@ -137,7 +152,7 @@ describe('PackResultPage', () => {
   it('should display conclusion', async () => {
     sessionStorage.setItem('generated-adventure-pack', JSON.stringify(mockPack))
 
-    render(<PackResultPage />)
+    renderWithProviders(<PackResultPage />)
 
     await screen.findByText('Y así, los valientes exploradores completaron su misión.')
     expect(screen.getByText('Celebrad con una fiesta de dinosaurios y diplomas.')).toBeInTheDocument()
@@ -146,7 +161,7 @@ describe('PackResultPage', () => {
   it('should display action buttons', async () => {
     sessionStorage.setItem('generated-adventure-pack', JSON.stringify(mockPack))
 
-    render(<PackResultPage />)
+    renderWithProviders(<PackResultPage />)
 
     await screen.findByText('La Aventura de los Dinosaurios')
     expect(screen.getByRole('button', { name: 'Crear nueva aventura' })).toBeInTheDocument()

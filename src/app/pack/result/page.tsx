@@ -11,17 +11,14 @@ import {
   DIFFICULTY_LABELS,
   PLACE_LABELS,
 } from '@/ui/wizard/labels'
-import { getCurrentUser } from '@/infrastructure/supabase/auth'
-import { AdventurePackRepository } from '@/infrastructure/supabase/adventure-pack-repository'
-import { saveAdventurePack } from '@/application/save-adventure-pack'
+import { useSaveAdventurePack } from '@/ui/hooks/use-save-adventure-pack'
 
 export default function PackResultPage() {
   const router = useRouter()
   const [pack, setPack] = useState<GeneratedAdventurePack | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-  const [isSaving, setIsSaving] = useState(false)
-  const [saved, setSaved] = useState(false)
-  const [saveError, setSaveError] = useState<string | null>(null)
+  
+  const { save, isSaving, saved, error: saveError } = useSaveAdventurePack()
 
   useEffect(() => {
     const stored = sessionStorage.getItem('generated-adventure-pack')
@@ -34,23 +31,9 @@ export default function PackResultPage() {
   const handleSave = async () => {
     if (!pack) return
 
-    setIsSaving(true)
-    setSaveError(null)
-
-    try {
-      const user = await getCurrentUser()
-      if (!user) {
-        router.push('/login')
-        return
-      }
-
-      const repository = new AdventurePackRepository()
-      await saveAdventurePack({ userId: user.id, pack }, repository)
-      setSaved(true)
-    } catch (err) {
-      setSaveError(err instanceof Error ? err.message : 'Error al guardar')
-    } finally {
-      setIsSaving(false)
+    const success = await save(pack)
+    if (!success && saveError?.includes('iniciar sesión')) {
+      router.push('/login')
     }
   }
 
