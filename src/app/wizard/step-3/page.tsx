@@ -6,6 +6,7 @@ import { WizardStepCard } from '@/ui/components/wizard-step-card'
 import { Label } from '@/ui/components/label'
 import { Textarea } from '@/ui/components/textarea'
 import { Button } from '@/ui/components/button'
+import { validateStep3 } from '@/application/validate-wizard-step'
 
 import { useWizard } from '@/ui/wizard/wizard-provider'
 
@@ -28,7 +29,7 @@ function normalizeTerms(value: string): string[] {
 export default function Step3Page() {
   const {wizardData, setWizardData} = useWizard()
   const interests = wizardData.interests ?? ''
-
+  const validation = validateStep3(wizardData)
 
   const handleChipClick = (chip: string) => {
     const current = interests
@@ -46,6 +47,8 @@ export default function Step3Page() {
       totalSteps={6}
       prevHref="/wizard/step-2"
       nextHref="/wizard/step-4"
+      nextDisabled={!validation.isValid}
+      validationMessage={!validation.isValid ? validation.message : undefined}
     >
       <WizardStepCard
         title="¿Qué le encanta al/la protagonista?"

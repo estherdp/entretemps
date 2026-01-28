@@ -5,6 +5,7 @@ import { WizardShell } from '@/ui/components/wizard-shell'
 import { WizardStepCard } from '@/ui/components/wizard-step-card'
 import { Home, Flower2, Trees, Building, Compass, LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { validateStep4 } from '@/application/validate-wizard-step'
 
 import type { Place } from '@/domain/wizard-data'
 import { useWizard } from '@/ui/wizard/wizard-provider'
@@ -20,6 +21,7 @@ const LOCATION_OPTIONS :{ value: Place; label: string; subtitle: string; icon: L
 export default function Step4Page() {
   const {wizardData, setWizardData} = useWizard()
   const selected = wizardData.place || null
+  const validation = validateStep4(wizardData)
 
   return (
     <WizardShell
@@ -27,6 +29,8 @@ export default function Step4Page() {
       totalSteps={6}
       prevHref="/wizard/step-3"
       nextHref="/wizard/step-5"
+      nextDisabled={!validation.isValid}
+      validationMessage={!validation.isValid ? validation.message : undefined}
     >
       <WizardStepCard
         title="¿Dónde será la aventura?"

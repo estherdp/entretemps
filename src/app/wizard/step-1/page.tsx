@@ -4,6 +4,7 @@ import { WizardShell } from '@/ui/components/wizard-shell'
 import { WizardStepCard } from '@/ui/components/wizard-step-card'
 import { Cake, Users, PartyPopper, Mountain, LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { validateStep1 } from '@/application/validate-wizard-step'
 
 import type { Occasion } from '@/domain/wizard-data'
 import { useWizard } from '@/ui/wizard/wizard-provider'
@@ -18,12 +19,15 @@ const OCCASION_OPTIONS: { value: Occasion; label: string; icon: LucideIcon }[] =
 export default function Step1Page() {
   const {wizardData, setWizardData} = useWizard()
   const selected = wizardData.occasion || null
+  const validation = validateStep1(wizardData)
 
   return (
     <WizardShell
       currentStep={1}
       totalSteps={6}
       nextHref="/wizard/step-2"
+      nextDisabled={!validation.isValid}
+      validationMessage={!validation.isValid ? validation.message : undefined}
     >
       <WizardStepCard
         title="¿Qué ocasión celebráis?"

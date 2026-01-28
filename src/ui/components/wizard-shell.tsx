@@ -11,6 +11,7 @@ interface WizardShellProps {
   nextLabel?: string
   nextDisabled?: boolean
   onNext?: () => void
+  validationMessage?: string
 }
 
 export function WizardShell({
@@ -22,6 +23,7 @@ export function WizardShell({
   nextLabel = 'Siguiente',
   nextDisabled = false,
   onNext,
+  validationMessage,
 }: WizardShellProps) {
   const progressValue = (currentStep / totalSteps) * 100
 
@@ -49,28 +51,35 @@ export function WizardShell({
           </div>
 
           {/* Desktop navigation buttons (hidden on mobile) */}
-          <div className="hidden lg:flex gap-3">
-            {prevHref ? (
-              <Button variant="outline" asChild>
-                <Link href={prevHref}>Atrás</Link>
-              </Button>
-            ) : null}
-            <div className="flex-1 flex justify-end">
-              {nextHref ? (
-                <Button
-                  asChild
-                  disabled={nextDisabled}
-                >
-                  <Link href={nextDisabled ? '#' : nextHref}>{nextLabel}</Link>
+          <div className="hidden lg:block space-y-3">
+            {validationMessage && (
+              <div className="text-sm text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 px-4 py-3 rounded-lg border border-amber-200 dark:border-amber-900">
+                {validationMessage}
+              </div>
+            )}
+            <div className="flex gap-3">
+              {prevHref ? (
+                <Button variant="outline" asChild>
+                  <Link href={prevHref}>Atrás</Link>
                 </Button>
-              ) : (
-                <Button
-                  disabled={nextDisabled}
-                  onClick={onNext}
-                >
-                  {nextLabel}
-                </Button>
-              )}
+              ) : null}
+              <div className="flex-1 flex justify-end">
+                {nextHref ? (
+                  <Button
+                    asChild
+                    disabled={nextDisabled}
+                  >
+                    <Link href={nextDisabled ? '#' : nextHref}>{nextLabel}</Link>
+                  </Button>
+                ) : (
+                  <Button
+                    disabled={nextDisabled}
+                    onClick={onNext}
+                  >
+                    {nextLabel}
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -78,7 +87,12 @@ export function WizardShell({
 
       {/* Mobile sticky footer (hidden on desktop) */}
       <div className="fixed bottom-0 left-0 right-0 lg:hidden bg-background/90 backdrop-blur-xl border-t border-border/40 shadow-[0_-4px_20px_-4px_rgba(0,0,0,0.05)]">
-        <div className="px-6 py-4 pb-8">
+        <div className="px-6 py-4 pb-8 space-y-3">
+          {validationMessage && (
+            <div className="text-sm text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 px-4 py-3 rounded-lg border border-amber-200 dark:border-amber-900">
+              {validationMessage}
+            </div>
+          )}
           <div className="flex gap-3">
             {prevHref ? (
               <Button variant="outline" asChild className="flex-1 h-12">

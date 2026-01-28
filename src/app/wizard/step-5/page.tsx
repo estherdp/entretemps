@@ -5,6 +5,7 @@ import { WizardStepCard } from '@/ui/components/wizard-step-card'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/ui/components/card'
 import { Search, Compass, Sparkles, Zap, Smile, LucideIcon, CheckCircle2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { validateStep5 } from '@/application/validate-wizard-step'
 
 import type {AdventureType, Tone, Difficulty} from '@/domain/wizard-data'
 import { useWizard } from '@/ui/wizard/wizard-provider'
@@ -41,6 +42,7 @@ export default function Step5Page() {
   const adventure = wizardData.adventureType || null
   const tone = wizardData.tone || null
   const difficulty = wizardData.difficulty || null
+  const validation = validateStep5(wizardData)
 
   // Check if all selections are made
   const allSelected = adventure && tone && difficulty
@@ -51,6 +53,8 @@ export default function Step5Page() {
       totalSteps={6}
       prevHref="/wizard/step-4"
       nextHref="/wizard/step-6"
+      nextDisabled={!validation.isValid}
+      validationMessage={!validation.isValid ? validation.message : undefined}
     >
       <WizardStepCard
         title="Demos forma a la historia"

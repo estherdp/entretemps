@@ -4,6 +4,7 @@ import { WizardShell } from '@/ui/components/wizard-shell'
 import { WizardStepCard } from '@/ui/components/wizard-step-card'
 import { Label } from '@/ui/components/label'
 import { Input } from '@/ui/components/input'
+import { validateStep2 } from '@/application/validate-wizard-step'
 
 import {useWizard} from '@/ui/wizard/wizard-provider'
 
@@ -11,7 +12,8 @@ export default function Step2Page() {
   const {wizardData, setWizardData} = useWizard()
   const ageMin = wizardData.ages?.min ?? ''
   const ageMax = wizardData.ages?.max ?? ''
-  const numChildren = wizardData.kidsCount ?? ''  
+  const numChildren = wizardData.kidsCount ?? ''
+  const validation = validateStep2(wizardData)
 
   return (
     <WizardShell
@@ -19,6 +21,8 @@ export default function Step2Page() {
       totalSteps={6}
       prevHref="/wizard/step-1"
       nextHref="/wizard/step-3"
+      nextDisabled={!validation.isValid}
+      validationMessage={!validation.isValid ? validation.message : undefined}
     >
       <WizardStepCard
         title="¿Qué edades tienen los niños?"
