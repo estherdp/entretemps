@@ -7,6 +7,7 @@ vi.mock('@/infrastructure/supabase/supabase-client', () => ({
     auth: {
       signInWithOtp: vi.fn(),
       getUser: vi.fn(),
+      getSession: vi.fn(),
       signOut: vi.fn(),
       onAuthStateChange: vi.fn(),
     },
@@ -40,18 +41,42 @@ describe('Auth Helper', () => {
         error: { message: 'Invalid email' },
       } as never)
 
-      await expect(signInWithEmail('invalid')).rejects.toThrow('Error al enviar el enlace')
+      await expect(signInWithEmail('invalid')).rejects.toThrow('El email introducido no es válido.')
+    })
+
+    it('should throw rate limit error with friendly message', async () => {
+      const mockSignInWithOtp = vi.spyOn(supabaseClient.supabase.auth, 'signInWithOtp')
+      mockSignInWithOtp.mockResolvedValue({
+        data: {},
+        error: { message: 'email rate limit exceeded' },
+      } as never)
+
+      await expect(signInWithEmail('test@example.com')).rejects.toThrow(
+        'Has solicitado demasiados enlaces. Por favor, espera unos minutos e inténtalo de nuevo.'
+      )
+    })
+
+    it('should throw generic error for unknown errors', async () => {
+      const mockSignInWithOtp = vi.spyOn(supabaseClient.supabase.auth, 'signInWithOtp')
+      mockSignInWithOtp.mockResolvedValue({
+        data: {},
+        error: { message: 'Unknown error' },
+      } as never)
+
+      await expect(signInWithEmail('test@example.com')).rejects.toThrow('Error al enviar el enlace: Unknown error')
     })
   })
 
   describe('getCurrentUser', () => {
     it('should return user when authenticated', async () => {
-      const mockGetUser = vi.spyOn(supabaseClient.supabase.auth, 'getUser')
-      mockGetUser.mockResolvedValue({
+      const mockGetSession = vi.spyOn(supabaseClient.supabase.auth, 'getSession')
+      mockGetSession.mockResolvedValue({
         data: {
-          user: {
-            id: 'user-123',
-            email: 'test@example.com',
+          session: {
+            user: {
+              id: 'user-123',
+              email: 'test@example.com',
+            },
           },
         },
       } as never)
@@ -65,9 +90,9 @@ describe('Auth Helper', () => {
     })
 
     it('should return null when not authenticated', async () => {
-      const mockGetUser = vi.spyOn(supabaseClient.supabase.auth, 'getUser')
-      mockGetUser.mockResolvedValue({
-        data: { user: null },
+      const mockGetSession = vi.spyOn(supabaseClient.supabase.auth, 'getSession')
+      mockGetSession.mockResolvedValue({
+        data: { session: null },
       } as never)
 
       const user = await getCurrentUser()

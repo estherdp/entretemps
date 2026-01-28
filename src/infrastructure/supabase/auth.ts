@@ -5,27 +5,41 @@ export async function signInWithEmail(email: string): Promise<void> {
   const { error } = await supabase.auth.signInWithOtp({
     email,
     options: {
-      emailRedirectTo: `${window.location.origin}/`,
+      emailRedirectTo: `${window.location.origin}/auth/callback`,
     },
   })
 
   if (error) {
+    // Manejo específico de rate limit
+    if (error.message.includes('rate limit')) {
+      throw new Error(
+        'Has solicitado demasiados enlaces. Por favor, espera unos minutos e inténtalo de nuevo.'
+      )
+    }
+
+    // Manejo específico de email inválido
+    if (error.message.includes('invalid') || error.message.includes('valid email')) {
+      throw new Error('El email introducido no es válido.')
+    }
+
+    // Error genérico
     throw new Error(`Error al enviar el enlace: ${error.message}`)
   }
 }
 
 export async function getCurrentUser(): Promise<User | null> {
+  // Primero obtener la sesión (esto carga desde localStorage si existe)
   const {
-    data: { user },
-  } = await supabase.auth.getUser()
+    data: { session },
+  } = await supabase.auth.getSession()
 
-  if (!user) {
+  if (!session) {
     return null
   }
 
   return {
-    id: user.id,
-    email: user.email || '',
+    id: session.user.id,
+    email: session.user.email || '',
   }
 }
 
