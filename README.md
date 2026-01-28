@@ -1,37 +1,203 @@
 # Entretemps
 
-Generador de aventuras personalizadas para fiestas infantiles. Un wizard guía al usuario para configurar la aventura y genera un pack completo con historia, puzzles y materiales imprimibles.
+## Descripción general
 
-## Stack
+**Entretemps** es una aplicación web interactiva que permite a padres, educadores y organizadores de eventos crear aventuras personalizadas para fiestas y actividades infantiles. A través de un wizard intuitivo de 6 pasos, los usuarios configuran todos los aspectos de su aventura (ocasión, participantes, intereses, ubicación, tono y dificultad) y la aplicación genera automáticamente un pack completo que incluye:
 
-- **Framework**: Next.js 16 (App Router) + TypeScript
-- **Estilos**: Tailwind CSS + shadcn/ui
-- **BD/Auth**: Supabase
-- **Tests**: Vitest + Testing Library
-- **Package Manager**: pnpm
+- Una historia narrativa con personajes y ambientación
+- 3 fases de juego con 6 puzzles sin pantallas
+- Guía de preparación paso a paso
+- Materiales imprimibles listos para usar
+
+El objetivo es facilitar la organización de actividades lúdicas y educativas que promuevan el juego activo, la resolución de problemas y la creatividad, sin depender de dispositivos electrónicos.
+
+## Stack tecnológico
+
+### Frontend
+- **Framework**: Next.js 16 (App Router) - Framework React con renderizado del lado del servidor
+- **Lenguaje**: TypeScript - Tipado estático para mayor seguridad y mantenibilidad
+- **Estilos**: Tailwind CSS 4 - Framework de utilidades CSS
+- **Componentes UI**: shadcn/ui - Componentes accesibles basados en Radix UI
+- **Iconos**: Lucide React - Biblioteca de iconos
+
+### Backend y Servicios
+- **Base de datos**: Supabase - Base de datos PostgreSQL con API REST autogenerada
+- **Autenticación**: Supabase Auth - Sistema de autenticación con proveedores sociales
+- **Generación de contenido**: n8n webhook - Workflow de automatización para generación de aventuras
+- **Generación de PDF**: @react-pdf/renderer - Creación de documentos PDF desde React
+
+### Desarrollo y Testing
+- **Tests**: Vitest - Framework de testing unitario y de integración
+- **Testing Library**: @testing-library/react - Utilidades para testing de componentes React
+- **Validación**: Zod - Validación de esquemas y tipos en runtime
+- **Linting**: ESLint - Análisis estático de código
+- **Package Manager**: pnpm - Gestor de paquetes eficiente
+
+## Instalación y ejecución
+
+### Requisitos previos
+
+- Node.js 20 o superior
+- pnpm 8 o superior
+- Cuenta de Supabase (gratuita)
+- Cuenta de n8n o webhook alternativo (opcional para generación real de contenido)
+
+### 1. Clonar el repositorio
+
+```bash
+git clone <repository-url>
+cd entretemps
+```
+
+### 2. Instalar dependencias
+
+```bash
+pnpm install
+```
+
+### 3. Configurar variables de entorno
+
+Crear un archivo [.env.local](.env.local) en la raíz del proyecto con las siguientes variables:
+
+```bash
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=https://tu-proyecto.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=tu-anon-key-aqui
+
+# n8n Webhook (opcional - usa API mock si no está configurado)
+NEXT_PUBLIC_N8N_WEBHOOK_URL=https://tu-instancia-n8n.com/webhook/entretemps
+```
+
+### 4. Configurar Supabase
+
+1. Crear un proyecto en [Supabase](https://supabase.com)
+2. Obtener la URL y la clave anónima desde Project Settings > API
+3. Ejecutar las migraciones de base de datos (si existen en `/supabase/migrations`)
+4. Configurar autenticación con Google/GitHub en Authentication > Providers
+
+### 5. Ejecutar en desarrollo
+
+```bash
+pnpm dev
+```
+
+La aplicación estará disponible en [http://localhost:3000](http://localhost:3000)
+
+### 6. Ejecutar tests
+
+```bash
+# Ejecutar todos los tests una vez
+pnpm test:run
+
+# Ejecutar tests en modo watch
+pnpm test:watch
+```
+
+### 7. Build para producción
+
+```bash
+pnpm build
+pnpm start
+```
 
 ## Estructura del proyecto
 
+El proyecto sigue una arquitectura hexagonal (ports & adapters) organizada en capas:
+
 ```
 src/
-├── app/                    # Rutas Next.js (App Router)
-│   └── wizard/             # Wizard de configuración (steps 1-6)
-├── application/            # Casos de uso y DTOs
-│   └── dto/                # Data Transfer Objects
-├── domain/                 # Tipos e interfaces de dominio
-├── infrastructure/         # Supabase, IA, PDF
-├── lib/                    # Utilidades y configuración
-│   └── schemas/            # Schemas Zod para validación
-└── ui/                     # Componentes UI
-    ├── components/         # Componentes reutilizables
-    └── wizard/             # Componentes específicos del wizard
+├── app/                           # Rutas Next.js (App Router)
+│   ├── wizard/                    # Wizard de configuración (steps 1-6)
+│   ├── pack/result/               # Visualización del pack generado
+│   ├── my-adventures/             # Listado y detalle de aventuras guardadas
+│   ├── templates/[id]/            # Visualización de plantillas predefinidas
+│   ├── login/                     # Página de inicio de sesión
+│   ├── auth/callback/             # Callback de autenticación OAuth
+│   └── api/                       # API Routes
+│       └── pack/mock/             # Endpoint mock para generación de packs
+├── application/                   # Casos de uso (Application Layer)
+│   ├── dto/                       # Data Transfer Objects
+│   ├── generate-adventure-pack.ts # Caso de uso principal
+│   ├── list-templates.ts          # Listar plantillas disponibles
+│   └── get-template-by-id.ts      # Obtener plantilla específica
+├── domain/                        # Tipos e interfaces de dominio (Domain Layer)
+│   ├── adventure-pack.ts          # Entidades del pack de aventura
+│   └── wizard-data.ts             # Tipos de datos del wizard
+├── infrastructure/                # Adaptadores externos (Infrastructure Layer)
+│   ├── supabase/                  # Cliente y servicios de Supabase
+│   ├── n8n/                       # Adaptador para n8n webhook
+│   └── pdf/                       # Generación de PDF
+├── lib/                           # Utilidades y configuración
+│   ├── schemas/                   # Schemas Zod para validación
+│   └── utils.ts                   # Funciones de utilidad
+└── ui/                            # Componentes de interfaz (Presentation Layer)
+    ├── components/                # Componentes reutilizables (Button, Card, etc.)
+    └── wizard/                    # Componentes específicos del wizard
 
-tests/
-├── domain/                 # Tests de dominio y contratos
-├── application/            # Tests de casos de uso
-├── ui/                     # Tests de componentes
-└── integration/            # Tests de integración
+tests/                             # Tests organizados por capa
+├── domain/                        # Tests de contratos y tipos de dominio
+├── application/                   # Tests de casos de uso
+├── infrastructure/                # Tests de adaptadores
+├── ui/                            # Tests de componentes React
+└── integration/                   # Tests de integración end-to-end
 ```
+
+### Principios arquitectónicos
+
+- **Separación de responsabilidades**: Cada capa tiene una responsabilidad clara
+- **Dependencias unidireccionales**: Las dependencias fluyen hacia el dominio
+- **Testing**: Cada capa es testeable de forma independiente
+- **Validación**: Schemas Zod en runtime + TypeScript en compile time
+
+## Funcionalidades principales
+
+### 1. Generación de aventuras personalizadas
+
+El corazón de la aplicación es el **wizard de 6 pasos** que guía al usuario a través de la configuración de su aventura:
+
+- **Paso 1 - Ocasión**: Selección del tipo de evento (cumpleaños, fiesta familiar, excursión, etc.)
+- **Paso 2 - Participantes**: Definición del número de niños y rango de edades
+- **Paso 3 - Intereses**: Personalización según los gustos del protagonista
+- **Paso 4 - Lugar**: Ubicación donde se desarrollará la aventura (casa, jardín, parque, interior/exterior)
+- **Paso 5 - Creatividad**: Configuración del tipo de aventura, tono emocional y nivel de dificultad
+- **Paso 6 - Resumen**: Revisión final antes de generar el pack
+
+### 2. Pack de aventura completo
+
+Al finalizar el wizard, la aplicación genera un pack que incluye:
+
+- **Historia narrativa**: Synopsis y ambientación personalizada
+- **Personajes**: Protagonistas, antagonistas y personajes secundarios con descripciones
+- **3 Fases de juego**: Cada fase con objetivo claro y narrativa progresiva
+- **6 Puzzles sin pantallas**: 2 puzzles por fase, variados y adaptados a las edades
+- **Guía de preparación**: Instrucciones paso a paso para el organizador
+- **Lista de materiales**: Todo lo necesario para preparar la aventura
+- **Materiales imprimibles**: PDFs listos para imprimir (mapas, pistas, cartas, etc.)
+
+### 3. Biblioteca de aventuras
+
+- **Mis Aventuras**: Los usuarios autenticados pueden guardar y acceder a sus aventuras generadas
+- **Vista de detalle**: Acceso completo a todos los componentes del pack guardado
+- **Historial**: Todas las aventuras generadas quedan disponibles para reutilizar
+
+### 4. Sistema de plantillas
+
+- **Plantillas predefinidas**: Acceso a aventuras ejemplo ya creadas
+- **Vista previa**: Posibilidad de explorar plantillas antes de generar la propia
+- **Inspiración**: Las plantillas sirven de referencia para nuevas aventuras
+
+### 5. Autenticación y persistencia
+
+- **Login social**: Autenticación mediante Google u otros proveedores OAuth
+- **Sesión persistente**: Las aventuras se guardan automáticamente al usuario
+- **Acceso multiplataforma**: Acceso desde cualquier dispositivo con la misma cuenta
+
+### 6. Generación sin pantallas
+
+Todas las aventuras están diseñadas con la filosofía **screen-free**:
+- Sin uso de tablets, móviles o pantallas durante el juego
+- Puzzles físicos y manipulativos
+- Fomento de la interacción real y el juego activo
 
 ## Wizard Flow
 

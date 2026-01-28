@@ -75,4 +75,31 @@ export class AdventurePackRepository {
       createdAt: data.created_at,
     }
   }
+
+  async updatePackJson(
+    id: string,
+    pack: GeneratedAdventurePack
+  ): Promise<SavedAdventurePack> {
+    // First, update the pack without trying to select
+    const { error: updateError } = await supabase
+      .from('adventure_packs')
+      .update({
+        pack: pack,
+        title: pack.title,
+      })
+      .eq('id', id)
+
+    if (updateError) {
+      throw new Error(`Error al actualizar el pack: ${updateError.message}`)
+    }
+
+    // Then fetch the updated pack separately
+    const updatedPack = await this.getById(id)
+
+    if (!updatedPack) {
+      throw new Error('No se pudo obtener el pack actualizado')
+    }
+
+    return updatedPack
+  }
 }

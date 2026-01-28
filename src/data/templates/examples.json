@@ -1,0 +1,167 @@
+[
+  {
+    "id": "pack_demo_001",
+    "title": "La Selva Perdida y el Tesoro Encendido",
+    "estimatedDurationMinutes": 45,
+    "ageRange": { "min": 5, "max": 10 },
+    "participants": 4,
+    "difficulty": "medium",
+    "tone": "enigmatic",
+    "adventureType": "adventure",
+    "place": "garden",
+    "materials": ["Cojines", "Linternas", "Cajas de cartón", "Papel brillante", "Cinta adhesiva", "Pequeños premios"],
+    "introduction": {
+      "story": "La Selva Perdida ha elegido este jardín como escenario. El Tesoro Encendido espera a los valientes.",
+      "setupForParents": "Prepara el jardín y esconde la caja final en un lugar elevado o tras un arbusto."
+    },
+    "missions": [
+      {
+        "order": 1,
+        "title": "El Río de Cojines",
+        "story": "Debéis cruzar el río de lava saltando solo sobre los cojines sin tocar el césped."
+      },
+      {
+        "order": 2,
+        "title": "El Tótem de Cartón",
+        "story": "Construid un tótem de 1 metro de altura usando solo cajas. Si se cae, los monos de la selva os descubrirán."
+      },
+      {
+        "order": 3,
+        "title": "La Cueva de los Luciérnagas",
+        "story": "Usad las linternas para encontrar los 5 símbolos brillantes ocultos en la oscuridad de los arbustos."
+      }
+    ]
+  },
+  {
+    "id": "pack_kids_002",
+    "title": "Misión Espacial: El Oxígeno se Agota",
+    "estimatedDurationMinutes": 30,
+    "ageRange": { "min": 6, "max": 12 },
+    "participants": 5,
+    "difficulty": "hard",
+    "tone": "urgent",
+    "adventureType": "sci-fi",
+    "place": "living_room",
+    "materials": ["Botellas de plástico", "Papel de aluminio", "Globos azules", "Cronómetro"],
+    "introduction": {
+      "story": "¡Atención tripulación! El sistema de aire falla. Tienen 30 minutos para recalibrar la nave.",
+      "setupForParents": "Esconde los 'tanques de oxígeno' (globos) y prepara una clave numérica en la calculadora."
+    },
+    "missions": [
+      {
+        "order": 1,
+        "title": "Código de Emergencia",
+        "story": "Descifrad la clave numérica mirando las constelaciones pegadas bajo las sillas."
+      },
+      {
+        "order": 2,
+        "title": "Gravedad Zero",
+        "story": "Transportad los globos de oxígeno de un lado a otro de la sala usando solo la cabeza o soplándolos."
+      },
+      {
+        "order": 3,
+        "title": "Reparación del Casco",
+        "story": "Unid las botellas con cinta para crear un conducto de ventilación que llegue hasta la 'unidad central'."
+      }
+    ]
+  },
+  {
+    "id": "pack_kids_003",
+    "title": "La Escuela de Magia: El Examen Final",
+    "estimatedDurationMinutes": 60,
+    "ageRange": { "min": 7, "max": 11 },
+    "participants": 6,
+    "difficulty": "medium",
+    "tone": "magical",
+    "adventureType": "fantasy",
+    "place": "indoor",
+    "materials": ["Vasos", "Vinagre", "Bicarbonato", "Sobres", "Varitas"],
+    "introduction": {
+      "story": "El Gran Mago ha sellado su despacho. Debéis preparar la poción de apertura antes del anochecer.",
+      "setupForParents": "Pon los ingredientes en botes con nombres mágicos como 'Lágrimas de Fénix'."
+    },
+    "missions": [
+      {
+        "order": 1,
+        "title": "El Vuelo de las Llaves",
+        "story": "Identificad la llave correcta entre todas las que cuelgan analizando un acertijo en verso."
+      },
+      {
+        "order": 2,
+        "title": "El Caldero Burbujeante",
+        "story": "Mezclad los polvos blancos con el líquido transparente para revelar el número oculto en el fondo del vaso."
+      },
+      {
+        "order": 3,
+        "title": "Encantamiento de Silencio",
+        "story": "Debéis encontrar el siguiente sobre siguiendo las instrucciones de uno de los niños que no puede hablar, solo gesticular."
+      }
+    ]
+  },
+  {
+    "id": "pack_kids_004",
+    "title": "El Galeón del Pirata Patapalo",
+    "estimatedDurationMinutes": 40,
+    "ageRange": { "min": 4, "max": 8 },
+    "participants": 3,
+    "difficulty": "easy",
+    "tone": "fun",
+    "adventureType": "pirates",
+    "place": "bedroom",
+    "materials": ["Pañuelos", "Monedas de chocolate", "Cuerda", "Peluche de loro"],
+    "introduction": {
+      "story": "¡Ahoy! Estáis encerrados en el camarote. El mapa del tesoro está en la cubierta superior.",
+      "setupForParents": "Usa una sábana azul en el suelo para simular el mar alrededor de la cama."
+    },
+    "missions": [
+      {
+        "order": 1,
+        "title": "Nudos Marineros",
+        "story": "Desatad los 5 nudos de la cuerda para liberar la llave de plástico colgada en el centro."
+      },
+      {
+        "order": 2,
+        "title": "El Loro Chivato",
+        "story": "El loro tiene una pista en su pata. Debéis imitar el sonido de 3 animales marinos para que os la entregue."
+      },
+      {
+        "order": 3,
+        "title": "X marca el Lugar",
+        "story": "Buscad bajo los 'arrecifes' (cojines rojos) las monedas que forman la palabra SECRETO."
+      }
+    ]
+  },
+  {
+    "id": "pack_kids_005",
+    "title": "Laboratorio Zombi: La Cura Final",
+    "estimatedDurationMinutes": 50,
+    "ageRange": { "min": 9, "max": 13 },
+    "participants": 4,
+    "difficulty": "hard",
+    "tone": "suspenseful",
+    "adventureType": "mystery",
+    "place": "kitchen",
+    "materials": ["Jeringuillas de juguete", "Ketchup", "Candados", "Libretas"],
+    "introduction": {
+      "story": "Un virus convierte a la gente en zombis vegetarianos. ¡Cread el antídoto de chocolate ya!",
+      "setupForParents": "Configura un candado de maleta en la despensa donde están los dulces."
+    },
+    "missions": [
+      {
+        "order": 1,
+        "title": "Análisis de ADN",
+        "story": "Ordenad los botes de especias por color para encontrar la letra oculta en cada tapa."
+      },
+      {
+        "order": 2,
+        "title": "Suministro de Energía",
+        "story": "Completad el circuito de 'cables' (hilos de lana) que cruzan la cocina sin tocar las alarmas (cascabeles)."
+      },
+      {
+        "order": 3,
+        "title": "La Mezcla Maestra",
+        "story": "Calculad la dosis exacta sumando los años de todos los participantes y dividiéndolos por dos."
+      }
+    ]
+  }
+]
