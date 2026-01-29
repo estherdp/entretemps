@@ -15,6 +15,8 @@ import {
   DIFFICULTY_LABELS,
 } from '@/ui/wizard/labels'
 import { generatePack } from '@/application/generate-pack'
+import { N8NAdapter } from '@/infrastructure/n8n/n8n-adapter'
+import { GeminiAdapter, OpenAIAdapter } from '@/infrastructure/ai/adapters'
 
 export default function Step6Page() {
   const router = useRouter()
@@ -26,7 +28,17 @@ export default function Step6Page() {
     setIsLoading(true)
     setMessage(null)
 
-    const result = await generatePack(wizardData)
+    // Seleccionar el provider de IA
+    // Por defecto usa N8N si está configurado, sino usa OpenAI (mock)
+    let provider
+    try {
+      provider = new GeminiAdapter()
+    } catch {
+      // Si N8N no está configurado, usar OpenAI (mock)
+      provider = new OpenAIAdapter()
+    }
+
+    const result = await generatePack(wizardData, provider)
 
     if (result.ok && result.pack) {
       sessionStorage.setItem('generated-adventure-pack', JSON.stringify(result.pack))

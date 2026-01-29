@@ -31,7 +31,7 @@ export class GeminiAdapter implements IAdventureProvider {
         prompt:
           'Selva tropical vibrante con cascadas y animales exóticos, arte digital para niños',
       },
-      estimatedDurationMinutes: wizardData.duration || 60,
+      estimatedDurationMinutes: 60,
       ageRange: wizardData.ages || { min: 6, max: 10 },
       participants: wizardData.kidsCount || 4,
       difficulty: wizardData.difficulty || 'medium',

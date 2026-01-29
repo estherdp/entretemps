@@ -31,7 +31,7 @@ export class OpenAIAdapter implements IAdventureProvider {
         prompt:
           'Ilustración colorida de una selva tropical mágica con animales amigables, estilo infantil',
       },
-      estimatedDurationMinutes: wizardData.duration || 60,
+      estimatedDurationMinutes: 60,
       ageRange: wizardData.ages || { min: 6, max: 10 },
       participants: wizardData.kidsCount || 4,
       difficulty: wizardData.difficulty || 'medium',

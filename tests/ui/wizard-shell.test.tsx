@@ -56,25 +56,26 @@ describe('WizardShell', () => {
     expect(screen.getAllByText('Generar aventura').length).toBeGreaterThanOrEqual(1)
   })
 
-  it('should render brand name Entretemps', () => {
-    render(
+  it('should have gradient background', () => {
+    const { container } = render(
       <WizardShell currentStep={1} totalSteps={5}>
         <p>Content</p>
       </WizardShell>
     )
 
-    expect(screen.getAllByText('Entre').length).toBeGreaterThan(0)
-    expect(screen.getAllByText('temps').length).toBeGreaterThan(0)
+    const wrapper = container.firstChild as HTMLElement
+    expect(wrapper.className).toContain('bg-gradient-to-b')
   })
 
-  it('should display benefits list on desktop', () => {
+  it('should render mobile sticky footer', () => {
     render(
-      <WizardShell currentStep={1} totalSteps={5}>
+      <WizardShell currentStep={1} totalSteps={5} nextHref="/next">
         <p>Content</p>
       </WizardShell>
     )
 
-    expect(screen.getByText('Aventura personalizada para tu familia')).toBeInTheDocument()
-    expect(screen.getByText('Pack descargable listo para imprimir')).toBeInTheDocument()
+    // Mobile footer should be present with fixed positioning
+    const buttons = screen.getAllByText('Siguiente')
+    expect(buttons.length).toBe(2) // Desktop + Mobile
   })
 })

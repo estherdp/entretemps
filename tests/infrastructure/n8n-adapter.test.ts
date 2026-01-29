@@ -1,25 +1,17 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { sendToN8N } from '@/infrastructure/n8n/n8n-adapter'
-import type { GeneratePackRequest } from '@/application/dto/generate-pack-request'
+import { N8NAdapter } from '@/infrastructure/n8n/n8n-adapter'
+import type { WizardData } from '@/domain/wizard-data'
 import type { GeneratedAdventurePack } from '@/domain/generated-adventure-pack'
 
-const mockRequest: GeneratePackRequest = {
-  locale: 'es',
-  wizardData: {
-    occasion: 'birthday',
-    ages: { min: 6, max: 10 },
-    kidsCount: 8,
-    interests: 'Dinosaurios',
-    place: 'home',
-    adventureType: 'mystery',
-    tone: 'funny',
-    difficulty: 'easy',
-  },
-  constraints: {
-    phases: 3,
-    puzzlesPerPhase: 2,
-    screenFree: true,
-  },
+const mockWizardData: WizardData = {
+  occasion: 'birthday',
+  ages: { min: 6, max: 10 },
+  kidsCount: 8,
+  interests: 'Dinosaurios',
+  place: 'home',
+  adventureType: 'mystery',
+  tone: 'funny',
+  difficulty: 'easy',
 }
 
 const mockGeneratedPack: GeneratedAdventurePack = {
@@ -49,6 +41,20 @@ const mockGeneratedPack: GeneratedAdventurePack = {
       parentGuide: 'Guía para padres',
       successCondition: 'Encontrar la pista',
     },
+    {
+      order: 2,
+      title: 'Misión 2',
+      story: 'Historia 2',
+      parentGuide: 'Guía 2',
+      successCondition: 'Pista 2',
+    },
+    {
+      order: 3,
+      title: 'Misión 3',
+      story: 'Historia 3',
+      parentGuide: 'Guía 3',
+      successCondition: 'Pista 3',
+    },
   ],
   conclusion: {
     story: 'Final feliz',
@@ -57,19 +63,16 @@ const mockGeneratedPack: GeneratedAdventurePack = {
   createdAt: '2024-01-15T10:30:00.000Z',
 }
 
-describe('sendToN8N', () => {
+describe('N8NAdapter', () => {
   beforeEach(() => {
     vi.stubEnv('NEXT_PUBLIC_N8N_WEBHOOK_URL', 'https://n8n.example.com/webhook')
     global.fetch = vi.fn()
   })
 
-  it('should return error if webhook URL is not configured', async () => {
+  it('should throw error if webhook URL is not configured', () => {
     vi.stubEnv('NEXT_PUBLIC_N8N_WEBHOOK_URL', '')
 
-    const result = await sendToN8N(mockRequest)
-
-    expect(result.ok).toBe(false)
-    expect(result.error).toBe('N8N_WEBHOOK_URL no configurada.')
+    expect(() => new N8NAdapter()).toThrow('N8N_WEBHOOK_URL no configurada.')
   })
 
   it('should send POST request to n8n webhook and return pack on success', async () => {
@@ -79,38 +82,54 @@ describe('sendToN8N', () => {
     })
     global.fetch = mockFetch
 
-    const result = await sendToN8N(mockRequest)
-
-    expect(mockFetch).toHaveBeenCalledWith('https://n8n.example.com/webhook', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(mockRequest),
+    const adapter = new N8NAdapter('https://n8n.example.com/webhook')
+    const pack = await adapter.generateAdventure(mockWizardData, 'es', {
+      phases: 3,
+      puzzlesPerPhase: 2,
+      screenFree: true,
     })
 
-    expect(result.ok).toBe(true)
-    expect(result.pack).toEqual(mockGeneratedPack)
+    expect(mockFetch).toHaveBeenCalledWith(
+      'https://n8n.example.com/webhook',
+      expect.objectContaining({
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      })
+    )
+
+    expect(pack).toEqual(mockGeneratedPack)
   })
 
-  it('should return error on non-ok response', async () => {
+  it('should throw error on non-ok response', async () => {
     const mockFetch = vi.fn().mockResolvedValue({
       ok: false,
       status: 500,
     })
     global.fetch = mockFetch
 
-    const result = await sendToN8N(mockRequest)
+    const adapter = new N8NAdapter('https://n8n.example.com/webhook')
 
-    expect(result.ok).toBe(false)
-    expect(result.error).toBe('Error del servidor: 500')
+    await expect(
+      adapter.generateAdventure(mockWizardData, 'es', {
+        phases: 3,
+        puzzlesPerPhase: 2,
+        screenFree: true,
+      })
+    ).rejects.toThrow('Error del servidor N8N: 500')
   })
 
-  it('should return error on network failure', async () => {
+  it('should throw error on network failure', async () => {
     const mockFetch = vi.fn().mockRejectedValue(new Error('Network error'))
     global.fetch = mockFetch
 
-    const result = await sendToN8N(mockRequest)
+    const adapter = new N8NAdapter('https://n8n.example.com/webhook')
 
-    expect(result.ok).toBe(false)
-    expect(result.error).toBe('Error de conexión con n8n.')
+    await expect(
+      adapter.generateAdventure(mockWizardData, 'es', {
+        phases: 3,
+        puzzlesPerPhase: 2,
+        screenFree: true,
+      })
+    ).rejects.toThrow('Error de conexión con N8N')
   })
 })

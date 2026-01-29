@@ -23,7 +23,11 @@ El objetivo es facilitar la organización de actividades lúdicas y educativas q
 ### Backend y Servicios
 - **Base de datos**: Supabase - Base de datos PostgreSQL con API REST autogenerada
 - **Autenticación**: Supabase Auth - Sistema de autenticación con proveedores sociales
-- **Generación de contenido**: n8n webhook - Workflow de automatización para generación de aventuras
+- **Generación de contenido IA**:
+  - Arquitectura multimodal con proveedores intercambiables
+  - N8N (producción actual), OpenAI, Google Gemini (preparados)
+  - Abstracción mediante patrón Adapter e Inversión de Dependencias
+- **Generación de imágenes**: Nanobanana (preparado para integración)
 - **Generación de PDF**: @react-pdf/renderer - Creación de documentos PDF desde React
 
 ### Desarrollo y Testing
@@ -64,8 +68,13 @@ Crear un archivo [.env.local](.env.local) en la raíz del proyecto con las sigui
 NEXT_PUBLIC_SUPABASE_URL=https://tu-proyecto.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=tu-anon-key-aqui
 
-# n8n Webhook (opcional - usa API mock si no está configurado)
+# n8n Webhook (opcional - usa adaptador mock si no está configurado)
 NEXT_PUBLIC_N8N_WEBHOOK_URL=https://tu-instancia-n8n.com/webhook/entretemps
+
+# IA Providers (opcional - los adaptadores usan mocks por defecto)
+OPENAI_API_KEY=sk-tu-key-aqui                    # Para OpenAIAdapter
+GOOGLE_AI_API_KEY=tu-gemini-key-aqui             # Para GeminiAdapter
+NANOBANANA_API_KEY=tu-nanobanana-key-aqui        # Para NanobananaAdapter
 ```
 
 ### 4. Configurar Supabase
@@ -146,8 +155,92 @@ tests/                             # Tests organizados por capa
 
 - **Separación de responsabilidades**: Cada capa tiene una responsabilidad clara
 - **Dependencias unidireccionales**: Las dependencias fluyen hacia el dominio
+- **Inversión de Dependencias (DIP)**: La capa de aplicación depende de abstracciones, no de implementaciones
+- **Patrón Adapter**: Los servicios externos implementan interfaces del dominio
 - **Testing**: Cada capa es testeable de forma independiente
 - **Validación**: Schemas Zod en runtime + TypeScript en compile time
+
+## Arquitectura de IA Multimodal
+
+Este proyecto implementa una **arquitectura limpia (Clean Architecture)** para la integración de servicios de IA, permitiendo intercambiar proveedores sin modificar la lógica de negocio.
+
+### Estructura de Capas
+
+```
+┌─────────────────────────────────────────────────────┐
+│          DOMAIN (Contratos/Interfaces)              │
+│  src/domain/services/                               │
+│  - IAdventureProvider: Generación de texto          │
+│  - IImageGenerator: Generación de imágenes          │
+└─────────────────────────────────────────────────────┘
+                        ▲
+                        │ implementa
+                        │
+┌─────────────────────────────────────────────────────┐
+│       INFRASTRUCTURE (Adaptadores concretos)        │
+│  src/infrastructure/ai/adapters/                    │
+│  - OpenAIAdapter (ChatGPT)                          │
+│  - GeminiAdapter (Google Gemini)                    │
+│  - NanobananaAdapter (Generación de imágenes)       │
+│  src/infrastructure/n8n/                            │
+│  - N8NAdapter (Workflow externo)                    │
+└─────────────────────────────────────────────────────┘
+                        ▲
+                        │ usa
+                        │
+┌─────────────────────────────────────────────────────┐
+│         APPLICATION (Casos de uso)                  │
+│  src/application/                                   │
+│  - generateAdventureMultimodal: Orquestador         │
+│    que coordina texto + imagen                      │
+└─────────────────────────────────────────────────────┘
+```
+
+### Proveedores de IA Disponibles
+
+#### Proveedores de Aventura (IAdventureProvider)
+- **N8NAdapter**: Integración con flujo externo (producción actual)
+- **OpenAIAdapter**: ChatGPT (mock, preparado para implementación real)
+- **GeminiAdapter**: Google Gemini (mock, preparado para implementación real)
+
+#### Proveedores de Imagen (IImageGenerator)
+- **NanobananaAdapter**: Generación de imágenes (mock, preparado para implementación real)
+
+### Orquestador Multimodal
+
+El caso de uso `generateAdventureMultimodal` coordina la generación de texto e imagen:
+
+```typescript
+import { generateAdventureMultimodal } from '@/application/generate-adventure-multimodal'
+import { OpenAIAdapter, NanobananaAdapter } from '@/infrastructure/ai/adapters'
+
+// Proveedores intercambiables
+const textProvider = new OpenAIAdapter()
+const imageProvider = new NanobananaAdapter()
+
+// Generación orquestada
+const result = await generateAdventureMultimodal(
+  wizardData,
+  textProvider,
+  imageProvider
+)
+```
+
+**Características del orquestador:**
+- ✅ **Flujo secuencial**: Genera texto → Extrae prompt → Genera imagen
+- ✅ **Resiliencia**: Si falla la imagen, usa placeholder automático
+- ✅ **Compatibilidad**: El resultado es directamente compatible con Supabase
+- ✅ **Warnings**: Registra problemas no críticos sin fallar la operación
+
+Ver documentación completa en: [src/infrastructure/ai/README.md](src/infrastructure/ai/README.md)
+
+### Ventajas de la Arquitectura
+
+1. **Intercambiabilidad**: Cambiar de OpenAI a Gemini sin tocar lógica de negocio
+2. **Testabilidad**: Mocks fáciles de crear para cada proveedor
+3. **Mantenibilidad**: Cada adaptador es independiente
+4. **Escalabilidad**: Añadir nuevos proveedores sin modificar código existente
+5. **Desacoplamiento**: La aplicación no depende de SDKs externos específicos
 
 ## Funcionalidades principales
 
