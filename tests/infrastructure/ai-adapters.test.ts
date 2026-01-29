@@ -1,8 +1,21 @@
 // tests/infrastructure/ai-adapters.test.ts
 
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { OpenAIAdapter, GeminiAdapter, NanobananaAdapter } from '@/infrastructure/ai/adapters'
 import type { WizardData } from '@/domain/wizard-data'
+
+// Mock del SDK de Google Gemini para tests de integración
+const mockGenerateContentIntegration = vi.fn()
+
+vi.mock('@google/genai', () => {
+  return {
+    GoogleGenAI: class MockGoogleGenAI {
+      models = {
+        generateContent: mockGenerateContentIntegration,
+      }
+    },
+  }
+})
 
 const mockWizardData: WizardData = {
   occasion: 'birthday',
@@ -97,14 +110,68 @@ describe('OpenAIAdapter', () => {
 })
 
 describe('GeminiAdapter', () => {
+  beforeEach(() => {
+    // Configurar mock para devolver aventura válida
+    mockGenerateContentIntegration.mockResolvedValue({
+      text: JSON.stringify({
+        id: crypto.randomUUID(),
+        title: 'El Secreto de la Selva Esmeralda',
+        image: {
+          url: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800',
+          prompt: 'Selva tropical vibrante con cascadas y animales exóticos, arte digital para niños',
+        },
+        estimatedDurationMinutes: 60,
+        ageRange: { min: 6, max: 10 },
+        participants: 4,
+        difficulty: 'medium',
+        tone: 'exciting',
+        adventureType: 'adventure',
+        place: 'home',
+        materials: ['Hojas de papel', 'Pinturas', 'Telas verdes'],
+        introduction: {
+          story: 'En el corazón de la Selva Esmeralda...',
+          setupForParents: 'Transforma tu hogar...',
+        },
+        missions: [
+          {
+            order: 1,
+            title: 'El Guardián Tucán',
+            story: 'El sabio Tucán guardián...',
+            parentGuide: 'Proporciona materiales...',
+            successCondition: 'El equipo completa un mapa...',
+          },
+          {
+            order: 2,
+            title: 'La Cascada de los Deseos',
+            story: 'Una cascada mágica...',
+            parentGuide: 'Prepara plantillas...',
+            successCondition: 'Cada niño crea mariposas...',
+          },
+          {
+            order: 3,
+            title: 'El Árbol de los Mil Colores',
+            story: 'El árbol aparece...',
+            parentGuide: 'Guía a los niños...',
+            successCondition: 'Los niños cantan la canción...',
+          },
+        ],
+        conclusion: {
+          story: 'El Árbol florece en toda su gloria...',
+          celebrationTip: 'Realiza una ceremonia...',
+        },
+        createdAt: new Date().toISOString(),
+      }),
+    })
+  })
+
   it('should implement IAdventureProvider interface', () => {
-    const adapter = new GeminiAdapter()
+    const adapter = new GeminiAdapter('test-api-key')
     expect(adapter.generateAdventure).toBeDefined()
     expect(typeof adapter.generateAdventure).toBe('function')
   })
 
   it('should generate adventure with correct structure', async () => {
-    const adapter = new GeminiAdapter()
+    const adapter = new GeminiAdapter('test-api-key')
     const pack = await adapter.generateAdventure(mockWizardData, 'es', {
       phases: 3,
       puzzlesPerPhase: 2,
@@ -120,7 +187,7 @@ describe('GeminiAdapter', () => {
 
   it('should generate different content than OpenAI', async () => {
     const openaiAdapter = new OpenAIAdapter()
-    const geminiAdapter = new GeminiAdapter()
+    const geminiAdapter = new GeminiAdapter('test-api-key')
 
     const openaiPack = await openaiAdapter.generateAdventure(mockWizardData, 'es', {
       phases: 3,
@@ -185,14 +252,14 @@ describe('NanobananaAdapter', () => {
 describe('Interface Compliance', () => {
   it('all adventure providers should have same method signature', () => {
     const openai = new OpenAIAdapter()
-    const gemini = new GeminiAdapter()
+    const gemini = new GeminiAdapter('test-api-key')
 
     // Ambos deberían tener el mismo método
     expect(openai.generateAdventure.length).toBe(gemini.generateAdventure.length)
   })
 
   it('adventure providers should be interchangeable', async () => {
-    const providers = [new OpenAIAdapter(), new GeminiAdapter()]
+    const providers = [new OpenAIAdapter(), new GeminiAdapter('test-api-key')]
 
     for (const provider of providers) {
       const pack = await provider.generateAdventure(mockWizardData, 'es', {
