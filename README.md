@@ -75,6 +75,9 @@ NEXT_PUBLIC_N8N_WEBHOOK_URL=https://tu-instancia-n8n.com/webhook/entretemps
 OPENAI_API_KEY=sk-tu-key-aqui                    # Para OpenAIAdapter
 GOOGLE_AI_API_KEY=tu-gemini-key-aqui             # Para GeminiAdapter
 NANOBANANA_API_KEY=tu-nanobanana-key-aqui        # Para NanobananaAdapter
+
+# Búsqueda de Imágenes (opcional - usa placeholder si no está configurado)
+PEXELS_API_KEY=tu-pexels-key-aqui                # Para búsqueda de imágenes reales
 ```
 
 ### 4. Configurar Supabase
@@ -83,6 +86,27 @@ NANOBANANA_API_KEY=tu-nanobanana-key-aqui        # Para NanobananaAdapter
 2. Obtener la URL y la clave anónima desde Project Settings > API
 3. Ejecutar las migraciones de base de datos (si existen en `/supabase/migrations`)
 4. Configurar autenticación con Google/GitHub en Authentication > Providers
+5. Crear la tabla de caché de imágenes ejecutando en SQL Editor:
+
+```sql
+-- Crear tabla image_cache para Pexels
+CREATE TABLE IF NOT EXISTS image_cache (
+  query TEXT PRIMARY KEY,
+  url TEXT NOT NULL,
+  photographer TEXT,
+  source_url TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_image_cache_created_at ON image_cache(created_at);
+
+ALTER TABLE image_cache ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "image_cache_select_policy" ON image_cache FOR SELECT USING (true);
+CREATE POLICY "image_cache_insert_policy" ON image_cache FOR INSERT WITH CHECK (true);
+CREATE POLICY "image_cache_update_policy" ON image_cache FOR UPDATE USING (true);
+CREATE POLICY "image_cache_delete_policy" ON image_cache FOR DELETE USING (true);
+```
 
 ### 5. Ejecutar en desarrollo
 
@@ -111,7 +135,7 @@ pnpm start
 
 ## Estructura del proyecto
 
-El proyecto sigue una arquitectura hexagonal (ports & adapters) organizada en capas:
+El proyecto sigue una clean architecture organizada en capas:
 
 ```
 src/
@@ -171,7 +195,8 @@ Este proyecto implementa una **arquitectura limpia (Clean Architecture)** para l
 │          DOMAIN (Contratos/Interfaces)              │
 │  src/domain/services/                               │
 │  - IAdventureProvider: Generación de texto          │
-│  - IImageGenerator: Generación de imágenes          │
+│  - IImageGenerator: Generación de imágenes por IA   │
+│  - IImageSearcher: Búsqueda de imágenes reales      │
 └─────────────────────────────────────────────────────┘
                         ▲
                         │ implementa
@@ -184,6 +209,10 @@ Este proyecto implementa una **arquitectura limpia (Clean Architecture)** para l
 │  - NanobananaAdapter (Generación de imágenes)       │
 │  src/infrastructure/n8n/                            │
 │  - N8NAdapter (Workflow externo)                    │
+│  src/infrastructure/images/                         │
+│  - PexelsImageAdapter (Búsqueda de fotos reales)    │
+│  src/infrastructure/supabase/                       │
+│  - ImageCacheRepository (Caché de 24h)              │
 └─────────────────────────────────────────────────────┘
                         ▲
                         │ usa
@@ -192,7 +221,7 @@ Este proyecto implementa una **arquitectura limpia (Clean Architecture)** para l
 │         APPLICATION (Casos de uso)                  │
 │  src/application/                                   │
 │  - generateAdventureMultimodal: Orquestador         │
-│    que coordina texto + imagen                      │
+│    que coordina texto + imagen con fallback         │
 └─────────────────────────────────────────────────────┘
 ```
 
@@ -204,7 +233,11 @@ Este proyecto implementa una **arquitectura limpia (Clean Architecture)** para l
 - **GeminiAdapter**: Google Gemini (mock, preparado para implementación real)
 
 #### Proveedores de Imagen (IImageGenerator)
-- **NanobananaAdapter**: Generación de imágenes (mock, preparado para implementación real)
+- **NanobananaAdapter**: Generación de imágenes por IA (mock, preparado para implementación real)
+
+#### Búsqueda de Imágenes (IImageSearcher)
+- **PexelsImageAdapter**: Búsqueda de fotografías reales en Pexels API
+- **ImageCacheRepository**: Sistema de caché con expiración de 24 horas
 
 ### Orquestador Multimodal
 
@@ -227,10 +260,12 @@ const result = await generateAdventureMultimodal(
 ```
 
 **Características del orquestador:**
-- ✅ **Flujo secuencial**: Genera texto → Extrae prompt → Genera imagen
-- ✅ **Resiliencia**: Si falla la imagen, usa placeholder automático
+- ✅ **Flujo secuencial**: Genera texto → Extrae prompt → Busca imagen real → Genera por IA (fallback) → Placeholder (último recurso)
+- ✅ **Resiliencia**: Estrategia de fallback multinivel para garantizar siempre una imagen
 - ✅ **Compatibilidad**: El resultado es directamente compatible con Supabase
 - ✅ **Warnings**: Registra problemas no críticos sin fallar la operación
+- ✅ **Caché inteligente**: Almacena búsquedas de imágenes durante 24 horas
+- ✅ **Atribución**: Registra fotógrafo y fuente para cumplir términos de uso
 
 Ver documentación completa en: [src/infrastructure/ai/README.md](src/infrastructure/ai/README.md)
 
@@ -291,6 +326,46 @@ Todas las aventuras están diseñadas con la filosofía **screen-free**:
 - Sin uso de tablets, móviles o pantallas durante el juego
 - Puzzles físicos y manipulativos
 - Fomento de la interacción real y el juego activo
+
+### 7. Búsqueda de imágenes con Pexels
+
+Sistema de búsqueda de fotografías reales para las portadas de aventuras:
+
+- **Búsqueda automática**: Construye queries optimizadas basadas en los metadatos de la aventura
+- **Caché inteligente**: Almacena resultados en Supabase por 24 horas para reducir llamadas a la API
+- **Estrategia de fallback**: Pexels → IA → Placeholder
+- **Atribución automática**: Registra el fotógrafo y URL de origen
+- **Server-only**: Todas las llamadas se hacen en servidor para proteger la API key
+- **Límites del plan gratuito**: 200 requests/hora, 20,000 requests/mes
+
+**Configuración:**
+1. Obtener API key gratuita en [https://www.pexels.com/api/](https://www.pexels.com/api/)
+2. Agregar `PEXELS_API_KEY=tu-key` en `.env.local`
+3. Crear tabla `image_cache` en Supabase (ver sección 4.5 de instalación)
+
+**Query builder automático:**
+El sistema construye queries optimizadas combinando el tipo de aventura, lugar, tono y keywords del prompt de imagen, limitado a 6 términos para mejores resultados.
+
+### 8. Eliminar aventuras
+
+Los usuarios autenticados pueden eliminar sus propias aventuras (no las plantillas del sistema):
+
+- **Seguridad**: Solo el dueño puede eliminar su aventura
+- **Autenticación requerida**: Se verifica que el usuario esté logueado
+- **Doble validación**: Validación en repositorio Y en base de datos
+- **Protección contra plantillas**: No se pueden eliminar aventuras que no pertenezcan al usuario
+
+**API Endpoint:**
+- `DELETE /api/pack/[id]` - Elimina una aventura del usuario autenticado
+- Retorna 200 si éxito, 401 si no autenticado, 403 si sin permisos, 404 si no encontrado
+
+**Políticas RLS en Supabase:**
+```sql
+CREATE POLICY "Users can delete their own packs"
+ON adventure_packs
+FOR DELETE
+USING (auth.uid() = user_id);
+```
 
 ## Wizard Flow
 

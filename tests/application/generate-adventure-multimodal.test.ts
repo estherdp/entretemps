@@ -2,9 +2,10 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { generateAdventureMultimodal } from '@/application/generate-adventure-multimodal'
-import type { IAdventureProvider, IImageGenerator } from '@/domain/services'
+import type { IAdventureProvider, IImageGenerator, IImageSearcher } from '@/domain/services'
 import type { WizardData } from '@/domain/wizard-data'
 import type { GeneratedAdventurePack, GeneratedAdventurePackImage } from '@/domain/generated-adventure-pack'
+import type { ImageCacheRepository } from '@/infrastructure/supabase/image-cache-repository'
 
 const mockWizardData: WizardData = {
   occasion: 'birthday',
@@ -101,7 +102,9 @@ describe('generateAdventureMultimodal', () => {
       const result = await generateAdventureMultimodal(
         mockWizardData,
         mockProvider,
-        mockImageGen
+        undefined, // No image searcher
+        undefined, // No cache
+        mockImageGen // Image generator
       )
 
       expect(result.ok).toBe(true)
@@ -130,7 +133,9 @@ describe('generateAdventureMultimodal', () => {
       const result = await generateAdventureMultimodal(
         mockWizardData,
         mockProvider,
-        mockImageGen
+        undefined, // No image searcher
+        undefined, // No cache
+        mockImageGen // Image generator
       )
 
       expect(result.ok).toBe(true)
@@ -145,7 +150,7 @@ describe('generateAdventureMultimodal', () => {
       // Debe registrar warning
       expect(result.warnings).toBeDefined()
       expect(result.warnings?.length).toBeGreaterThan(0)
-      expect(result.warnings?.[0]).toContain('Generación de imagen falló')
+      expect(result.warnings?.some(w => w.includes('Generación de imagen falló'))).toBe(true)
     })
 
     it('should use provider image when no image generator provided', async () => {
@@ -159,12 +164,12 @@ describe('generateAdventureMultimodal', () => {
       expect(result.ok).toBe(true)
       expect(result.pack).toBeDefined()
 
-      // Debería mantener la imagen del provider
-      expect(result.pack?.image.url).toBe('https://example.com/old-image.jpg')
+      // Sin searcher ni generator, debe usar placeholder
+      expect(result.pack?.image.url).toContain('placehold.co')
 
       // Debe registrar warning
       expect(result.warnings).toBeDefined()
-      expect(result.warnings?.[0]).toContain('No se proporcionó generador de imagen')
+      expect(result.warnings?.some(w => w.includes('No se pudo obtener imagen'))).toBe(true)
     })
 
     it('should add default placeholder when pack has no image', async () => {
@@ -182,10 +187,10 @@ describe('generateAdventureMultimodal', () => {
 
       // Debería añadir placeholder por defecto
       expect(result.pack?.image).toBeDefined()
-      expect(result.pack?.image.url).toContain('Sin+Imagen')
+      expect(result.pack?.image.url).toContain('placehold.co')
 
       expect(result.warnings).toBeDefined()
-      expect(result.warnings?.[0]).toContain('No se generó imagen')
+      expect(result.warnings?.some(w => w.includes('No se pudo obtener imagen'))).toBe(true)
     })
   })
 
@@ -260,7 +265,9 @@ describe('generateAdventureMultimodal', () => {
       const result = await generateAdventureMultimodal(
         mockWizardData,
         mockProvider,
-        faultyImageGen
+        undefined, // No image searcher
+        undefined, // No cache
+        faultyImageGen // Faulty image generator
       )
 
       // Incluso con fallo de imagen, debe tener imagen válida
@@ -287,7 +294,9 @@ describe('generateAdventureMultimodal', () => {
       const result = await generateAdventureMultimodal(
         mockWizardData,
         mockProvider,
-        mockImageGen
+        undefined, // No image searcher
+        undefined, // No cache
+        mockImageGen // Image generator
       )
 
       expect(result.ok).toBe(true)
@@ -310,11 +319,295 @@ describe('generateAdventureMultimodal', () => {
       const result = await generateAdventureMultimodal(
         mockWizardData,
         mockProvider,
-        mockImageGen
+        undefined, // No image searcher
+        undefined, // No cache
+        mockImageGen // Image generator
       )
 
       expect(result.ok).toBe(true)
       expect(result.warnings).toBeUndefined()
+    })
+  })
+
+  describe('Integración con Image Searcher (Pexels)', () => {
+    it('should use image searcher to fetch real image', async () => {
+      const mockPack = createMockPack()
+      const mockProvider: IAdventureProvider = {
+        generateAdventure: vi.fn().mockResolvedValue(mockPack),
+      }
+
+      const mockImageSearcher: IImageSearcher = {
+        searchCoverImage: vi.fn().mockResolvedValue({
+          url: 'https://images.pexels.com/photos/123/photo.jpg',
+          prompt: 'adventure home exciting',
+          attribution: {
+            photographer: 'John Photographer',
+            sourceUrl: 'https://pexels.com/photo/123',
+          },
+        }),
+      }
+
+      const result = await generateAdventureMultimodal(
+        mockWizardData,
+        mockProvider,
+        mockImageSearcher
+      )
+
+      expect(result.ok).toBe(true)
+      expect(result.pack).toBeDefined()
+
+      // Verificar que se llamó al searcher
+      expect(mockImageSearcher.searchCoverImage).toHaveBeenCalledTimes(1)
+
+      // Verificar que la imagen fue reemplazada con la de Pexels
+      expect(result.pack?.image.url).toBe('https://images.pexels.com/photos/123/photo.jpg')
+
+      // Debe registrar atribución en warnings
+      expect(result.warnings).toBeDefined()
+      expect(result.warnings?.some((w) => w.includes('John Photographer'))).toBe(true)
+    })
+
+    it('should use cache when available', async () => {
+      const mockPack = createMockPack()
+      const mockProvider: IAdventureProvider = {
+        generateAdventure: vi.fn().mockResolvedValue(mockPack),
+      }
+
+      const mockImageSearcher: IImageSearcher = {
+        searchCoverImage: vi.fn().mockResolvedValue({
+          url: 'https://images.pexels.com/photos/456/photo.jpg',
+          prompt: 'adventure home exciting',
+          attribution: {
+            photographer: 'Jane Doe',
+            sourceUrl: 'https://pexels.com/photo/456',
+          },
+        }),
+      }
+
+      const mockCache: ImageCacheRepository = {
+        get: vi.fn().mockResolvedValue({
+          query: 'adventure home exciting',
+          url: 'https://images.pexels.com/cached/789/photo.jpg',
+          photographer: 'Cached Photographer',
+          sourceUrl: 'https://pexels.com/photo/789',
+          createdAt: new Date().toISOString(),
+        }),
+        set: vi.fn().mockResolvedValue(undefined),
+        cleanExpired: vi.fn().mockResolvedValue(0),
+      }
+
+      const result = await generateAdventureMultimodal(
+        mockWizardData,
+        mockProvider,
+        mockImageSearcher,
+        mockCache
+      )
+
+      expect(result.ok).toBe(true)
+
+      // Verificar que se consultó la caché
+      expect(mockCache.get).toHaveBeenCalledTimes(1)
+
+      // Verificar que NO se llamó al searcher (porque estaba en caché)
+      expect(mockImageSearcher.searchCoverImage).not.toHaveBeenCalled()
+
+      // Verificar que se usó la imagen de caché
+      expect(result.pack?.image.url).toBe('https://images.pexels.com/cached/789/photo.jpg')
+
+      // Verificar que NO se guardó en caché (ya estaba)
+      expect(mockCache.set).not.toHaveBeenCalled()
+    })
+
+    it('should save to cache when searcher finds new image', async () => {
+      const mockPack = createMockPack()
+      const mockProvider: IAdventureProvider = {
+        generateAdventure: vi.fn().mockResolvedValue(mockPack),
+      }
+
+      const mockImageSearcher: IImageSearcher = {
+        searchCoverImage: vi.fn().mockResolvedValue({
+          url: 'https://images.pexels.com/photos/999/photo.jpg',
+          prompt: 'adventure home exciting',
+          attribution: {
+            photographer: 'New Photographer',
+            sourceUrl: 'https://pexels.com/photo/999',
+          },
+        }),
+      }
+
+      const mockCache: ImageCacheRepository = {
+        get: vi.fn().mockResolvedValue(null), // No hay en caché
+        set: vi.fn().mockResolvedValue(undefined),
+        cleanExpired: vi.fn().mockResolvedValue(0),
+      }
+
+      const result = await generateAdventureMultimodal(
+        mockWizardData,
+        mockProvider,
+        mockImageSearcher,
+        mockCache
+      )
+
+      expect(result.ok).toBe(true)
+
+      // Verificar que se consultó la caché
+      expect(mockCache.get).toHaveBeenCalledTimes(1)
+
+      // Verificar que se llamó al searcher (no estaba en caché)
+      expect(mockImageSearcher.searchCoverImage).toHaveBeenCalledTimes(1)
+
+      // Verificar que se guardó en caché el nuevo resultado
+      expect(mockCache.set).toHaveBeenCalledTimes(1)
+      expect(mockCache.set).toHaveBeenCalledWith({
+        query: expect.any(String),
+        url: 'https://images.pexels.com/photos/999/photo.jpg',
+        photographer: 'New Photographer',
+        sourceUrl: 'https://pexels.com/photo/999',
+      })
+    })
+
+    it('should fallback to image generator when searcher returns null', async () => {
+      const mockPack = createMockPack()
+      const mockProvider: IAdventureProvider = {
+        generateAdventure: vi.fn().mockResolvedValue(mockPack),
+      }
+
+      const mockImageSearcher: IImageSearcher = {
+        searchCoverImage: vi.fn().mockResolvedValue(null), // No encontró imagen
+      }
+
+      const mockImageGen: IImageGenerator = {
+        generateImage: vi.fn().mockResolvedValue({
+          url: 'https://example.com/ai-generated.jpg',
+          prompt: 'Una selva mágica',
+        }),
+      }
+
+      const result = await generateAdventureMultimodal(
+        mockWizardData,
+        mockProvider,
+        mockImageSearcher,
+        undefined,
+        mockImageGen
+      )
+
+      expect(result.ok).toBe(true)
+
+      // Verificar que se intentó búsqueda primero
+      expect(mockImageSearcher.searchCoverImage).toHaveBeenCalledTimes(1)
+
+      // Verificar que se usó el generador como fallback
+      expect(mockImageGen.generateImage).toHaveBeenCalledTimes(1)
+
+      // Verificar que la imagen es la generada por IA
+      expect(result.pack?.image.url).toBe('https://example.com/ai-generated.jpg')
+
+      // Debe tener warning sobre generación por IA
+      expect(result.warnings).toBeDefined()
+      expect(result.warnings?.some((w) => w.includes('Imagen generada por IA'))).toBe(true)
+    })
+
+    it('should use placeholder when both searcher and generator fail', async () => {
+      const mockPack = createMockPack()
+      const mockProvider: IAdventureProvider = {
+        generateAdventure: vi.fn().mockResolvedValue(mockPack),
+      }
+
+      const mockImageSearcher: IImageSearcher = {
+        searchCoverImage: vi.fn().mockResolvedValue(null),
+      }
+
+      const mockImageGen: IImageGenerator = {
+        generateImage: vi.fn().mockRejectedValue(new Error('AI service down')),
+      }
+
+      const result = await generateAdventureMultimodal(
+        mockWizardData,
+        mockProvider,
+        mockImageSearcher,
+        undefined,
+        mockImageGen
+      )
+
+      expect(result.ok).toBe(true)
+
+      // Verificar que se intentó ambos métodos
+      expect(mockImageSearcher.searchCoverImage).toHaveBeenCalledTimes(1)
+      expect(mockImageGen.generateImage).toHaveBeenCalledTimes(1)
+
+      // Verificar que se usó placeholder
+      expect(result.pack?.image.url).toContain('placehold.co')
+
+      // Debe tener warnings de ambos fallos
+      expect(result.warnings).toBeDefined()
+      expect(result.warnings!.length).toBeGreaterThan(1)
+    })
+
+    it('should handle searcher error gracefully', async () => {
+      const mockPack = createMockPack()
+      const mockProvider: IAdventureProvider = {
+        generateAdventure: vi.fn().mockResolvedValue(mockPack),
+      }
+
+      const mockImageSearcher: IImageSearcher = {
+        searchCoverImage: vi.fn().mockRejectedValue(new Error('Network timeout')),
+      }
+
+      const result = await generateAdventureMultimodal(
+        mockWizardData,
+        mockProvider,
+        mockImageSearcher
+      )
+
+      expect(result.ok).toBe(true)
+      expect(result.pack).toBeDefined()
+
+      // Debe continuar el flujo y usar placeholder
+      expect(result.pack?.image.url).toContain('placehold.co')
+
+      // Debe registrar warning del error
+      expect(result.warnings).toBeDefined()
+      expect(result.warnings?.some((w) => w.includes('Network timeout'))).toBe(true)
+    })
+
+    it('should prioritize searcher over generator when both provided', async () => {
+      const mockPack = createMockPack()
+      const mockProvider: IAdventureProvider = {
+        generateAdventure: vi.fn().mockResolvedValue(mockPack),
+      }
+
+      const mockImageSearcher: IImageSearcher = {
+        searchCoverImage: vi.fn().mockResolvedValue({
+          url: 'https://images.pexels.com/priority/123.jpg',
+          prompt: 'adventure home exciting',
+        }),
+      }
+
+      const mockImageGen: IImageGenerator = {
+        generateImage: vi.fn().mockResolvedValue({
+          url: 'https://example.com/should-not-be-used.jpg',
+          prompt: 'Test',
+        }),
+      }
+
+      const result = await generateAdventureMultimodal(
+        mockWizardData,
+        mockProvider,
+        mockImageSearcher,
+        undefined,
+        mockImageGen
+      )
+
+      expect(result.ok).toBe(true)
+
+      // Verificar que se usó el searcher
+      expect(mockImageSearcher.searchCoverImage).toHaveBeenCalledTimes(1)
+
+      // Verificar que NO se llamó al generador (searcher tuvo éxito)
+      expect(mockImageGen.generateImage).not.toHaveBeenCalled()
+
+      // Verificar que se usó la imagen de Pexels
+      expect(result.pack?.image.url).toBe('https://images.pexels.com/priority/123.jpg')
     })
   })
 })

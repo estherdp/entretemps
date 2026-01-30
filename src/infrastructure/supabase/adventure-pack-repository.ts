@@ -102,4 +102,30 @@ export class AdventurePackRepository {
 
     return updatedPack
   }
+
+  async deleteById(id: string, userId: string): Promise<boolean> {
+    // Verificar que el pack pertenece al usuario antes de eliminar
+    const pack = await this.getById(id)
+
+    if (!pack) {
+      throw new Error('Pack no encontrado')
+    }
+
+    if (pack.userId !== userId) {
+      throw new Error('No tienes permisos para eliminar este pack')
+    }
+
+    // Eliminar el pack (doble check con user_id en la query)
+    const { error } = await supabase
+      .from('adventure_packs')
+      .delete()
+      .eq('id', id)
+      .eq('user_id', userId)
+
+    if (error) {
+      throw new Error(`Error al eliminar el pack: ${error.message}`)
+    }
+
+    return true
+  }
 }

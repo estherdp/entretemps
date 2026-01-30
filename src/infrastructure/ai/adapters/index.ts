@@ -5,10 +5,10 @@
  *
  * Proveedores de Aventura (IAdventureProvider):
  * - OpenAIAdapter: Generación mediante ChatGPT (mock)
- * - GeminiAdapter: Generación mediante Google Gemini (mock)
+ * - GeminiAdapter: Generación mediante Google Gemini
  *
  * Proveedores de Imagen (IImageGenerator):
- * - NanobananaAdapter: Generación de imágenes (mock)
+ * - NanobananaAdapter: Generación de imágenes mediante Gemini (gemini-2.5-flash-image)
  *
  * Nota: N8NAdapter se exporta desde src/infrastructure/n8n/
  */

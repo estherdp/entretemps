@@ -3,6 +3,8 @@
 
 import { generateAdventureMultimodal } from '@/application/generate-adventure-multimodal'
 import { OpenAIAdapter, GeminiAdapter, NanobananaAdapter } from '@/infrastructure/ai/adapters'
+import { PexelsImageAdapter } from '@/infrastructure/images'
+import { ImageCacheRepository } from '@/infrastructure/supabase'
 import type { WizardData } from '@/domain/wizard-data'
 
 const testWizardData: WizardData = {
@@ -98,14 +100,99 @@ async function testComparison() {
   }
 }
 
+async function testPexels() {
+  console.log('\n🖼️ Probando Búsqueda de Imágenes con Pexels...')
+  const provider = new GeminiAdapter()
+  const imageSearcher = new PexelsImageAdapter()
+  const imageCacheRepo = new ImageCacheRepository()
+
+  const result = await generateAdventureMultimodal(
+    testWizardData,
+    provider,
+    imageSearcher,      // Busca en Pexels (prioridad)
+    imageCacheRepo,     // Usa caché de 24h
+    undefined           // Sin generador IA
+  )
+
+  if (result.ok && result.pack) {
+    console.log('✅ Aventura generada:', result.pack.title)
+    console.log('🖼️ Imagen URL:', result.pack.image.url)
+    console.log('📝 Imagen prompt:', result.pack.image.prompt)
+
+    if (result.warnings) {
+      console.log('⚠️ Warnings:', result.warnings)
+    }
+
+    // Verificar origen de la imagen
+    if (result.pack.image.url.includes('pexels.com')) {
+      console.log('✅ Imagen de Pexels detectada')
+    } else if (result.pack.image.url.includes('placehold.co')) {
+      console.log('⚠️ Usando placeholder (Pexels no encontró imagen o falló)')
+    } else {
+      console.log('❓ Imagen de origen desconocido:', result.pack.image.url)
+    }
+  } else {
+    console.error('❌ Error:', result.error)
+  }
+}
+
+async function testPexelsWithFallback() {
+  console.log('\n🔄 Probando Pexels con Fallback a IA...')
+  const provider = new GeminiAdapter()
+  const imageSearcher = new PexelsImageAdapter()
+  const imageCacheRepo = new ImageCacheRepository()
+  const imageGenerator = new NanobananaAdapter()
+
+  const result = await generateAdventureMultimodal(
+    testWizardData,
+    provider,
+    imageSearcher,      // Intenta Pexels primero
+    imageCacheRepo,     // Usa caché
+    imageGenerator      // Fallback a generación IA
+  )
+
+  if (result.ok && result.pack) {
+    console.log('✅ Aventura generada:', result.pack.title)
+    console.log('🖼️ Imagen URL:', result.pack.image.url)
+
+    if (result.warnings) {
+      console.log('⚠️ Warnings:', result.warnings)
+
+      // Analizar warnings para saber qué método se usó
+      const usedPexels = result.warnings.some(w => w.includes('Pexels'))
+      const usedAI = result.warnings.some(w => w.includes('Imagen generada por IA'))
+      const usedPlaceholder = result.warnings.some(w => w.includes('placeholder'))
+
+      if (usedPexels) {
+        console.log('✅ Usó imagen de Pexels')
+      } else if (usedAI) {
+        console.log('🤖 Usó generación por IA (fallback)')
+      } else if (usedPlaceholder) {
+        console.log('📦 Usó placeholder (ambos fallaron)')
+      }
+    }
+  } else {
+    console.error('❌ Error:', result.error)
+  }
+}
+
 async function main() {
   console.log('🚀 Iniciando pruebas del orquestador multimodal...\n')
 
   try {
+    // Pruebas básicas
     await testOpenAI()
     await testGemini()
     await testMultimodal()
     await testComparison()
+
+    // Pruebas con Pexels (NUEVO)
+    console.log('\n' + '='.repeat(60))
+    console.log('🆕 PRUEBAS CON PEXELS IMAGE SEARCH')
+    console.log('='.repeat(60))
+
+    await testPexels()
+    await testPexelsWithFallback()
 
     console.log('\n✅ Todas las pruebas completadas exitosamente!')
   } catch (error) {
