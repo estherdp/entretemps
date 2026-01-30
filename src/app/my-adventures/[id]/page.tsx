@@ -6,8 +6,18 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/ui/components/card'
 import { Button } from '@/ui/components/button'
 import { Textarea } from '@/ui/components/textarea'
 import { Input } from '@/ui/components/input'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/ui/components/dialog'
 import { SavedAdventurePack } from '@/domain/saved-adventure-pack'
 import { useUserPackDetails } from '@/ui/hooks/use-user-pack-details'
+import { useDeletePack } from '@/ui/hooks/use-delete-pack'
 import { useRepositories } from '@/ui/providers/repository-provider'
 import { updateMyPackText, PackTextChanges } from '@/application/update-my-pack-text'
 import { duplicateMyPack } from '@/application/duplicate-my-pack'
@@ -31,6 +41,11 @@ export default function AdventureDetailPage() {
   const [isSaving, setIsSaving] = useState(false)
   const [isDuplicating, setIsDuplicating] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
+
+  // Delete dialog state
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+  const [deleteSuccess, setDeleteSuccess] = useState(false)
+  const { deletePack, isDeleting, error: deleteError } = useDeletePack()
 
   // Editable text fields
   const [title, setTitle] = useState('')
@@ -118,6 +133,26 @@ export default function AdventureDetailPage() {
     } finally {
       setIsDuplicating(false)
     }
+  }
+
+  const handleDelete = async () => {
+    console.log('[handleDelete] Iniciando eliminación...')
+    const success = await deletePack(id)
+    console.log('[handleDelete] Resultado de deletePack:', success)
+
+    if (success) {
+      console.log('[handleDelete] Eliminación exitosa, mostrando mensaje...')
+      setDeleteSuccess(true)
+      // Esperar 2 segundos para que se vean los logs
+      await new Promise(resolve => setTimeout(resolve, 2000))
+      console.log('[handleDelete] Redirigiendo a /my-adventures')
+      setShowDeleteDialog(false)
+      // Forzar recarga completa de la página para actualizar el listado
+      window.location.href = '/my-adventures'
+    } else {
+      console.error('[handleDelete] La eliminación falló')
+    }
+    // Si hay error, se muestra en el dialog (deleteError del hook)
   }
 
   const handleCancelEdit = () => {
@@ -228,11 +263,62 @@ export default function AdventureDetailPage() {
               </Button>
               <Button
                 onClick={handleDuplicate}
-                disabled={isDuplicating}
+                disabled={isDuplicating || isDeleting}
                 variant="outline"
               >
                 {isDuplicating ? 'Duplicando...' : '📋 Guardar como nueva'}
               </Button>
+
+              {/* Delete Button with Confirmation Dialog */}
+              <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+                <DialogTrigger asChild>
+                  <Button
+                    variant="destructive"
+                    disabled={isDuplicating || isDeleting}
+                  >
+                    🗑️ Eliminar
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>¿Eliminar esta aventura?</DialogTitle>
+                    <DialogDescription>
+                      Esta acción no se puede deshacer. Se eliminará permanentemente
+                      "{title}" de tu colección de aventuras.
+                    </DialogDescription>
+                  </DialogHeader>
+                  {deleteSuccess && (
+                    <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg p-3">
+                      <p className="text-sm text-green-800 dark:text-green-200">
+                        ✓ Aventura eliminada exitosamente. Redirigiendo...
+                      </p>
+                    </div>
+                  )}
+                  {deleteError && !deleteSuccess && (
+                    <div className="bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-lg p-3">
+                      <p className="text-sm text-red-800 dark:text-red-200">
+                        {deleteError}
+                      </p>
+                    </div>
+                  )}
+                  <DialogFooter>
+                    <Button
+                      variant="outline"
+                      onClick={() => setShowDeleteDialog(false)}
+                      disabled={isDeleting || deleteSuccess}
+                    >
+                      Cancelar
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      onClick={handleDelete}
+                      disabled={isDeleting || deleteSuccess}
+                    >
+                      {isDeleting ? 'Eliminando...' : deleteSuccess ? 'Eliminada ✓' : 'Sí, eliminar'}
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </div>
           )}
 

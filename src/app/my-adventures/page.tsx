@@ -2,8 +2,9 @@
 
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { Card, CardContent, CardHeader, CardTitle } from '@/ui/components/card'
+import { Card, CardContent } from '@/ui/components/card'
 import { Button } from '@/ui/components/button'
+import { AdventureCard } from '@/ui/components/adventure-card'
 import { useMyAdventurePacks } from '@/ui/hooks/use-my-adventure-packs'
 
 export default function MyAdventuresPage() {
@@ -36,9 +37,14 @@ export default function MyAdventuresPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
-      <div className="max-w-4xl mx-auto px-4 pt-20 pb-8 space-y-8">
+      <div className="max-w-7xl mx-auto px-4 pt-20 pb-8 space-y-8">
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl md:text-4xl font-bold">Mis Aventuras</h1>
+          <div>
+            <h1 className="text-3xl md:text-4xl font-bold">Mis Aventuras</h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              Tus creaciones guardadas
+            </p>
+          </div>
           <Button onClick={() => router.push('/wizard/step-1')}>
             Nueva aventura
           </Button>
@@ -56,43 +62,17 @@ export default function MyAdventuresPage() {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
             {packs.map((pack) => (
-              <Card
+              <AdventureCard
                 key={pack.id}
-                className="hover:shadow-lg transition-shadow cursor-pointer"
-                onClick={() => router.push(`/my-adventures/${pack.id}`)}
-              >
-                <CardHeader>
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1">
-                      <CardTitle className="text-xl">{pack.title}</CardTitle>
-                      <p className="text-sm text-muted-foreground mt-2">
-                        {pack.pack.ageRange.min}-{pack.pack.ageRange.max} años •{' '}
-                        {pack.pack.estimatedDurationMinutes} min •{' '}
-                        {pack.pack.participants} participantes
-                      </p>
-                    </div>
-                    {pack.pack.image.url && (
-                      <img
-                        src={pack.pack.image.url}
-                        alt={pack.title}
-                        className="w-20 h-20 object-cover rounded"
-                      />
-                    )}
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-xs text-muted-foreground">
-                    Creado el{' '}
-                    {new Date(pack.createdAt).toLocaleDateString('es-ES', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })}
-                  </p>
-                </CardContent>
-              </Card>
+                id={pack.id}
+                title={pack.title}
+                ageRange={pack.pack.ageRange}
+                estimatedDurationMinutes={pack.pack.estimatedDurationMinutes}
+                imageUrl={pack.pack.image?.url}
+                href={`/my-adventures/${pack.id}`}
+              />
             ))}
           </div>
         )}
