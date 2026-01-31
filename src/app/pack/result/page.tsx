@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/components/card'
 import { Button } from '@/ui/components/button'
 import type { GeneratedAdventurePack } from '@/domain/generated-adventure-pack'
@@ -59,10 +60,13 @@ export default function PackResultPage() {
       {/* Hero Image */}
       <div className="relative w-full h-64 md:h-96 bg-gradient-to-br from-purple-500/20 to-blue-500/20 overflow-hidden">
         {pack.image.url ? (
-          <img
+          <Image
             src={pack.image.url}
             alt={pack.title}
-            className="w-full h-full object-cover"
+            fill
+            className="object-cover"
+            unoptimized
+            priority
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">

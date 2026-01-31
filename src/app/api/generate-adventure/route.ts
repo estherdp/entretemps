@@ -2,22 +2,29 @@
 
 import { NextResponse } from 'next/server'
 import { generateAdventureMultimodal } from '@/application/generate-adventure-multimodal'
-import { GeminiAdapter } from '@/infrastructure/ai/adapters'
+import { GeminiAdapter, NanobananaAdapter, PollinationsImageAdapter } from '@/infrastructure/ai/adapters'
 import { N8NAdapter } from '@/infrastructure/n8n/n8n-adapter'
 import { PexelsImageAdapter } from '@/infrastructure/images'
 import { ImageCacheRepository } from '@/infrastructure/supabase'
 import type { WizardData } from '@/domain/wizard-data'
+import type { IImageGenerator } from '@/domain/services'
 
 /**
  * API Route para generar aventuras con IA.
  *
- * ACTUALIZADO: Ahora usa generateAdventureMultimodal con Pexels para imágenes reales.
+ * ACTUALIZADO: Usa generateAdventureMultimodal con estrategia multimodal de imágenes.
  *
- * Flujo de imágenes:
- * 1. Busca en Pexels (prioridad) - imágenes reales de alta calidad
- * 2. Si falla, usa placeholder (no genera por IA para ahorrar costes)
+ * Flujo de imágenes (prioridad invertida):
+ * 1. Si hay IMAGE_GENERATOR_PROVIDER configurado, genera imagen por IA (PRIORIDAD)
+ * 2. Si falla (ej. sin créditos) o no hay generador, busca en Pexels (FALLBACK)
+ * 3. Si todo falla, usa placeholder
  *
- * Server-only: Tiene acceso a variables de entorno privadas como GEMINI_API_KEY y PEXELS_API_KEY.
+ * Proveedores de generación de imágenes disponibles:
+ * - 'nanobanana': Google Gemini 2.5 Flash Image (requiere GEMINI_API_KEY)
+ * - 'pollinations': Pollinations AI con modelo Flux (requiere POLLINATIONS_API_KEY)
+ * - undefined: Sin generador (solo usa Pexels + placeholder)
+ *
+ * Server-only: Tiene acceso a variables de entorno privadas.
  * El cliente (step-6) hace un POST a esta ruta con los datos del wizard.
  */
 export async function POST(request: Request) {
@@ -72,13 +79,43 @@ export async function POST(request: Request) {
     const imageSearcher = new PexelsImageAdapter() // Lee PEXELS_API_KEY del env
     const imageCacheRepo = new ImageCacheRepository()
 
+    // Configurar generador de imágenes (opcional, usado como fallback)
+    // Options: 'nanobanana', 'pollinations', undefined (sin generador)
+    const imageGeneratorType = process.env.IMAGE_GENERATOR_PROVIDER
+    let imageGenerator: IImageGenerator | undefined
+
+    if (imageGeneratorType) {
+      try {
+        switch (imageGeneratorType) {
+          case 'nanobanana':
+            imageGenerator = new NanobananaAdapter()
+            console.log('[generate-adventure API] Usando NanobananaAdapter para generación de imágenes')
+            break
+
+          case 'pollinations':
+            imageGenerator = new PollinationsImageAdapter()
+            console.log('[generate-adventure API] Usando PollinationsImageAdapter para generación de imágenes')
+            break
+
+          default:
+            console.warn(`[generate-adventure API] IMAGE_GENERATOR_PROVIDER desconocido: ${imageGeneratorType}. No se usará generador de imágenes.`)
+            imageGenerator = undefined
+        }
+      } catch (error) {
+        console.warn(
+          `[generate-adventure API] Error al inicializar generador de imágenes: ${error instanceof Error ? error.message : 'Error desconocido'}`
+        )
+        imageGenerator = undefined
+      }
+    }
+
     // Generar aventura usando el orquestador multimodal
     const result = await generateAdventureMultimodal(
       wizardData,
       provider,
-      imageSearcher,    // Busca en Pexels (prioridad)
+      imageSearcher,    // Busca en Pexels (fallback si generador falla)
       imageCacheRepo,   // Usa caché de 24h para optimizar
-      undefined         // Sin generador IA (ahorramos costes)
+      imageGenerator    // Generador IA (prioridad si está configurado)
     )
 
     if (result.ok) {

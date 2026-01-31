@@ -466,21 +466,25 @@ describe('generateAdventureMultimodal', () => {
       })
     })
 
-    it('should fallback to image generator when searcher returns null', async () => {
+    it('should fallback to image searcher when generator fails', async () => {
       const mockPack = createMockPack()
       const mockProvider: IAdventureProvider = {
         generateAdventure: vi.fn().mockResolvedValue(mockPack),
       }
 
       const mockImageSearcher: IImageSearcher = {
-        searchCoverImage: vi.fn().mockResolvedValue(null), // No encontró imagen
+        searchCoverImage: vi.fn().mockResolvedValue({
+          url: 'https://images.pexels.com/photos/fallback/123.jpg',
+          prompt: 'adventure home exciting',
+          attribution: {
+            photographer: 'Fallback Photographer',
+            sourceUrl: 'https://pexels.com/photo/123',
+          },
+        }),
       }
 
       const mockImageGen: IImageGenerator = {
-        generateImage: vi.fn().mockResolvedValue({
-          url: 'https://example.com/ai-generated.jpg',
-          prompt: 'Una selva mágica',
-        }),
+        generateImage: vi.fn().mockRejectedValue(new Error('AI service unavailable')),
       }
 
       const result = await generateAdventureMultimodal(
@@ -493,18 +497,19 @@ describe('generateAdventureMultimodal', () => {
 
       expect(result.ok).toBe(true)
 
-      // Verificar que se intentó búsqueda primero
-      expect(mockImageSearcher.searchCoverImage).toHaveBeenCalledTimes(1)
-
-      // Verificar que se usó el generador como fallback
+      // Verificar que se intentó generación primero
       expect(mockImageGen.generateImage).toHaveBeenCalledTimes(1)
 
-      // Verificar que la imagen es la generada por IA
-      expect(result.pack?.image.url).toBe('https://example.com/ai-generated.jpg')
+      // Verificar que se usó el searcher como fallback
+      expect(mockImageSearcher.searchCoverImage).toHaveBeenCalledTimes(1)
 
-      // Debe tener warning sobre generación por IA
+      // Verificar que la imagen es la de Pexels (fallback)
+      expect(result.pack?.image.url).toBe('https://images.pexels.com/photos/fallback/123.jpg')
+
+      // Debe tener warnings sobre el fallo y el fallback
       expect(result.warnings).toBeDefined()
-      expect(result.warnings?.some((w) => w.includes('Imagen generada por IA'))).toBe(true)
+      expect(result.warnings?.some((w) => w.includes('AI service unavailable'))).toBe(true)
+      expect(result.warnings?.some((w) => w.includes('Pexels, usado como fallback'))).toBe(true)
     })
 
     it('should use placeholder when both searcher and generator fail', async () => {
@@ -570,7 +575,7 @@ describe('generateAdventureMultimodal', () => {
       expect(result.warnings?.some((w) => w.includes('Network timeout'))).toBe(true)
     })
 
-    it('should prioritize searcher over generator when both provided', async () => {
+    it('should prioritize generator over searcher when both provided', async () => {
       const mockPack = createMockPack()
       const mockProvider: IAdventureProvider = {
         generateAdventure: vi.fn().mockResolvedValue(mockPack),
@@ -578,15 +583,15 @@ describe('generateAdventureMultimodal', () => {
 
       const mockImageSearcher: IImageSearcher = {
         searchCoverImage: vi.fn().mockResolvedValue({
-          url: 'https://images.pexels.com/priority/123.jpg',
+          url: 'https://images.pexels.com/should-not-be-used/123.jpg',
           prompt: 'adventure home exciting',
         }),
       }
 
       const mockImageGen: IImageGenerator = {
         generateImage: vi.fn().mockResolvedValue({
-          url: 'https://example.com/should-not-be-used.jpg',
-          prompt: 'Test',
+          url: 'https://example.com/ai-priority.jpg',
+          prompt: 'Una selva mágica',
         }),
       }
 
@@ -600,14 +605,14 @@ describe('generateAdventureMultimodal', () => {
 
       expect(result.ok).toBe(true)
 
-      // Verificar que se usó el searcher
-      expect(mockImageSearcher.searchCoverImage).toHaveBeenCalledTimes(1)
+      // Verificar que se usó el generador primero
+      expect(mockImageGen.generateImage).toHaveBeenCalledTimes(1)
 
-      // Verificar que NO se llamó al generador (searcher tuvo éxito)
-      expect(mockImageGen.generateImage).not.toHaveBeenCalled()
+      // Verificar que NO se llamó al searcher (generador tuvo éxito)
+      expect(mockImageSearcher.searchCoverImage).not.toHaveBeenCalled()
 
-      // Verificar que se usó la imagen de Pexels
-      expect(result.pack?.image.url).toBe('https://images.pexels.com/priority/123.jpg')
+      // Verificar que se usó la imagen generada por IA
+      expect(result.pack?.image.url).toBe('https://example.com/ai-priority.jpg')
     })
   })
 })

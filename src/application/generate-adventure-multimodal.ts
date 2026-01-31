@@ -60,20 +60,22 @@ function buildImageSearchQuery(pack: GeneratedAdventurePack): string {
  * ORQUESTADOR MULTIMODAL:
  * Este caso de uso coordina proveedores de IA y búsqueda de imágenes:
  * 1. IAdventureProvider: Genera el texto de la aventura y el prompt de imagen
- * 2. IImageSearcher: Busca imágenes reales en Pexels (prioritario, con caché)
- * 3. IImageGenerator: Genera imágenes por IA (fallback si no hay searcher)
+ * 2. IImageGenerator: Genera imágenes por IA (prioritario si está configurado)
+ * 3. IImageSearcher: Busca imágenes reales en Pexels (fallback si generador falla)
  *
  * FLUJO SECUENCIAL CON ESTRATEGIA DE IMAGEN:
  * 1. Genera la aventura (texto + prompt de imagen)
- * 2. Intenta búsqueda de imagen real (Pexels):
+ * 2. Si hay imageGenerator configurado, intenta generación por IA (prioridad):
+ *    - Genera imagen con Pollinations/Nanobanana
+ *    - Si falla (ej. sin créditos), continúa con búsqueda
+ * 3. Si generación falla o no hay generador, intenta búsqueda (Pexels):
  *    - Consulta caché primero (24h)
  *    - Si no hay en caché, busca en Pexels y guarda resultado
- * 3. Si búsqueda falla, intenta generación de imagen por IA (fallback)
  * 4. Si todo falla, usa placeholder
  * 5. Retorna el pack completo listo para persistir en Supabase
  *
  * RESILIENCIA:
- * - Si la búsqueda/generación de imagen falla, mantiene un placeholder
+ * - Si la generación/búsqueda de imagen falla, mantiene un placeholder
  * - Registra warnings pero no falla toda la operación
  * - La aventura (texto) siempre se guarda, incluso sin imagen
  *
@@ -83,9 +85,9 @@ function buildImageSearchQuery(pack: GeneratedAdventurePack): string {
  *
  * @param wizardData - Datos del wizard
  * @param adventureProvider - Proveedor de generación de texto
- * @param imageSearcher - Buscador de imágenes (Pexels, opcional pero recomendado)
+ * @param imageSearcher - Buscador de imágenes (Pexels, fallback opcional)
  * @param imageCacheRepo - Repositorio de caché (opcional, mejora performance)
- * @param imageGenerator - Generador de imágenes por IA (fallback opcional)
+ * @param imageGenerator - Generador de imágenes por IA (prioridad si está configurado)
  * @returns Resultado con el pack completo o error
  */
 export async function generateAdventureMultimodal(
@@ -107,8 +109,29 @@ export async function generateAdventureMultimodal(
 
     let imageObtained = false
 
-    // PASO 2: PRIORIDAD - Intentar búsqueda de imagen real (Pexels con caché)
-    if (imageSearcher) {
+    // PASO 2: PRIORIDAD - Intentar generación de imagen por IA (si está configurado)
+    if (imageGenerator && pack.image?.prompt) {
+      try {
+        console.log('[generateAdventureMultimodal] Generando imagen por IA (prioridad)...')
+        const newImage = await imageGenerator.generateImage(pack.image.prompt)
+
+        pack.image = {
+          url: newImage.url,
+          prompt: newImage.prompt,
+        }
+        imageObtained = true
+        console.log('[generateAdventureMultimodal] Imagen generada exitosamente por IA')
+      } catch (imageError) {
+        const errorMessage =
+          imageError instanceof Error ? imageError.message : 'Error desconocido'
+
+        console.error('[generateAdventureMultimodal] Error en generación de imagen:', imageError)
+        warnings.push(`Generación de imagen falló: ${errorMessage}. Intentando búsqueda...`)
+      }
+    }
+
+    // PASO 3: FALLBACK - Si no se obtuvo imagen por IA, intentar búsqueda en Pexels
+    if (!imageObtained && imageSearcher) {
       try {
         // Construir query optimizada para búsqueda
         const searchQuery = buildImageSearchQuery(pack)
@@ -116,7 +139,7 @@ export async function generateAdventureMultimodal(
 
         let searchResult = null
 
-        // 2.1: Intentar obtener de caché primero
+        // 3.1: Intentar obtener de caché primero
         if (imageCacheRepo) {
           searchResult = await imageCacheRepo.get(searchQuery)
           if (searchResult) {
@@ -124,12 +147,12 @@ export async function generateAdventureMultimodal(
           }
         }
 
-        // 2.2: Si no hay en caché, buscar en Pexels
+        // 3.2: Si no hay en caché, buscar en Pexels
         if (!searchResult) {
           console.log('[generateAdventureMultimodal] Buscando en Pexels...')
           searchResult = await imageSearcher.searchCoverImage(searchQuery)
 
-          // 2.3: Guardar en caché si se encontró resultado
+          // 3.3: Guardar en caché si se encontró resultado
           if (searchResult && imageCacheRepo) {
             await imageCacheRepo.set({
               query: searchQuery,
@@ -141,7 +164,7 @@ export async function generateAdventureMultimodal(
           }
         }
 
-        // 2.4: Si se encontró imagen, actualizar el pack
+        // 3.4: Si se encontró imagen, actualizar el pack
         if (searchResult) {
           pack.image = {
             url: searchResult.url,
@@ -151,7 +174,7 @@ export async function generateAdventureMultimodal(
 
           if (searchResult.attribution) {
             warnings.push(
-              `Imagen por ${searchResult.attribution.photographer} (Pexels)`
+              `Imagen por ${searchResult.attribution.photographer} (Pexels, usado como fallback)`
             )
           }
         }
@@ -160,31 +183,6 @@ export async function generateAdventureMultimodal(
           searchError instanceof Error ? searchError.message : 'Error desconocido'
         console.error('[generateAdventureMultimodal] Error en búsqueda de imagen:', searchError)
         warnings.push(`Búsqueda de imagen falló: ${errorMessage}`)
-      }
-    }
-
-    // PASO 3: FALLBACK - Si no se obtuvo imagen por búsqueda, intentar generación por IA
-    if (!imageObtained && imageGenerator && pack.image?.prompt) {
-      try {
-        console.log('[generateAdventureMultimodal] Generando imagen por IA...')
-        const newImage = await imageGenerator.generateImage(pack.image.prompt)
-
-        pack.image = {
-          url: newImage.url,
-          prompt: newImage.prompt,
-        }
-        imageObtained = true
-
-        // Solo agregar warning si imageGenerator se usa como fallback (después de que searcher falló)
-        if (imageSearcher) {
-          warnings.push('Imagen generada por IA')
-        }
-      } catch (imageError) {
-        const errorMessage =
-          imageError instanceof Error ? imageError.message : 'Error desconocido'
-
-        console.error('[generateAdventureMultimodal] Error en generación de imagen:', imageError)
-        warnings.push(`Generación de imagen falló: ${errorMessage}`)
       }
     }
 

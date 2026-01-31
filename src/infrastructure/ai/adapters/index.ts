@@ -9,6 +9,7 @@
  *
  * Proveedores de Imagen (IImageGenerator):
  * - NanobananaAdapter: Generación de imágenes mediante Gemini (gemini-2.5-flash-image)
+ * - PollinationsImageAdapter: Generación de imágenes mediante Pollinations AI (Flux)
  *
  * Nota: N8NAdapter se exporta desde src/infrastructure/n8n/
  */
@@ -16,3 +17,4 @@
 export { OpenAIAdapter } from './openai.adapter'
 export { GeminiAdapter } from './gemini.adapter'
 export { NanobananaAdapter } from './nanobanana.adapter'
+export { PollinationsImageAdapter, createPollinationsImageAdapter } from './pollinations-image.adapter'

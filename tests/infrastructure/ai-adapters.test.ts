@@ -1,7 +1,7 @@
 // tests/infrastructure/ai-adapters.test.ts
 
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { OpenAIAdapter, GeminiAdapter, NanobananaAdapter } from '@/infrastructure/ai/adapters'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { OpenAIAdapter, GeminiAdapter, NanobananaAdapter, PollinationsImageAdapter } from '@/infrastructure/ai/adapters'
 import type { WizardData } from '@/domain/wizard-data'
 
 // Mock del SDK de Google Gemini para tests de integración
@@ -246,6 +246,109 @@ describe('NanobananaAdapter', () => {
 
     // Prompts diferentes deberían dar URLs diferentes
     expect(image1.url).not.toBe(image2.url)
+  })
+})
+
+describe('PollinationsImageAdapter', () => {
+  // Mock de fetch global para simular respuestas de Pollinations
+  const originalFetch = global.fetch
+
+  beforeEach(() => {
+    // Mock de fetch que simula respuesta exitosa de Pollinations
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      statusText: 'OK',
+    })
+  })
+
+  afterEach(() => {
+    global.fetch = originalFetch
+  })
+
+  it('should implement IImageGenerator interface', () => {
+    const adapter = new PollinationsImageAdapter('test-api-key')
+    expect(adapter.generateImage).toBeDefined()
+    expect(typeof adapter.generateImage).toBe('function')
+  })
+
+  it('should throw error if API key is not configured', () => {
+    const originalEnv = process.env.POLLINATIONS_API_KEY
+    delete process.env.POLLINATIONS_API_KEY
+
+    expect(() => new PollinationsImageAdapter()).toThrow(
+      'POLLINATIONS_API_KEY no configurada'
+    )
+
+    process.env.POLLINATIONS_API_KEY = originalEnv
+  })
+
+  it('should generate image with correct structure', async () => {
+    const adapter = new PollinationsImageAdapter('test-api-key')
+    const prompt = 'Una selva tropical mágica con animales'
+    const image = await adapter.generateImage(prompt)
+
+    expect(image).toBeDefined()
+    expect(image.url).toBeTruthy()
+    expect(typeof image.url).toBe('string')
+    expect(image.url).toContain('gen.pollinations.ai')
+    expect(image.url).toContain('/image/')
+    expect(image.url).toContain('width=1024')
+    expect(image.url).toContain('height=1024')
+    expect(image.url).toContain('model=flux')
+
+    // Verificar que se aplicó el style wrapper
+    expect(image.prompt).toContain(prompt)
+    expect(image.prompt).toContain('Cartoon illustration style')
+  })
+
+  it('should apply style wrapper to prompt', async () => {
+    const adapter = new PollinationsImageAdapter('test-api-key')
+    const originalPrompt = 'Un dragón amigable'
+    const image = await adapter.generateImage(originalPrompt)
+
+    expect(image.prompt).toContain(originalPrompt)
+    expect(image.prompt).toContain('Cartoon illustration style')
+    expect(image.prompt).toContain('vibrant colors')
+    expect(image.prompt).toContain('cute animated characters')
+    expect(image.prompt).toContain('no text')
+    expect(image.prompt).toContain('no realistic people')
+  })
+
+  it('should include API key in URL as query parameter', async () => {
+    const adapter = new PollinationsImageAdapter('test-api-key-123')
+    const image = await adapter.generateImage('test prompt')
+
+    // Verificar que la API key está en la URL generada
+    expect(image.url).toContain('key=test-api-key-123')
+    expect(image.url).toContain('gen.pollinations.ai')
+  })
+
+  it('should generate different seeds for different calls', async () => {
+    const adapter = new PollinationsImageAdapter('test-api-key')
+    const prompt = 'Test prompt'
+
+    const image1 = await adapter.generateImage(prompt)
+    const image2 = await adapter.generateImage(prompt)
+
+    // Mismo prompt pero diferentes seeds = diferentes URLs
+    expect(image1.url).not.toBe(image2.url)
+
+    // Extraer seeds de las URLs
+    const seed1 = new URL(image1.url).searchParams.get('seed')
+    const seed2 = new URL(image2.url).searchParams.get('seed')
+
+    expect(seed1).not.toBe(seed2)
+  })
+
+  it('should generate valid URL even without verification', async () => {
+    const adapter = new PollinationsImageAdapter('test-api-key')
+    const image = await adapter.generateImage('test prompt')
+
+    // La URL debe ser válida incluso sin verificación HTTP
+    expect(image.url).toMatch(/^https:\/\/gen\.pollinations\.ai\/image\//)
+    expect(image.url).toContain('key=test-api-key')
+    expect(image.url).toContain('model=flux')
   })
 })
 
