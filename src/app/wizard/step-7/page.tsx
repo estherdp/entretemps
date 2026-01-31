@@ -4,49 +4,48 @@ import { WizardShell } from '@/ui/components/wizard-shell'
 import { WizardStepCard } from '@/ui/components/wizard-step-card'
 import { cn } from '@/lib/utils'
 
-import type { Tone } from '@/domain/wizard-data'
+import type { Difficulty } from '@/domain/wizard-data'
 import { useWizard } from '@/ui/wizard/wizard-provider'
 
-const TONE_OPTIONS: { value: Tone; label: string }[] = [
-  { value: 'funny', label: 'Divertida' },
-  { value: 'enigmatic', label: 'Enigmática' },
-  { value: 'exciting', label: 'Emocionante' },
-  { value: 'calm', label: 'Tranquila' },
+const DIFFICULTY_OPTIONS: { value: Difficulty; label: string }[] = [
+  { value: 'easy', label: 'Fácil' },
+  { value: 'medium', label: 'Media' },
+  { value: 'hard', label: 'Desafiante' },
 ]
 
-export default function Step6Page() {
+export default function Step7Page() {
   const { wizardData, setWizardData } = useWizard()
-  const selected = wizardData.tone || null
+  const selected = wizardData.difficulty || null
 
   return (
     <WizardShell
-      currentStep={6}
+      currentStep={7}
       totalSteps={8}
-      prevHref="/wizard/step-5"
-      nextHref="/wizard/step-7"
+      prevHref="/wizard/step-6"
+      nextHref="/wizard/step-8"
       nextDisabled={!selected}
-      validationMessage={!selected ? 'Selecciona un tono para la historia' : undefined}
+      validationMessage={!selected ? 'Selecciona un nivel de dificultad' : undefined}
     >
       <WizardStepCard
-        title="Tono de la historia"
-        description="Define el ambiente y sensación de tu aventura."
+        title="Nivel de dificultad"
+        description="Los retos se adaptarán al nivel que elijas."
       >
-        <div className="flex flex-wrap gap-2">
-          {TONE_OPTIONS.map((option) => {
+        <div className="grid grid-cols-3 gap-3">
+          {DIFFICULTY_OPTIONS.map((option) => {
             const isSelected = selected === option.value
 
             return (
               <button
                 key={option.value}
                 type="button"
-                onClick={() => setWizardData({ tone: option.value })}
+                onClick={() => setWizardData({ difficulty: option.value })}
                 className={cn(
-                  'px-4 py-2.5 rounded-full text-sm font-medium transition-all',
-                  'border-2',
+                  'px-2 sm:px-4 py-3 rounded-lg text-xs sm:text-sm font-medium transition-all',
+                  'border-2 break-words',
                   'hover:border-primary/50 hover:bg-primary/5',
                   'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50',
                   isSelected
-                    ? 'border-primary bg-primary/10 text-primary shadow-sm'
+                    ? 'border-primary bg-primary text-primary-foreground shadow-sm'
                     : 'border-border bg-background text-foreground'
                 )}
                 aria-pressed={isSelected}

@@ -257,14 +257,15 @@ export default function AdventureDetailPage() {
 
           {/* Edit Mode Toggle */}
           {!isEditing && (
-            <div className="flex gap-2">
-              <Button onClick={() => setIsEditing(true)} variant="outline">
+            <div className="flex flex-col sm:flex-row gap-2">
+              <Button onClick={() => setIsEditing(true)} variant="outline" className="w-full sm:w-auto">
                 ✏️ Editar aventura
               </Button>
               <Button
                 onClick={handleDuplicate}
                 disabled={isDuplicating || isDeleting}
                 variant="outline"
+                className="w-full sm:w-auto"
               >
                 {isDuplicating ? 'Duplicando...' : '📋 Guardar como nueva'}
               </Button>
@@ -275,6 +276,7 @@ export default function AdventureDetailPage() {
                   <Button
                     variant="destructive"
                     disabled={isDuplicating || isDeleting}
+                    className="w-full sm:w-auto"
                   >
                     🗑️ Eliminar
                   </Button>

@@ -18,7 +18,7 @@ export default function Step2Page() {
   return (
     <WizardShell
       currentStep={2}
-      totalSteps={6}
+      totalSteps={8}
       prevHref="/wizard/step-1"
       nextHref="/wizard/step-3"
       nextDisabled={!validation.isValid}
