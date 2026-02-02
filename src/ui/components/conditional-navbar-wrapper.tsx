@@ -6,9 +6,8 @@ import { Navbar } from './navbar'
 export function ConditionalNavbarWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
 
-  const shouldShowNavbar =
-    !pathname.startsWith('/login') &&
-    !pathname.startsWith('/auth')
+  // Only hide navbar on auth callback pages (not on login page)
+  const shouldShowNavbar = !pathname.startsWith('/auth/callback')
 
   return (
     <>
