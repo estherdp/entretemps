@@ -405,6 +405,13 @@ export default function AdventureDetailPage() {
               >
                 {isDuplicating ? 'Duplicando...' : '📋 Guardar como nueva'}
               </Button>
+              <Button
+                onClick={() => window.print()}
+                variant="outline"
+                className="w-full sm:w-auto"
+              >
+                🖨️ Imprimir
+              </Button>
 
               {/* Delete Button with Confirmation Dialog */}
               <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
@@ -637,35 +644,26 @@ export default function AdventureDetailPage() {
           </CardContent>
         </Card>
 
-        {/* Actions */}
-        <div className="flex flex-col sm:flex-row gap-4 pt-4">
-          {isEditing ? (
-            <>
-              <Button
-                onClick={handleCancelEdit}
-                variant="outline"
-                className="flex-1"
-                disabled={isSaving}
-              >
-                Cancelar
-              </Button>
-              <Button
-                onClick={handleSaveChanges}
-                className="flex-1"
-                disabled={isSaving}
-              >
-                {isSaving ? 'Guardando...' : '💾 Guardar cambios'}
-              </Button>
-            </>
-          ) : (
+        {/* Actions - Save/Cancel when editing */}
+        {isEditing && (
+          <div className="flex flex-col sm:flex-row gap-4 pt-4">
             <Button
-              onClick={() => window.print()}
-              className="w-full sm:w-auto"
+              onClick={handleCancelEdit}
+              variant="outline"
+              className="flex-1"
+              disabled={isSaving}
             >
-              Imprimir Pack
+              Cancelar
             </Button>
-          )}
-        </div>
+            <Button
+              onClick={handleSaveChanges}
+              className="flex-1"
+              disabled={isSaving}
+            >
+              {isSaving ? 'Guardando...' : '💾 Guardar cambios'}
+            </Button>
+          </div>
+        )}
 
         {/* Footer Info */}
         <p className="text-xs text-center text-muted-foreground pt-4">
