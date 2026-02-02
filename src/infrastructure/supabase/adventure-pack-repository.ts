@@ -1,6 +1,7 @@
 import { supabase } from './supabase-client'
 import { GeneratedAdventurePack } from '@/domain/generated-adventure-pack'
 import { SavedAdventurePack } from '@/domain/saved-adventure-pack'
+import type { SupabaseClient } from '@supabase/supabase-js'
 
 export interface SaveAdventurePackParams {
   userId: string
@@ -9,8 +10,14 @@ export interface SaveAdventurePackParams {
 }
 
 export class AdventurePackRepository {
+  private client: SupabaseClient
+
+  constructor(client?: SupabaseClient) {
+    this.client = client || supabase
+  }
+
   async save(params: SaveAdventurePackParams): Promise<SavedAdventurePack> {
-    const { data, error } = await supabase
+    const { data, error } = await this.client
       .from('adventure_packs')
       .insert({
         user_id: params.userId,
@@ -34,7 +41,7 @@ export class AdventurePackRepository {
   }
 
   async listByUserId(userId: string): Promise<SavedAdventurePack[]> {
-    const { data, error } = await supabase
+    const { data, error } = await this.client
       .from('adventure_packs')
       .select('*')
       .eq('user_id', userId)
@@ -54,7 +61,7 @@ export class AdventurePackRepository {
   }
 
   async getById(id: string): Promise<SavedAdventurePack | null> {
-    const { data, error } = await supabase
+    const { data, error } = await this.client
       .from('adventure_packs')
       .select('*')
       .eq('id', id)
@@ -81,7 +88,7 @@ export class AdventurePackRepository {
     pack: GeneratedAdventurePack
   ): Promise<SavedAdventurePack> {
     // First, update the pack without trying to select
-    const { error: updateError } = await supabase
+    const { error: updateError } = await this.client
       .from('adventure_packs')
       .update({
         pack: pack,
@@ -122,7 +129,7 @@ export class AdventurePackRepository {
 
     console.log('[Repository] Ejecutando DELETE en Supabase...')
     // Eliminar el pack (doble check con user_id en la query)
-    const { error, data, count } = await supabase
+    const { error, data, count } = await this.client
       .from('adventure_packs')
       .delete()
       .eq('id', id)

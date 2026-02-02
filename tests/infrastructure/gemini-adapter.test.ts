@@ -331,4 +331,228 @@ Espero que te guste!`
       expect(callArgs.config.maxOutputTokens).toBe(2000)
     })
   })
+
+  describe('regenerateSingleMission', () => {
+    const mockContext = {
+      title: 'La Aventura del Tesoro',
+      ageRange: { min: 6, max: 10 },
+      adventureType: 'adventure' as const,
+      tone: 'exciting' as const,
+      place: 'home' as const,
+      difficulty: 'medium' as const,
+      existingMissions: [
+        {
+          order: 1,
+          title: 'Encuentra el mapa',
+          story: 'Historia de la misión 1',
+        },
+        {
+          order: 3,
+          title: 'Descubre el tesoro',
+          story: 'Historia de la misión 3',
+        },
+      ],
+    }
+
+    const mockCurrentMission = {
+      order: 2,
+      title: 'Descifra las pistas',
+      story: 'Historia de la misión 2',
+      parentGuide: 'Guía para padres',
+      successCondition: 'Resolver el acertijo',
+    }
+
+    const validMissionJSON = {
+      order: 2,
+      title: 'Descifra las pistas mejoradas',
+      story: 'Nueva historia de la misión 2',
+      parentGuide: 'Nueva guía para padres',
+      successCondition: 'Resolver el nuevo acertijo',
+    }
+
+    it('should regenerate a mission successfully', async () => {
+      mockGenerateContent.mockResolvedValue({
+        text: JSON.stringify(validMissionJSON),
+      })
+
+      const result = await adapter.regenerateSingleMission(
+        mockContext,
+        mockCurrentMission,
+        undefined,
+        'es'
+      )
+
+      expect(result).toEqual(validMissionJSON)
+      expect(mockGenerateContent).toHaveBeenCalledTimes(1)
+
+      const callArgs = mockGenerateContent.mock.calls[0][0]
+      expect(callArgs.config.responseMimeType).toBe('application/json')
+      expect(callArgs.config.maxOutputTokens).toBe(1500) // Menos tokens para una sola misión
+    })
+
+    it('should include context in the prompt', async () => {
+      mockGenerateContent.mockResolvedValue({
+        text: JSON.stringify(validMissionJSON),
+      })
+
+      await adapter.regenerateSingleMission(
+        mockContext,
+        mockCurrentMission,
+        undefined,
+        'es'
+      )
+
+      const callArgs = mockGenerateContent.mock.calls[0][0]
+      const prompt = callArgs.contents
+
+      expect(prompt).toContain('La Aventura del Tesoro')
+      expect(prompt).toContain('6-10 años')
+      expect(prompt).toContain('adventure')
+      expect(prompt).toContain('exciting')
+      expect(prompt).toContain('home')
+      expect(prompt).toContain('medium')
+    })
+
+    it('should include existing missions in the prompt for coherence', async () => {
+      mockGenerateContent.mockResolvedValue({
+        text: JSON.stringify(validMissionJSON),
+      })
+
+      await adapter.regenerateSingleMission(
+        mockContext,
+        mockCurrentMission,
+        undefined,
+        'es'
+      )
+
+      const callArgs = mockGenerateContent.mock.calls[0][0]
+      const prompt = callArgs.contents
+
+      expect(prompt).toContain('Encuentra el mapa')
+      expect(prompt).toContain('Descubre el tesoro')
+      expect(prompt).toContain('MISIONES EXISTENTES')
+    })
+
+    it('should include feedback in the prompt when provided', async () => {
+      mockGenerateContent.mockResolvedValue({
+        text: JSON.stringify(validMissionJSON),
+      })
+
+      const feedback = 'Hazla más divertida con elementos de humor'
+
+      await adapter.regenerateSingleMission(
+        mockContext,
+        mockCurrentMission,
+        feedback,
+        'es'
+      )
+
+      const callArgs = mockGenerateContent.mock.calls[0][0]
+      const prompt = callArgs.contents
+
+      expect(prompt).toContain(feedback)
+      expect(prompt).toContain('FEEDBACK DEL USUARIO')
+    })
+
+    it('should handle JSON wrapped in markdown code blocks', async () => {
+      mockGenerateContent.mockResolvedValue({
+        text: '```json\n' + JSON.stringify(validMissionJSON) + '\n```',
+      })
+
+      const result = await adapter.regenerateSingleMission(
+        mockContext,
+        mockCurrentMission,
+        undefined,
+        'es'
+      )
+
+      expect(result).toEqual(validMissionJSON)
+    })
+
+    it('should throw error if response is not valid JSON', async () => {
+      mockGenerateContent.mockResolvedValue({
+        text: 'This is not JSON',
+      })
+
+      await expect(
+        adapter.regenerateSingleMission(mockContext, mockCurrentMission, undefined, 'es')
+      ).rejects.toThrow('No se encontró un JSON válido')
+    })
+
+    it('should throw error if mission validation fails', async () => {
+      const invalidMission = {
+        order: 2,
+        title: 'Test',
+        // Faltan campos requeridos
+      }
+
+      mockGenerateContent.mockResolvedValue({
+        text: JSON.stringify(invalidMission),
+      })
+
+      await expect(
+        adapter.regenerateSingleMission(mockContext, mockCurrentMission, undefined, 'es')
+      ).rejects.toThrow('Validación de misión falló')
+    })
+
+    it('should correct the order if it does not match expected', async () => {
+      const missionWithWrongOrder = {
+        ...validMissionJSON,
+        order: 5, // Orden incorrecto
+      }
+
+      mockGenerateContent.mockResolvedValue({
+        text: JSON.stringify(missionWithWrongOrder),
+      })
+
+      const result = await adapter.regenerateSingleMission(
+        mockContext,
+        mockCurrentMission,
+        undefined,
+        'es'
+      )
+
+      expect(result.order).toBe(2) // Debe corregir al orden esperado
+    })
+
+    it('should throw error if SDK throws error', async () => {
+      mockGenerateContent.mockRejectedValue(new Error('Network error'))
+
+      await expect(
+        adapter.regenerateSingleMission(mockContext, mockCurrentMission, undefined, 'es')
+      ).rejects.toThrow('Error al regenerar misión con Gemini: Network error')
+    })
+
+    it('should use Spanish language instruction for es locale', async () => {
+      mockGenerateContent.mockResolvedValue({
+        text: JSON.stringify(validMissionJSON),
+      })
+
+      await adapter.regenerateSingleMission(
+        mockContext,
+        mockCurrentMission,
+        undefined,
+        'es'
+      )
+
+      const callArgs = mockGenerateContent.mock.calls[0][0]
+      expect(callArgs.contents).toContain('español')
+    })
+
+    it('should use English language instruction for en locale', async () => {
+      mockGenerateContent.mockResolvedValue({
+        text: JSON.stringify(validMissionJSON),
+      })
+
+      await adapter.regenerateSingleMission(
+        mockContext,
+        mockCurrentMission,
+        undefined,
+        'en'
+      )
+
+      const callArgs = mockGenerateContent.mock.calls[0][0]
+      expect(callArgs.contents).toContain('inglés')
+    })
+  })
 })

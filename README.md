@@ -367,6 +367,87 @@ FOR DELETE
 USING (auth.uid() = user_id);
 ```
 
+### 9. Edición Human-in-the-Loop con Drag & Drop
+
+Sistema avanzado de edición colaborativa entre humano e IA para refinar aventuras guardadas:
+
+#### Características principales
+
+- **Regeneración de misiones individuales**: Mejora misiones específicas manteniendo coherencia con el resto de la aventura
+- **Reordenamiento visual**: Drag & Drop para reorganizar misiones sin perder información
+- **Feedback contextual**: Proporciona feedback opcional a la IA para regenerar con instrucciones específicas
+- **Estado de carga granular**: Skeleton loader individual por misión durante regeneración
+- **Persistencia automática**: Todos los cambios se guardan instantáneamente en Supabase
+- **UX optimista**: Actualización inmediata de la UI antes de confirmar con el servidor
+
+#### Arquitectura de la funcionalidad
+
+**Domain Layer (Interfaces):**
+- `IMissionEditor`: Puerto para proveedores de regeneración de misiones
+- `AdventureContext`: Contexto compartido entre misiones para coherencia narrativa
+
+**Infrastructure Layer (Implementación):**
+- `GeminiAdapter.regenerateSingleMission()`: Prompt especializado de "Editor" que recibe el contexto completo
+- Validación con Zod para misiones individuales
+- Forzado de salida JSON para estructura consistente
+
+**Application Layer (Casos de uso):**
+- `regenerateMission`: Orquesta regeneración manteniendo contexto y permisos
+- `reorderMissions`: Actualiza índices de orden y persiste cambios
+
+**API Endpoints:**
+- `POST /api/pack/[id]/regenerate-mission` - Regenera una misión específica
+- `POST /api/pack/[id]/reorder-missions` - Reordena el array de misiones
+
+**UI Layer (Componentes):**
+- `MissionCard`: Componente sortable con botón de regeneración y drag handle
+- `@dnd-kit/core` y `@dnd-kit/sortable` para drag & drop fluido
+- Hooks personalizados: `useRegenerateMission`, `useReorderMissions`
+
+#### Flujo de regeneración
+
+```typescript
+1. Usuario hace clic en "Regenerar" en una misión
+2. Se extrae el contexto de la aventura (título, tipo, tono, otras misiones)
+3. Se llama al adaptador de IA con el contexto completo
+4. La IA genera una nueva misión coherente con el resto
+5. Se actualiza optimistamente la UI
+6. Se persiste en Supabase vía updatePackJson
+7. Se muestra la nueva misión con transición suave
+```
+
+#### Flujo de reordenamiento
+
+```typescript
+1. Usuario arrastra una misión a nueva posición
+2. Se actualiza el orden localmente (optimistic UI)
+3. Se persiste el nuevo orden en Supabase
+4. Se actualizan los índices `order` de todas las misiones
+5. En caso de error, se revierte al orden original
+```
+
+#### Ventajas del patrón Human-in-the-Loop
+
+- **Iteración rápida**: Refina misiones específicas sin regenerar todo el pack
+- **Control creativo**: El humano decide qué mejorar y cuándo
+- **Coherencia garantizada**: La IA recibe contexto completo de la aventura
+- **Resiliencia**: Cada misión es independiente, errores no afectan el resto
+- **Experiencia fluida**: Drag & drop nativo sin recargas de página
+
+#### Ejemplo de uso
+
+```typescript
+// En la página de detalle de una aventura guardada
+
+// Regenerar misión 2 con feedback
+await regenerateMission(packId, userId, 2, "Hazla más divertida")
+
+// Reordenar: misión 3 primero, luego 1, luego 2
+await reorderMissions(packId, userId, [3, 1, 2])
+```
+
+Ver implementación completa en: [src/app/my-adventures/[id]/page.tsx](src/app/my-adventures/[id]/page.tsx)
+
 ## Wizard Flow
 
 El wizard consta de 6 pasos:

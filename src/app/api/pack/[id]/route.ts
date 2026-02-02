@@ -3,7 +3,7 @@
 import { NextResponse } from 'next/server'
 import { deleteMyAdventurePack } from '@/application/delete-my-adventure-pack'
 import { AdventurePackRepository } from '@/infrastructure/supabase/adventure-pack-repository'
-import { getCurrentUser } from '@/infrastructure/supabase/auth'
+import { getCurrentUserServer, createSupabaseServerClient } from '@/infrastructure/supabase/auth-server'
 
 /**
  * API Route para eliminar una aventura del usuario.
@@ -17,11 +17,11 @@ import { getCurrentUser } from '@/infrastructure/supabase/auth'
  */
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Obtener usuario autenticado
-    const user = await getCurrentUser()
+    const user = await getCurrentUserServer()
 
     if (!user) {
       return NextResponse.json(
@@ -31,7 +31,7 @@ export async function DELETE(
     }
 
     // Obtener ID del pack de los parámetros
-    const packId = params.id
+    const { id: packId } = await params
 
     if (!packId) {
       return NextResponse.json(
@@ -41,7 +41,8 @@ export async function DELETE(
     }
 
     // Ejecutar caso de uso
-    const repository = new AdventurePackRepository()
+    const supabaseServer = await createSupabaseServerClient()
+    const repository = new AdventurePackRepository(supabaseServer)
     const result = await deleteMyAdventurePack(
       {
         packId,

@@ -168,11 +168,13 @@ export async function generateAdventureMultimodal(
         if (searchResult) {
           pack.image = {
             url: searchResult.url,
-            prompt: searchResult.prompt,
+            // ImageSearchResult tiene 'prompt', ImageCache tiene 'query'
+            prompt: 'prompt' in searchResult ? searchResult.prompt : searchResult.query,
           }
           imageObtained = true
 
-          if (searchResult.attribution) {
+          // ImageSearchResult tiene 'attribution', ImageCache no
+          if ('attribution' in searchResult && searchResult.attribution) {
             warnings.push(
               `Imagen por ${searchResult.attribution.photographer} (Pexels, usado como fallback)`
             )

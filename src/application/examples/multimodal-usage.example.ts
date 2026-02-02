@@ -12,7 +12,8 @@ import { generateAdventureMultimodal } from '@/application/generate-adventure-mu
 import { saveAdventurePack } from '@/application/save-adventure-pack'
 import { AdventurePackRepository } from '@/infrastructure/supabase/adventure-pack-repository'
 import { N8NAdapter } from '@/infrastructure/n8n/n8n-adapter'
-import { OpenAIAdapter, GeminiAdapter, NanobananaAdapter } from '@/infrastructure/ai/adapters'
+import { OpenAIAdapter, GeminiAdapter } from '@/infrastructure/ai/adapters'
+import { PexelsImageAdapter } from '@/infrastructure/images/pexels-image.adapter'
 
 // ============================================================================
 // EJEMPLO 1: N8N (texto + imagen integrados)
@@ -46,7 +47,7 @@ async function example2_OpenAI_Plus_Nanobanana(userId: string, wizardData: Wizar
   console.log('📝 Ejemplo 2: OpenAI (texto) + Nanobanana (imagen separada)')
 
   const textProvider = new OpenAIAdapter()
-  const imageProvider = new NanobananaAdapter()
+  const imageProvider = new PexelsImageAdapter()
 
   // El orquestador coordina ambos proveedores
   const result = await generateAdventureMultimodal(wizardData, textProvider, imageProvider)
@@ -77,7 +78,7 @@ async function example3_Gemini_Plus_Nanobanana(userId: string, wizardData: Wizar
   console.log('📝 Ejemplo 3: Gemini (texto) + Nanobanana (imagen separada)')
 
   const textProvider = new GeminiAdapter()
-  const imageProvider = new NanobananaAdapter()
+  const imageProvider = new PexelsImageAdapter()
 
   const result = await generateAdventureMultimodal(wizardData, textProvider, imageProvider)
 
@@ -103,9 +104,9 @@ async function example4_Resilience(userId: string, wizardData: WizardData) {
 
   const textProvider = new OpenAIAdapter()
 
-  // Simulamos un generador de imagen que falla
-  const faultyImageGenerator = {
-    generateImage: async () => {
+  // Simulamos un buscador de imagen que falla
+  const faultyImageSearcher = {
+    searchCoverImage: async () => {
       throw new Error('Servicio de imágenes no disponible')
     },
   }
@@ -113,7 +114,7 @@ async function example4_Resilience(userId: string, wizardData: WizardData) {
   const result = await generateAdventureMultimodal(
     wizardData,
     textProvider,
-    faultyImageGenerator
+    faultyImageSearcher
   )
 
   if (result.ok && result.pack) {
@@ -156,7 +157,7 @@ async function example5_FactoryPattern(
 
   // Factory pattern para seleccionar proveedor en runtime
   const provider = createAdventureProvider(providerType)
-  const imageGenerator = providerType !== 'n8n' ? new NanobananaAdapter() : undefined
+  const imageGenerator = providerType !== 'n8n' ? new PexelsImageAdapter() : undefined
 
   const result = await generateAdventureMultimodal(wizardData, provider, imageGenerator)
 
@@ -181,7 +182,7 @@ export async function handleGenerateAdventureAPI(
   try {
     // Seleccionar proveedor basado en configuración
     const provider = createAdventureProvider(preferredProvider)
-    const imageGenerator = preferredProvider !== 'n8n' ? new NanobananaAdapter() : undefined
+    const imageGenerator = preferredProvider !== 'n8n' ? new PexelsImageAdapter() : undefined
 
     // Generar aventura
     const result = await generateAdventureMultimodal(wizardData, provider, imageGenerator)

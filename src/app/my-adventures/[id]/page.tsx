@@ -15,9 +15,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/ui/components/dialog'
+import { MissionCard } from '@/ui/components/mission-card'
 import { SavedAdventurePack } from '@/domain/saved-adventure-pack'
 import { useUserPackDetails } from '@/ui/hooks/use-user-pack-details'
 import { useDeletePack } from '@/ui/hooks/use-delete-pack'
+import { useRegenerateMission } from '@/ui/hooks/use-regenerate-mission'
+import { useReorderMissions } from '@/ui/hooks/use-reorder-missions'
 import { useRepositories } from '@/ui/providers/repository-provider'
 import { updateMyPackText, PackTextChanges } from '@/application/update-my-pack-text'
 import { duplicateMyPack } from '@/application/duplicate-my-pack'
@@ -27,6 +30,22 @@ import {
   DIFFICULTY_LABELS,
   PLACE_LABELS,
 } from '@/ui/wizard/labels'
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core'
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable'
+import type { GeneratedAdventurePackMission } from '@/domain/generated-adventure-pack'
 
 export default function AdventureDetailPage() {
   const router = useRouter()
@@ -55,6 +74,24 @@ export default function AdventureDetailPage() {
   const [missionsStory, setMissionsStory] = useState<Record<number, string>>({})
   const [conclusionStory, setConclusionStory] = useState('')
 
+  // Mission management hooks
+  const { regenerateMission, isRegenerating: isRegeneratingHook, error: regenerateError } = useRegenerateMission()
+  const { reorderMissions, isReordering, error: reorderError } = useReorderMissions()
+
+  // Track which mission is being regenerated
+  const [regeneratingMissionOrder, setRegeneratingMissionOrder] = useState<number | null>(null)
+
+  // Local missions state for optimistic UI updates
+  const [localMissions, setLocalMissions] = useState<GeneratedAdventurePackMission[]>([])
+
+  // Drag and Drop sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
+
   // Redirect if needs authentication
   useEffect(() => {
     if (needsAuth) {
@@ -76,6 +113,9 @@ export default function AdventureDetailPage() {
         missionsMap[mission.order] = mission.story
       })
       setMissionsStory(missionsMap)
+
+      // Initialize local missions
+      setLocalMissions(savedPack.pack.missions)
     }
   }, [savedPack])
 
@@ -173,6 +213,102 @@ export default function AdventureDetailPage() {
 
     setIsEditing(false)
     setSaveError(null)
+  }
+
+  /**
+   * Handler para el evento DragEnd de @dnd-kit.
+   * Reordena las misiones localmente y persiste el cambio en el servidor.
+   */
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event
+
+    if (!over || active.id === over.id || !savedPack) {
+      return
+    }
+
+    const oldIndex = localMissions.findIndex((m) => m.order === active.id)
+    const newIndex = localMissions.findIndex((m) => m.order === over.id)
+
+    if (oldIndex === -1 || newIndex === -1) {
+      return
+    }
+
+    // Actualización optimista: reordenar localmente primero
+    const reorderedMissions = arrayMove(localMissions, oldIndex, newIndex)
+    setLocalMissions(reorderedMissions)
+
+    try {
+      // Persistir en el servidor
+      const newOrder = reorderedMissions.map((m) => m.order)
+      const result = await reorderMissions(id, newOrder)
+
+      if (result) {
+        // Actualizar con el resultado del servidor (con los orders correctos)
+        setLocalMissions(result)
+
+        // Actualizar missionsStory map
+        const missionsMap: Record<number, string> = {}
+        result.forEach((mission) => {
+          missionsMap[mission.order] = mission.story
+        })
+        setMissionsStory(missionsMap)
+      } else {
+        // Si falla, revertir al estado original
+        if (savedPack) {
+          setLocalMissions(savedPack.pack.missions)
+        }
+        if (reorderError) {
+          setSaveError(reorderError)
+        }
+      }
+    } catch (err) {
+      // Si hay error, revertir al estado original
+      if (savedPack) {
+        setLocalMissions(savedPack.pack.missions)
+      }
+      const errorMessage = err instanceof Error ? err.message : 'Error al reordenar misiones'
+      setSaveError(errorMessage)
+    }
+  }
+
+  /**
+   * Handler para regenerar una misión individual.
+   */
+  const handleRegenerateMission = async (missionOrder: number) => {
+    if (!savedPack || regeneratingMissionOrder !== null) {
+      // No permitir regeneración si:
+      // - No hay pack cargado
+      // - Ya hay una regeneración en curso
+      return
+    }
+
+    setRegeneratingMissionOrder(missionOrder)
+    setSaveError(null)
+
+    try {
+      const result = await regenerateMission(id, missionOrder)
+
+      if (result) {
+        // Actualizar la misión en el estado local
+        const updatedMissions = localMissions.map((m) =>
+          m.order === missionOrder ? result : m
+        )
+        setLocalMissions(updatedMissions)
+
+        // Actualizar missionsStory map
+        setMissionsStory({
+          ...missionsStory,
+          [missionOrder]: result.story,
+        })
+      } else if (regenerateError) {
+        setSaveError(regenerateError)
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Error al regenerar misión'
+      setSaveError(errorMessage)
+    } finally {
+      setRegeneratingMissionOrder(null)
+    }
   }
 
   if (isLoading) {
@@ -427,64 +563,49 @@ export default function AdventureDetailPage() {
           </Card>
         )}
 
-        {/* Missions */}
+        {/* Missions with Drag & Drop */}
         <div className="space-y-6">
-          <h2 className="text-2xl font-bold">Misiones</h2>
-          {pack.missions
-            .sort((a, b) => a.order - b.order)
-            .map((mission) => (
-              <Card key={mission.order} className="overflow-hidden">
-                <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5">
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary text-primary-foreground font-bold">
-                      {mission.order}
-                    </div>
-                    <CardTitle className="text-xl">{mission.title}</CardTitle>
-                  </div>
-                </CardHeader>
-                <CardContent className="pt-6 space-y-4">
-                  {/* Story for kids */}
-                  <div className="space-y-2">
-                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                      📖 Historia
-                    </p>
-                    {isEditing ? (
-                      <Textarea
-                        value={missionsStory[mission.order] || ''}
-                        onChange={(e) =>
-                          setMissionsStory({
-                            ...missionsStory,
-                            [mission.order]: e.target.value,
-                          })
-                        }
-                        className="min-h-32"
-                        placeholder={`Historia de la misión ${mission.order}...`}
-                      />
-                    ) : (
-                      <p className="text-base leading-relaxed">{mission.story}</p>
-                    )}
-                  </div>
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-bold">Misiones</h2>
+            {isEditing && localMissions.length > 0 && (
+              <p className="text-sm text-muted-foreground">
+                Arrastra las misiones para reordenarlas
+              </p>
+            )}
+          </div>
 
-                  {/* Parent Guide */}
-                  <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 space-y-2">
-                    <p className="text-xs font-semibold text-blue-900 dark:text-blue-100 uppercase tracking-wide">
-                      👥 Guía para padres
-                    </p>
-                    <p className="text-sm text-blue-800 dark:text-blue-200 leading-relaxed">
-                      {mission.parentGuide}
-                    </p>
-                  </div>
-
-                  {/* Success Condition */}
-                  <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg p-3">
-                    <p className="text-sm text-green-800 dark:text-green-200 leading-relaxed">
-                      <span className="font-semibold">✅ Misión completada cuando:</span>{' '}
-                      {mission.successCondition}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={localMissions.map((m) => m.order)}
+              strategy={verticalListSortingStrategy}
+            >
+              <div className="space-y-4">
+                {localMissions
+                  .sort((a, b) => a.order - b.order)
+                  .map((mission) => (
+                    <MissionCard
+                      key={mission.order}
+                      mission={mission}
+                      isEditing={isEditing}
+                      isRegenerating={regeneratingMissionOrder === mission.order}
+                      missionStory={missionsStory[mission.order] || ''}
+                      onStoryChange={(story) =>
+                        setMissionsStory({
+                          ...missionsStory,
+                          [mission.order]: story,
+                        })
+                      }
+                      onRegenerate={() => handleRegenerateMission(mission.order)}
+                      isDragDisabled={!isEditing || regeneratingMissionOrder !== null}
+                    />
+                  ))}
+              </div>
+            </SortableContext>
+          </DndContext>
         </div>
 
         {/* Conclusion */}

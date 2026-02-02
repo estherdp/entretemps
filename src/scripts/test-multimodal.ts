@@ -2,7 +2,7 @@
 // Ejecutar con: npx tsx src/scripts/test-multimodal.ts
 
 import { generateAdventureMultimodal } from '@/application/generate-adventure-multimodal'
-import { OpenAIAdapter, GeminiAdapter, NanobananaAdapter } from '@/infrastructure/ai/adapters'
+import { OpenAIAdapter, GeminiAdapter, PollinationsImageAdapter } from '@/infrastructure/ai/adapters'
 import { PexelsImageAdapter } from '@/infrastructure/images'
 import { ImageCacheRepository } from '@/infrastructure/supabase'
 import type { WizardData } from '@/domain/wizard-data'
@@ -52,7 +52,7 @@ async function testGemini() {
 async function testMultimodal() {
   console.log('\n🎨 Probando Orquestador Multimodal (OpenAI + Nanobanana)...')
   const textProvider = new OpenAIAdapter()
-  const imageProvider = new NanobananaAdapter()
+  const imageProvider = new PexelsImageAdapter()
 
   const result = await generateAdventureMultimodal(
     testWizardData,
@@ -141,7 +141,7 @@ async function testPexelsWithFallback() {
   const provider = new GeminiAdapter()
   const imageSearcher = new PexelsImageAdapter()
   const imageCacheRepo = new ImageCacheRepository()
-  const imageGenerator = new NanobananaAdapter()
+  const imageGenerator = new PollinationsImageAdapter()
 
   const result = await generateAdventureMultimodal(
     testWizardData,
