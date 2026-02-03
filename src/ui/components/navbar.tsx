@@ -50,23 +50,25 @@ export function Navbar() {
             <span className="text-foreground">temps</span>
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-6">
-            {navLinks.map((link) => {
-              if (link.requireAuth && !user) return null
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={`text-sm font-medium transition-colors hover:text-primary ${
-                    isLinkActive(link.href) ? 'text-primary' : 'text-muted-foreground'
-                  }`}
-                >
-                  {link.label}
-                </Link>
-              )
-            })}
-          </div>
+          {/* Desktop Navigation - Only show when user is logged in */}
+          {user && (
+            <div className="hidden md:flex items-center gap-6">
+              {navLinks.map((link) => {
+                if (link.requireAuth && !user) return null
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={`text-sm font-medium transition-colors hover:text-primary ${
+                      isLinkActive(link.href) ? 'text-primary' : 'text-muted-foreground'
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                )
+              })}
+            </div>
+          )}
 
           {/* Desktop User Section */}
           <div className="hidden md:flex items-center gap-4">
@@ -108,8 +110,8 @@ export function Navbar() {
       {isMobileMenuOpen && (
         <div className="md:hidden border-t border-border bg-background">
           <div className="px-4 py-6 space-y-4">
-            {/* Navigation Links */}
-            {navLinks.map((link) => {
+            {/* Navigation Links - Only show when user is logged in */}
+            {user && navLinks.map((link) => {
               if (link.requireAuth && !user) return null
               return (
                 <Link
