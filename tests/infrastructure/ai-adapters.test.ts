@@ -315,15 +315,15 @@ describe('PollinationsImageAdapter', () => {
     expect(image).toBeDefined()
     expect(image.url).toBeTruthy()
     expect(typeof image.url).toBe('string')
-    expect(image.url).toContain('image.pollinations.ai')
-    expect(image.url).toContain('/prompt/')
+    expect(image.url).toContain('gen.pollinations.ai')
+    expect(image.url).toContain('/image/')
     expect(image.url).toContain('width=1024')
     expect(image.url).toContain('height=1024')
     expect(image.url).toContain('model=flux')
 
     // Verificar que se aplicó el style wrapper
     expect(image.prompt).toContain(prompt)
-    expect(image.prompt).toContain('Cartoon illustration style')
+    expect(image.prompt).toContain('Cartoon style')
   })
 
   it('should apply style wrapper to prompt', async () => {
@@ -332,11 +332,11 @@ describe('PollinationsImageAdapter', () => {
     const image = await adapter.generateImage(originalPrompt)
 
     expect(image.prompt).toContain(originalPrompt)
-    expect(image.prompt).toContain('Cartoon illustration style')
+    expect(image.prompt).toContain('Cartoon style')
     expect(image.prompt).toContain('vibrant colors')
-    expect(image.prompt).toContain('cute animated characters')
+    expect(image.prompt).toContain('cute characters')
+    expect(image.prompt).toContain('cheerful')
     expect(image.prompt).toContain('no text')
-    expect(image.prompt).toContain('no realistic people')
   })
 
   it('should include API key in URL as query parameter', async () => {
@@ -344,8 +344,8 @@ describe('PollinationsImageAdapter', () => {
     const image = await adapter.generateImage('test prompt')
 
     // Verificar que la API key está en la URL generada
-    expect(image.url).toContain('auth=test-api-key-123')
-    expect(image.url).toContain('image.pollinations.ai')
+    expect(image.url).toContain('key=test-api-key-123')
+    expect(image.url).toContain('gen.pollinations.ai')
   })
 
   it('should generate different seeds for different calls', async () => {
@@ -369,9 +369,9 @@ describe('PollinationsImageAdapter', () => {
     const adapter = new PollinationsImageAdapter('test-api-key')
     const image = await adapter.generateImage('test prompt')
 
-    // La URL debe usar el nuevo formato de Pollinations (image.pollinations.ai/prompt)
-    expect(image.url).toMatch(/^https:\/\/image\.pollinations\.ai\/prompt\//)
-    expect(image.url).toContain('auth=test-api-key')
+    // La URL debe usar el formato correcto de Pollinations (gen.pollinations.ai/image)
+    expect(image.url).toMatch(/^https:\/\/gen\.pollinations\.ai\/image\//)
+    expect(image.url).toContain('key=test-api-key')
     expect(image.url).toContain('model=flux')
   })
 })

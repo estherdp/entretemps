@@ -27,10 +27,15 @@ interface PollinationsImageParams {
  * - Optimizado para ilustraciones infantiles de alta calidad
  * - Resolución 1024x1024 por defecto
  * - Seeds aleatorias para variedad
- * - Autenticación mediante API Key (modo auth)
+ * - Autenticación mediante API Key (parámetro 'key')
  *
  * Variables de entorno:
  * - POLLINATIONS_API_KEY (requerida): API key de Pollinations
+ *
+ * API Format:
+ * - Base URL: https://gen.pollinations.ai/image/{prompt}
+ * - Auth parameter: key={API_KEY}
+ * - Ejemplo: https://gen.pollinations.ai/image/prompt?width=1024&height=1024&key=API_KEY
  *
  * Clean Architecture: Este adaptador pertenece a la capa de infraestructura
  * y adapta la API de Pollinations al contrato IImageGenerator del dominio.
@@ -39,11 +44,12 @@ interface PollinationsImageParams {
  */
 export class PollinationsImageAdapter implements IImageGenerator {
   private readonly apiKey: string
-  private readonly baseUrl = 'https://image.pollinations.ai/prompt'
+  private readonly baseUrl = 'https://gen.pollinations.ai/image'
 
   // Prompt wrapper para estilo de ilustraciones infantiles tipo cartoon/anime
+  // Versión corta para evitar URLs demasiado largas
   private readonly styleWrapper =
-    'Cartoon illustration style, vibrant colors, cute animated characters, playful and whimsical art, digital painting, fantasy storybook aesthetic, cheerful atmosphere, smooth shading, no text, no realistic people, anime-inspired children\'s illustration'
+    'Cartoon style, vibrant colors, cute characters, cheerful, no text'
 
   // Parámetros por defecto optimizados para ilustraciones infantiles
   private readonly defaultParams: PollinationsImageParams = {
@@ -122,7 +128,7 @@ export class PollinationsImageAdapter implements IImageGenerator {
    * Construye la URL de la imagen con todos los parámetros necesarios.
    *
    * La API de Pollinations genera imágenes bajo demanda mediante URLs GET.
-   * Formato: https://image.pollinations.ai/prompt/{prompt}?width=1024&height=1024&model=flux&seed=123&nologo=true
+   * Formato: https://gen.pollinations.ai/image/{prompt}?width=1024&height=1024&model=flux&seed=123&nologo=true&key=API_KEY
    *
    * El navegador hará la petición GET directamente, sin bloquear el servidor.
    *
@@ -144,9 +150,9 @@ export class PollinationsImageAdapter implements IImageGenerator {
       enhance: this.defaultParams.enhance!.toString(),
     })
 
-    // Si hay API key, añadirla como parámetro auth
+    // Si hay API key, añadirla como parámetro key
     if (this.apiKey) {
-      params.append('auth', this.apiKey)
+      params.append('key', this.apiKey)
     }
 
     return `${this.baseUrl}/${encodedPrompt}?${params.toString()}`
