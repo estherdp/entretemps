@@ -21,7 +21,8 @@ export function Navbar() {
   const handleSignOut = async () => {
     try {
       await signOut()
-      router.push('/')
+      // Use window.location to force a full page reload and clear all state
+      window.location.href = '/'
     } catch (error) {
       console.error('Error during sign out:', error)
     }
