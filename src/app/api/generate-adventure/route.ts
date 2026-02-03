@@ -1,6 +1,12 @@
 // src/app/api/generate-adventure/route.ts
 
 import { NextResponse } from 'next/server'
+
+// Vercel Serverless Function Configuration
+// maxDuration: Timeout extendido a 60s para llamadas a APIs de IA (Gemini, Pollinations)
+// dynamic: Fuerza generación dinámica, sin caché
+export const maxDuration = 60
+export const dynamic = 'force-dynamic'
 import { generateAdventureMultimodal } from '@/application/generate-adventure-multimodal'
 import { GeminiAdapter, NanobananaAdapter, PollinationsImageAdapter } from '@/infrastructure/ai/adapters'
 import { N8NAdapter } from '@/infrastructure/n8n/n8n-adapter'

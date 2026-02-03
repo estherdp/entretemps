@@ -1,6 +1,12 @@
 // src/app/api/pack/[id]/regenerate-mission/route.ts
 
 import { NextRequest, NextResponse } from 'next/server'
+
+// Vercel Serverless Function Configuration
+// maxDuration: Timeout extendido a 60s para llamadas a APIs de IA (Gemini)
+// dynamic: Fuerza generación dinámica, sin caché
+export const maxDuration = 60
+export const dynamic = 'force-dynamic'
 import { regenerateMission } from '@/application/regenerate-mission'
 import { GeminiAdapter } from '@/infrastructure/ai/adapters/gemini.adapter'
 import { AdventurePackRepository } from '@/infrastructure/supabase/adventure-pack-repository'
