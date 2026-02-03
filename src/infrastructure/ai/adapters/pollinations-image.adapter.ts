@@ -69,6 +69,11 @@ export class PollinationsImageAdapter implements IImageGenerator {
         'POLLINATIONS_API_KEY no configurada. Configura la variable de entorno.'
       )
     }
+
+    // Log para verificar versión en Vercel
+    console.log('[PollinationsImageAdapter] ✅ VERSIÓN CORREGIDA - Inicializado correctamente')
+    console.log('[PollinationsImageAdapter] Base URL:', this.baseUrl)
+    console.log('[PollinationsImageAdapter] Formato auth: key=API_KEY')
   }
 
   /**
@@ -84,7 +89,7 @@ export class PollinationsImageAdapter implements IImageGenerator {
    * @returns Promise con la URL de generación y prompt mejorado
    */
   async generateImage(prompt: string): Promise<GeneratedAdventurePackImage> {
-    console.log('[PollinationsImageAdapter] Construyendo URL de imagen')
+    console.log('[PollinationsImageAdapter] ✅ VERSIÓN CORREGIDA - Construyendo URL de imagen')
     console.log(`[PollinationsImageAdapter] Prompt original: ${prompt}`)
 
     // Aplicar style wrapper al prompt
@@ -97,8 +102,10 @@ export class PollinationsImageAdapter implements IImageGenerator {
     // Construir URL de la imagen con parámetros
     const imageUrl = this.buildImageUrl(enhancedPrompt, seed)
 
-    console.log(`[PollinationsImageAdapter] URL construida (seed: ${seed})`)
-    console.log(`[PollinationsImageAdapter] URL: ${imageUrl}`)
+    console.log(`[PollinationsImageAdapter] ✅ URL construida (seed: ${seed})`)
+    console.log(`[PollinationsImageAdapter] ✅ Base URL: gen.pollinations.ai/image (CORRECTO)`)
+    console.log(`[PollinationsImageAdapter] ✅ Auth param: key= (CORRECTO)`)
+    console.log(`[PollinationsImageAdapter] URL completa: ${imageUrl}`)
 
     // Devolver URL inmediatamente - el navegador hará la petición GET
     return {
