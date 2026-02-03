@@ -68,8 +68,8 @@ Crear un archivo [.env.local](.env.local) en la raíz del proyecto con las sigui
 NEXT_PUBLIC_SUPABASE_URL=https://tu-proyecto.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=tu-anon-key-aqui
 
-# n8n Webhook (opcional - usa adaptador mock si no está configurado)
-NEXT_PUBLIC_N8N_WEBHOOK_URL=https://tu-instancia-n8n.com/webhook/entretemps
+# n8n Webhook (server-only, opcional - usa adaptador mock si no está configurado)
+N8N_WEBHOOK_URL=https://tu-instancia-n8n.com/webhook/entretemps
 
 # IA Providers (opcional - los adaptadores usan mocks por defecto)
 OPENAI_API_KEY=sk-tu-key-aqui                    # Para OpenAIAdapter

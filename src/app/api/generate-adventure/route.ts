@@ -32,7 +32,7 @@ export async function POST(request: Request) {
     const wizardData: WizardData = await request.json()
 
     // Seleccionar provider de texto basado en configuración
-    const aiProvider = process.env.NEXT_PUBLIC_AI_PROVIDER || 'gemini'
+    const aiProvider = process.env.AI_PROVIDER || 'gemini'
     let provider
 
     switch (aiProvider) {

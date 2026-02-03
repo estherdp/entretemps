@@ -30,6 +30,7 @@ describe('Auth Helper', () => {
         email: 'test@example.com',
         options: {
           emailRedirectTo: expect.stringContaining('/'),
+          shouldCreateUser: true,
         },
       })
     })

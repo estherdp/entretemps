@@ -18,7 +18,7 @@ export class N8NAdapter implements IAdventureProvider {
   private readonly webhookUrl: string
 
   constructor(webhookUrl?: string) {
-    const url = webhookUrl || process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL
+    const url = webhookUrl || process.env.N8N_WEBHOOK_URL
 
     if (!url) {
       throw new Error('N8N_WEBHOOK_URL no configurada.')

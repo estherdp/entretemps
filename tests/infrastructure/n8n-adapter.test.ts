@@ -65,12 +65,12 @@ const mockGeneratedPack: GeneratedAdventurePack = {
 
 describe('N8NAdapter', () => {
   beforeEach(() => {
-    vi.stubEnv('NEXT_PUBLIC_N8N_WEBHOOK_URL', 'https://n8n.example.com/webhook')
+    vi.stubEnv('N8N_WEBHOOK_URL', 'https://n8n.example.com/webhook')
     global.fetch = vi.fn()
   })
 
   it('should throw error if webhook URL is not configured', () => {
-    vi.stubEnv('NEXT_PUBLIC_N8N_WEBHOOK_URL', '')
+    vi.stubEnv('N8N_WEBHOOK_URL', '')
 
     expect(() => new N8NAdapter()).toThrow('N8N_WEBHOOK_URL no configurada.')
   })
