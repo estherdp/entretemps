@@ -49,6 +49,58 @@ describe('AdventurePackRepository', () => {
     repository = new AdventurePackRepository()
   })
 
+  describe('Constructor and client injection', () => {
+    it('should use default client when no client is provided', () => {
+      const repo = new AdventurePackRepository()
+      expect(repo).toBeInstanceOf(AdventurePackRepository)
+    })
+
+    it('should accept custom client via constructor', () => {
+      const customClient = {
+        from: vi.fn(),
+      }
+      const repo = new AdventurePackRepository(customClient as never)
+      expect(repo).toBeInstanceOf(AdventurePackRepository)
+    })
+
+    it('should use injected client for queries', async () => {
+      const mockSingle = vi.fn().mockResolvedValue({
+        data: {
+          id: 'pack-123',
+          user_id: 'user-123',
+          title: 'Test Pack',
+          pack: mockPack,
+          created_at: '2024-01-01T00:00:00Z',
+        },
+        error: null,
+      })
+
+      const mockEq = vi.fn().mockReturnValue({
+        single: mockSingle,
+      })
+
+      const mockSelect = vi.fn().mockReturnValue({
+        eq: mockEq,
+      })
+
+      const mockFrom = vi.fn().mockReturnValue({
+        select: mockSelect,
+      })
+
+      const customClient = {
+        from: mockFrom,
+      }
+
+      const repo = new AdventurePackRepository(customClient as never)
+      await repo.getById('pack-123')
+
+      // Verify that the custom client's from method was called
+      expect(mockFrom).toHaveBeenCalledWith('adventure_packs')
+      expect(mockSelect).toHaveBeenCalledWith('*')
+      expect(mockEq).toHaveBeenCalledWith('id', 'pack-123')
+    })
+  })
+
   describe('save', () => {
     it('should save pack and return saved data', async () => {
       const mockInsert = vi.fn().mockReturnValue({
