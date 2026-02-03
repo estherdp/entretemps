@@ -77,13 +77,13 @@ describe('GeminiAdapter - Unit Tests with SDK Mocks', () => {
     vi.clearAllMocks()
     mockGenerateContent.mockReset()
     // Crear adapter con API key de prueba
-    adapter = new GeminiAdapter('test-api-key', 'gemini-2.0-flash-exp')
+    adapter = new GeminiAdapter('test-api-key', 'gemini-2.5-flash-lite')
   })
 
   describe('Constructor', () => {
     it('should throw error if GEMINI_API_KEY is not provided', () => {
       expect(() => {
-        new GeminiAdapter(undefined, 'gemini-2.0-flash-exp')
+        new GeminiAdapter(undefined, 'gemini-2.5-flash-lite')
       }).toThrow('GEMINI_API_KEY no configurada')
     })
 
@@ -94,7 +94,7 @@ describe('GeminiAdapter - Unit Tests with SDK Mocks', () => {
     })
 
     it('should use custom temperature and maxTokens when provided', () => {
-      const customAdapter = new GeminiAdapter('test-key', 'gemini-2.0-flash-exp', 0.5, 2000)
+      const customAdapter = new GeminiAdapter('test-key', 'gemini-2.5-flash-lite', 0.5, 2000)
       expect(customAdapter).toBeDefined()
     })
 
@@ -270,7 +270,7 @@ Espero que te guste!`
       })
 
       const callArgs = mockGenerateContent.mock.calls[0][0]
-      expect(callArgs.model).toBe('gemini-2.0-flash-exp')
+      expect(callArgs.model).toBe('gemini-2.5-flash-lite')
       expect(callArgs.contents).toContain('birthday')
       expect(callArgs.contents).toContain('6-10 años')
       expect(callArgs.contents).toContain('naturaleza, aventuras')
@@ -314,7 +314,7 @@ Espero que te guste!`
     })
 
     it('should use custom temperature and maxTokens when provided', async () => {
-      const customAdapter = new GeminiAdapter('test-key', 'gemini-2.0-flash-exp', 0.3, 2000)
+      const customAdapter = new GeminiAdapter('test-key', 'gemini-2.5-flash-lite', 0.3, 2000)
 
       mockGenerateContent.mockResolvedValue({
         text: JSON.stringify(validAdventurePackJSON),

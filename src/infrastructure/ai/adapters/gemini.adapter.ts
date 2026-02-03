@@ -26,7 +26,7 @@ const missionSchema = z.object({
  *
  * Variables de entorno configurables:
  * - GEMINI_API_KEY (requerida): API key de Google AI Studio
- * - GEMINI_MODEL (opcional): Modelo a usar (default: gemini-2.0-flash-exp)
+ * - GEMINI_MODEL (opcional): Modelo a usar (default: gemini-2.5-flash-lite)
  * - GEMINI_TEMPERATURE (opcional): Creatividad 0-2 (default: 0.7)
  * - GEMINI_MAX_TOKENS (opcional): Límite de tokens de salida (default: 4000)
  *
@@ -46,7 +46,7 @@ export class GeminiAdapter implements IAdventureProvider, IMissionEditor {
     }
 
     this.genAI = new GoogleGenAI({ apiKey: key })
-    this.modelName = modelName || process.env.GEMINI_MODEL || 'gemini-2.0-flash-exp'
+    this.modelName = modelName || process.env.GEMINI_MODEL || 'gemini-2.5-flash-lite'
 
     // Temperature: 0.7 balancea creatividad y consistencia
     this.temperature = temperature ?? parseFloat(process.env.GEMINI_TEMPERATURE || '0.7')
