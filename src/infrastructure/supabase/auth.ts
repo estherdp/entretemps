@@ -6,6 +6,9 @@ export async function signInWithEmail(email: string): Promise<void> {
     email,
     options: {
       emailRedirectTo: `${window.location.origin}/auth/callback`,
+      // Disable PKCE for magic link flow to avoid verifier issues
+      // Magic links are already secure and don't need PKCE
+      shouldCreateUser: true,
     },
   })
 

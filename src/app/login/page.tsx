@@ -17,8 +17,23 @@ function LoginForm() {
   // Check for error from callback
   useEffect(() => {
     const errorParam = searchParams.get('error')
-    if (errorParam === 'auth_failed') {
-      setError('Error al completar el inicio de sesión. Por favor, solicita un nuevo enlace.')
+    const messageParam = searchParams.get('message')
+
+    if (errorParam) {
+      // Use custom message if provided, otherwise use default messages
+      if (messageParam) {
+        setError(decodeURIComponent(messageParam))
+      } else if (errorParam === 'pkce_error') {
+        setError('El enlace ha expirado o fue usado en otro navegador. Por favor, solicita un nuevo enlace.')
+      } else if (errorParam === 'auth_error' || errorParam === 'auth_failed') {
+        setError('Error al completar el inicio de sesión. Por favor, solicita un nuevo enlace.')
+      } else if (errorParam === 'no_session') {
+        setError('No se pudo establecer la sesión. Por favor, intenta de nuevo.')
+      } else if (errorParam === 'invalid_callback') {
+        setError('Enlace de autenticación inválido. Por favor, solicita un nuevo enlace.')
+      } else {
+        setError('Error al procesar la autenticación. Por favor, intenta de nuevo.')
+      }
     }
   }, [searchParams])
 
