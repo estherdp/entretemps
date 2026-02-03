@@ -39,7 +39,7 @@ interface PollinationsImageParams {
  */
 export class PollinationsImageAdapter implements IImageGenerator {
   private readonly apiKey: string
-  private readonly baseUrl = 'https://gen.pollinations.ai'
+  private readonly baseUrl = 'https://image.pollinations.ai/prompt'
 
   // Prompt wrapper para estilo de ilustraciones infantiles tipo cartoon/anime
   private readonly styleWrapper =
@@ -66,46 +66,38 @@ export class PollinationsImageAdapter implements IImageGenerator {
   }
 
   /**
-   * Genera una imagen basada en el prompt proporcionado.
+   * Genera una URL de imagen de Pollinations que se renderiza on-demand.
    *
-   * Aplica automáticamente un estilo wrapper optimizado para ilustraciones
-   * infantiles y configura parámetros para alta calidad visual.
+   * IMPORTANTE: No hace fetch del servidor. Devuelve la URL directamente para que
+   * el navegador del cliente haga la petición GET y obtenga la imagen.
+   *
+   * Esto evita bloquear las Serverless Functions de Vercel esperando la generación.
+   * El navegador se encarga de cargar la imagen cuando el usuario accede a la URL.
    *
    * @param prompt - Descripción de la imagen a generar
-   * @returns Promise con la imagen generada (URL y prompt)
-   * @throws Error si la generación falla o la API retorna un error
+   * @returns Promise con la URL de generación y prompt mejorado
    */
   async generateImage(prompt: string): Promise<GeneratedAdventurePackImage> {
-    try {
-      console.log('[PollinationsImageAdapter] Iniciando generación de imagen')
-      console.log(`[PollinationsImageAdapter] Prompt original: ${prompt}`)
+    console.log('[PollinationsImageAdapter] Construyendo URL de imagen')
+    console.log(`[PollinationsImageAdapter] Prompt original: ${prompt}`)
 
-      // Aplicar style wrapper al prompt
-      const enhancedPrompt = this.enhancePrompt(prompt)
-      console.log(`[PollinationsImageAdapter] Prompt mejorado: ${enhancedPrompt}`)
+    // Aplicar style wrapper al prompt
+    const enhancedPrompt = this.enhancePrompt(prompt)
+    console.log(`[PollinationsImageAdapter] Prompt mejorado: ${enhancedPrompt}`)
 
-      // Generar seed aleatorio para variedad en las imágenes
-      const seed = this.generateRandomSeed()
+    // Generar seed aleatorio para variedad en las imágenes
+    const seed = this.generateRandomSeed()
 
-      // Construir URL de la imagen con parámetros
-      const imageUrl = this.buildImageUrl(enhancedPrompt, seed)
+    // Construir URL de la imagen con parámetros
+    const imageUrl = this.buildImageUrl(enhancedPrompt, seed)
 
-      console.log('[PollinationsImageAdapter] URL de imagen construida')
-      console.log(`[PollinationsImageAdapter] Seed: ${seed}`)
-      console.log(`[PollinationsImageAdapter] URL: ${imageUrl}`)
+    console.log(`[PollinationsImageAdapter] URL construida (seed: ${seed})`)
+    console.log(`[PollinationsImageAdapter] URL: ${imageUrl}`)
 
-      // Pollinations genera imágenes bajo demanda al acceder a la URL
-      // No se requiere verificación previa - la imagen se genera cuando se accede a la URL
-      console.log('[PollinationsImageAdapter] Imagen generada exitosamente')
-
-      return {
-        url: imageUrl,
-        prompt: enhancedPrompt,
-      }
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Error desconocido'
-      console.error('[PollinationsImageAdapter] Error al generar imagen:', error)
-      throw new Error(`Error al generar imagen con Pollinations: ${errorMessage}`)
+    // Devolver URL inmediatamente - el navegador hará la petición GET
+    return {
+      url: imageUrl,
+      prompt: enhancedPrompt,
     }
   }
 
@@ -130,32 +122,34 @@ export class PollinationsImageAdapter implements IImageGenerator {
    * Construye la URL de la imagen con todos los parámetros necesarios.
    *
    * La API de Pollinations genera imágenes bajo demanda mediante URLs GET.
-   * Formato correcto según documentación oficial:
-   * https://gen.pollinations.ai/image/{prompt}?model=flux&key=YOUR_KEY
+   * Formato: https://image.pollinations.ai/prompt/{prompt}?width=1024&height=1024&model=flux&seed=123&nologo=true
    *
-   * Autenticación: Se incluye la API key como query parameter.
+   * El navegador hará la petición GET directamente, sin bloquear el servidor.
    *
    * @param prompt - Prompt de la imagen (será URL-encoded)
    * @param seed - Seed para la generación
-   * @returns URL completa de la imagen
+   * @returns URL completa de la imagen para renderizado directo
    */
   private buildImageUrl(prompt: string, seed: number): string {
     // Codificar el prompt para URL
     const encodedPrompt = encodeURIComponent(prompt)
 
-    // Construir query string con parámetros (incluye API key)
+    // Construir query string con parámetros optimizados
     const params = new URLSearchParams({
-      model: this.defaultParams.model!,
       width: this.defaultParams.width!.toString(),
       height: this.defaultParams.height!.toString(),
+      model: this.defaultParams.model!,
       seed: seed.toString(),
       nologo: this.defaultParams.nologo!.toString(),
-      private: this.defaultParams.private!.toString(),
       enhance: this.defaultParams.enhance!.toString(),
-      key: this.apiKey, // API key como query parameter
     })
 
-    return `${this.baseUrl}/image/${encodedPrompt}?${params.toString()}`
+    // Si hay API key, añadirla como parámetro auth
+    if (this.apiKey) {
+      params.append('auth', this.apiKey)
+    }
+
+    return `${this.baseUrl}/${encodedPrompt}?${params.toString()}`
   }
 
 }
