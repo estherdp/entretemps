@@ -126,8 +126,14 @@ describe('AdventureDetailPage - Edit Mode', () => {
     const introTextarea = screen.getByPlaceholderText('Historia de introducción...')
     expect(introTextarea).toHaveValue('Original intro story')
 
-    // Verify mission textarea also appears
-    expect(screen.getByPlaceholderText('Historia de la misión 1...')).toBeInTheDocument()
+    // Expand the mission accordion first
+    const expandButton = screen.getByLabelText('Expandir')
+    await user.click(expandButton)
+
+    // Wait for the accordion to expand
+    await waitFor(() => {
+      expect(screen.getByPlaceholderText('Historia de la misión 1...')).toBeInTheDocument()
+    })
 
     // Verify conclusion textarea appears
     expect(screen.getByPlaceholderText('Historia de conclusión...')).toBeInTheDocument()

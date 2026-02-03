@@ -12,7 +12,7 @@ describe('Step5Page', () => {
   it('should render the step title', () => {
     renderWithProvider(<Step5Page />)
 
-    expect(screen.getByText('Demos forma a la historia')).toBeInTheDocument()
+    expect(screen.getByText('Tipo de aventura')).toBeInTheDocument()
   })
 
   it('should mark "Misterio" card as selected when clicked', async () => {

@@ -61,6 +61,6 @@ describe('Step1Page', () => {
   it('should display correct step progress', () => {
     renderWithProvider(<Step1Page />)
 
-    expect(screen.getByText('Paso 1 de 6')).toBeInTheDocument()
+    expect(screen.getByText('Paso 1 de 8')).toBeInTheDocument()
   })
 })

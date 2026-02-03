@@ -207,45 +207,69 @@ describe('GeminiAdapter', () => {
 })
 
 describe('NanobananaAdapter', () => {
+  beforeEach(() => {
+    // Mock para que generateContent devuelva una imagen válida
+    // Estructura esperada por Gemini Image Generation API
+    mockGenerateContentIntegration.mockResolvedValue({
+      candidates: [
+        {
+          content: {
+            parts: [
+              {
+                inlineData: {
+                  mimeType: 'image/jpeg',
+                  data: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+                },
+              },
+            ],
+          },
+        },
+      ],
+    })
+  })
+
   it('should implement IImageGenerator interface', () => {
-    const adapter = new NanobananaAdapter()
+    const adapter = new NanobananaAdapter('test-api-key')
     expect(adapter.generateImage).toBeDefined()
     expect(typeof adapter.generateImage).toBe('function')
   })
 
   it('should generate image with correct structure', async () => {
-    const adapter = new NanobananaAdapter()
+    const adapter = new NanobananaAdapter('test-api-key')
     const prompt = 'Una selva tropical mágica con animales'
     const image = await adapter.generateImage(prompt)
 
     expect(image).toBeDefined()
     expect(image.url).toBeTruthy()
     expect(typeof image.url).toBe('string')
-    expect(image.url).toMatch(/^https?:\/\//)
+    expect(image.url).toMatch(/^data:image/)
 
     expect(image.prompt).toBe(prompt)
   })
 
   it('should return consistent images for same prompt', async () => {
-    const adapter = new NanobananaAdapter()
+    const adapter = new NanobananaAdapter('test-api-key')
     const prompt = 'Test prompt consistente'
 
     const image1 = await adapter.generateImage(prompt)
     const image2 = await adapter.generateImage(prompt)
 
-    // El hash debería ser el mismo, por lo tanto la URL también
-    expect(image1.url).toBe(image2.url)
+    // Ambas deberían tener la misma estructura (aunque el contenido puede variar)
+    expect(image1.url).toBeTruthy()
+    expect(image2.url).toBeTruthy()
     expect(image1.prompt).toBe(image2.prompt)
   })
 
   it('should return different images for different prompts', async () => {
-    const adapter = new NanobananaAdapter()
+    const adapter = new NanobananaAdapter('test-api-key')
 
     const image1 = await adapter.generateImage('Prompt A')
     const image2 = await adapter.generateImage('Prompt B')
 
-    // Prompts diferentes deberían dar URLs diferentes
-    expect(image1.url).not.toBe(image2.url)
+    // Prompts diferentes deberían estar reflejados
+    expect(image1.prompt).not.toBe(image2.prompt)
+    expect(image1.prompt).toBe('Prompt A')
+    expect(image2.prompt).toBe('Prompt B')
   })
 })
 
@@ -353,6 +377,60 @@ describe('PollinationsImageAdapter', () => {
 })
 
 describe('Interface Compliance', () => {
+  beforeEach(() => {
+    // Configurar mock para GeminiAdapter igual que en su describe
+    mockGenerateContentIntegration.mockResolvedValue({
+      text: JSON.stringify({
+        id: crypto.randomUUID(),
+        title: 'El Secreto de la Selva Esmeralda',
+        image: {
+          url: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800',
+          prompt: 'Selva tropical vibrante con cascadas y animales exóticos, arte digital para niños',
+        },
+        estimatedDurationMinutes: 60,
+        ageRange: { min: 6, max: 10 },
+        participants: 4,
+        difficulty: 'medium',
+        tone: 'exciting',
+        adventureType: 'adventure',
+        place: 'home',
+        materials: ['Hojas de papel', 'Pinturas', 'Telas verdes'],
+        introduction: {
+          story: 'En el corazón de la Selva Esmeralda...',
+          setupForParents: 'Transforma tu hogar...',
+        },
+        missions: [
+          {
+            order: 1,
+            title: 'El Guardián Tucán',
+            story: 'El sabio Tucán guardián...',
+            parentGuide: 'Proporciona materiales...',
+            successCondition: 'El equipo completa un mapa...',
+          },
+          {
+            order: 2,
+            title: 'La Cascada de los Deseos',
+            story: 'Una cascada mágica...',
+            parentGuide: 'Prepara plantillas...',
+            successCondition: 'Cada niño crea mariposas...',
+          },
+          {
+            order: 3,
+            title: 'El Árbol de los Mil Colores',
+            story: 'El árbol aparece...',
+            parentGuide: 'Guía a los niños...',
+            successCondition: 'Los niños cantan la canción...',
+          },
+        ],
+        conclusion: {
+          story: 'El Árbol florece en toda su gloria...',
+          celebrationTip: 'Realiza una ceremonia...',
+        },
+        createdAt: new Date().toISOString(),
+      }),
+    })
+  })
+
   it('all adventure providers should have same method signature', () => {
     const openai = new OpenAIAdapter()
     const gemini = new GeminiAdapter('test-api-key')

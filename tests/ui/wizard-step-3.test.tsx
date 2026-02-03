@@ -43,7 +43,7 @@ describe('Step3Page', () => {
   it('should display correct step progress', () => {
     renderWithProvider(<Step3Page />)
 
-    expect(screen.getByText('Paso 3 de 6')).toBeInTheDocument()
+    expect(screen.getByText('Paso 3 de 8')).toBeInTheDocument()
   })
 
   it('should render all suggested chips', () => {
