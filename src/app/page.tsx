@@ -22,7 +22,7 @@ export default function Home() {
           <section className="px-4 pt-20 pb-12 md:pt-32 md:pb-20 text-center">
             <div className="max-w-4xl mx-auto space-y-6">
               <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-                Entretemps
+                Entretemps V123132
               </h1>
               <p className="text-xl md:text-2xl text-muted-foreground">
                 Aventuras infantiles personalizadas con IA
