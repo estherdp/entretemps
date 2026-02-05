@@ -20,7 +20,13 @@ jobs:
     - name: Run Playwright tests
       run: pnpm exec playwright test
       env:
-        NEXT_PUBLIC_SITE_URL: https://entretemps.vercel.app
+        NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
+        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        IMAGE_GENERATOR_PROVIDER: ${{ secrets.IMAGE_GENERATOR_PROVIDER }}
+        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+        NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+        PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+        POLLINATIONS_API_KEY: ${{ secrets.POLLINATIONS_API_KEY }}
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:
