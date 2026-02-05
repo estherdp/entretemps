@@ -271,12 +271,12 @@ Creado con Entretemps el ${new Date(pack.createdAt).toLocaleDateString('es-ES')}
             .sort((a, b) => a.order - b.order)
             .map((mission) => (
               <Card key={mission.order} className="rounded-2xl shadow-premium-lg border-border/60 overflow-hidden hover:shadow-premium-lg hover-lift">
-                <CardHeader className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent pb-4">
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-primary text-primary-foreground font-bold text-2xl shadow-md">
+                <CardHeader className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent pb-4 min-h-[100px] flex items-center">
+                  <div className="flex items-center gap-4 w-full">
+                    <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-primary text-primary-foreground font-bold text-2xl shadow-md flex-shrink-0">
                       {mission.order}
                     </div>
-                    <CardTitle className="text-2xl">{mission.title}</CardTitle>
+                    <CardTitle className="text-2xl line-clamp-2 flex-1">{mission.title}</CardTitle>
                   </div>
                 </CardHeader>
                 <CardContent className="pt-6 space-y-6">
