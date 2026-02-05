@@ -19,6 +19,8 @@ jobs:
       run: pnpm exec playwright install --with-deps
     - name: Run Playwright tests
       run: pnpm exec playwright test
+      env:
+        NEXT_PUBLIC_SITE_URL: https://entretemps.vercel.app
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:
