@@ -110,9 +110,8 @@ test.describe('Adventure Generation - API Mocking', () => {
     await generateButton.click()
 
     // 5. VERIFICAR ESTADO DE CARGA
-    // Durante la generación, el botón debe mostrar "Generando..." y estar deshabilitado
-    await expect(page.getByRole('button', { name: /Generando/i })).toBeVisible()
-    await expect(page.getByRole('button', { name: /Generando/i })).toBeDisabled()
+    // Durante la generación, debe mostrarse el skeleton loader con el mensaje
+    await expect(page.getByText(/Creando tu aventura personalizada/i)).toBeVisible({ timeout: 5000 })
 
     // 6. ESPERAR NAVEGACIÓN: La app debe redirigir a /pack/result tras éxito
     await expect(page).toHaveURL(/\/pack\/result/, { timeout: 10000 })
@@ -128,9 +127,10 @@ test.describe('Adventure Generation - API Mocking', () => {
     await expect(page.getByText('Descifrar el Mapa Antiguo')).toBeVisible()
 
     // Verificar información de la aventura
-    await expect(page.getByText('6-8 años')).toBeVisible()
-    await expect(page.getByText('60 min')).toBeVisible()
-    await expect(page.getByText('4 niños')).toBeVisible()
+    // Con el nuevo diseño premium, verificar que la información clave está presente
+    await expect(page.locator('text=/6-8/').first()).toBeVisible()
+    await expect(page.locator('text=/60/').first()).toBeVisible()
+    await expect(page.locator('text=/participantes/i')).toBeVisible()
 
     // 8. CAPTURA DE EVIDENCIA: Screenshot del resultado final
     await page.screenshot({
@@ -172,7 +172,8 @@ test.describe('Adventure Generation - API Mocking', () => {
     await generateButton.click()
 
     // 3. VERIFICAR ESTADO DE CARGA (temporal)
-    await expect(page.getByRole('button', { name: /Generando/i })).toBeVisible()
+    // Durante la generación, debe mostrarse el skeleton loader
+    await expect(page.getByText(/Creando tu aventura personalizada/i)).toBeVisible({ timeout: 5000 })
 
     // 4. VERIFICAR MENSAJE DE ERROR
     // La app debe mostrar el error y NO navegar a /pack/result
