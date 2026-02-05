@@ -33,7 +33,7 @@ export default function Step5Page() {
         title="Tipo de aventura"
         description="Elige el género que más te guste para tu historia."
       >
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
           {ADVENTURE_TYPE_OPTIONS.map((option) => {
             const isSelected = selected === option.value
             const Icon = option.icon
@@ -44,26 +44,30 @@ export default function Step5Page() {
                 type="button"
                 onClick={() => setWizardData({ adventureType: option.value })}
                 className={cn(
-                  'flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all',
-                  'hover:border-primary/50 hover:bg-primary/5',
-                  'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50',
+                  'group flex flex-col items-center gap-3 p-5 rounded-2xl border transition-all duration-200',
+                  'hover:scale-105 hover:border-primary/60 hover:shadow-premium-lg',
+                  'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2',
+                  'active:scale-95',
                   isSelected
-                    ? 'border-primary bg-primary/10 shadow-md shadow-primary/20'
-                    : 'border-border bg-background'
+                    ? 'border-primary bg-primary/10 shadow-premium-lg shadow-primary/15'
+                    : 'border-border bg-card shadow-premium hover:bg-primary/5'
                 )}
                 aria-pressed={isSelected}
               >
                 <div
                   className={cn(
-                    'w-11 h-11 rounded-full flex items-center justify-center transition-colors',
-                    isSelected ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
+                    'w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-200',
+                    'group-hover:scale-110',
+                    isSelected
+                      ? 'bg-primary text-primary-foreground shadow-md'
+                      : 'bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary'
                   )}
                 >
-                  <Icon className="w-5 h-5" />
+                  <Icon className="w-6 h-6" strokeWidth={1.5} />
                 </div>
                 <span
                   className={cn(
-                    'text-sm font-medium text-center transition-colors',
+                    'text-sm font-semibold text-center transition-colors',
                     isSelected ? 'text-primary' : 'text-foreground'
                   )}
                 >

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { WizardShell } from '@/ui/components/wizard-shell'
 import { WizardStepCard } from '@/ui/components/wizard-step-card'
 import { Card, CardContent } from '@/ui/components/card'
+import { SkeletonLoader } from '@/ui/components/skeleton-loader'
 
 import { useWizard } from '@/ui/wizard/wizard-provider'
 import {
@@ -56,13 +57,17 @@ export default function Step8Page() {
     }
   }
 
+  // Mostrar skeleton loader elegante durante la generación
+  if (isLoading) {
+    return <SkeletonLoader message="Creando tu aventura personalizada..." />
+  }
+
   return (
     <WizardShell
       currentStep={8}
       totalSteps={8}
       prevHref="/wizard/step-7"
-      nextLabel={isLoading ? 'Generando...' : 'Generar aventura'}
-      nextDisabled={isLoading}
+      nextLabel="✨ Generar aventura"
       onNext={handleGenerate}
     >
       <WizardStepCard

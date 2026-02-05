@@ -54,33 +54,39 @@ export default function Step3Page() {
         title="¿Qué le encanta al/la protagonista?"
         description="Escribe personajes, hobbies o universos que le hagan ilusión. Cuanto más concreto, mejor."
       >
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="interests">Intereses del protagonista</Label>
+        <div className="space-y-6">
+          <div className="space-y-3">
+            <Label htmlFor="interests" className="text-base font-semibold">
+              Intereses del protagonista
+            </Label>
             <Textarea
               id="interests"
               value={interests}
               onChange={(e) => setWizardData({ interests: e.target.value })}
               placeholder="Ej: Superman, dinosaurios, Harry Potter, fútbol, la Oveja Dolly…"
-              className="min-h-28 resize-none"
+              className="min-h-32 resize-none rounded-2xl border-border/60 shadow-premium focus:shadow-premium-lg focus:border-primary/60 transition-all"
             />
+            <p className="text-xs text-muted-foreground">
+              Separa varios intereses con comas. Cuanto más específico, ¡mejor!
+            </p>
           </div>
 
-          {/* Suggested chips */}
-          <div className="space-y-2">
-            <p className="text-sm text-muted-foreground">Ideas para inspirarte:</p>
+          {/* Suggested chips - Modern bubbles */}
+          <div className="space-y-3">
+            <p className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+              <span className="inline-block w-1.5 h-1.5 rounded-full bg-primary"></span>
+              Ideas para inspirarte
+            </p>
             <div className="flex flex-wrap gap-2">
               {SUGGESTED_CHIPS.map((chip) => (
-                <Button
+                <button
                   key={chip}
                   type="button"
-                  variant="secondary"
-                  size="sm"
                   onClick={() => handleChipClick(chip)}
-                  className="rounded-full"
+                  className="px-4 py-2 text-sm font-medium rounded-full bg-gradient-to-br from-primary/10 to-primary/5 text-primary border border-primary/20 hover:border-primary/40 hover:shadow-premium hover:scale-105 active:scale-95 transition-all duration-200"
                 >
                   {chip}
-                </Button>
+                </button>
               ))}
             </div>
           </div>
