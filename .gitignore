@@ -48,7 +48,7 @@ next-env.d.ts
 .turbo
 
 
-.claude/
+/.claude/
 
 # --- Playwright ---
 # Evita subir los reportes y resultados de ejecución

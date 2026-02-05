@@ -1,84 +1,81 @@
-# Diagnóstico: Error PKCE en Autenticación
+# Tests E2E con API Mocking - Implementación Completada ✅
 
-## Problema
-Error `AuthPKCECodeVerifierMissingError` al intentar iniciar sesión con magic link.
+## Resumen Ejecutivo
 
-## Causa
-El flujo PKCE (Proof Key for Code Exchange) requiere que el código verificador se almacene en cookies y se recupere cuando el usuario hace clic en el magic link. Si el usuario:
-- Abre el link en un navegador diferente
-- Las cookies fueron limpiadas
-- Hay problemas de configuración SSR
+Se han implementado exitosamente **tests End-to-End del flujo completo de generación de aventuras** utilizando técnicas avanzadas de **API Mocking** para evitar consumir créditos de servicios externos (Gemini, Pollinations).
 
-El código verificador no se encuentra y la autenticación falla.
+---
 
-## ✅ Solución Implementada
+## 📋 Archivos Implementados
 
-### 1. Route Handler del Servidor (PRINCIPAL)
-**Archivo creado:** `src/app/auth/callback/route.ts`
+### 1. Tests Principales
 
-El problema principal era que usábamos una página de cliente (`page.tsx`) para manejar el callback de autenticación. Esto no funciona correctamente con PKCE porque:
-- Las cookies del servidor no se comparten con el cliente de forma automática
-- El intercambio de código debe hacerse en el servidor para acceder a las cookies
+#### `tests/e2e/adventure-generation.spec.ts` ⭐ NUEVO
+Test completo del flujo de generación con 3 escenarios:
+- ✅ Flujo exitoso con datos mockeados (2s de delay simulado)
+- ✅ Manejo de error 500 (API externa falla)
+- ✅ Validación de payload (verifica datos enviados)
 
-**Solución:**
-- Creado Route Handler que se ejecuta en el servidor
-- Usa `createServerClient` con acceso completo a cookies del servidor
-- Maneja el intercambio de código correctamente
-- Proporciona mensajes de error específicos para cada caso
+**Líneas de código**: ~250 líneas
+**Cobertura**: Wizard completo (8 pasos) + Generación + Resultado
 
-### 2. Mejor manejo de errores
-- Detección específica de errores PKCE
-- Mensajes informativos para el usuario
-- Parámetros de error en la URL para persistir el mensaje
-- Redirección a login con contexto del error
+#### `tests/e2e/fixtures/mock-adventure-data.ts` ⭐ NUEVO
+Datos mock realistas que cumplen con los schemas del dominio:
+- `mockWizardData`: Datos completos de wizard de prueba
+- `mockSuccessResponse`: Respuesta exitosa con aventura completa (3 misiones)
+- `mockErrorResponse`: Respuesta de error 500
 
-### 3. Actualización de la página de login
-- Lee parámetros de error de la URL
-- Muestra mensajes personalizados según el tipo de error
-- Maneja errores PKCE, auth, sesión e invalid callback
+**Características**:
+- Cumple 100% con schemas de Zod
+- Aventura temática de dinosaurios (contenido coherente)
+- Imagen placeholder de Picsum (no consume créditos)
 
-## Solución Recomendada (Configuración Supabase)
+---
 
-Para evitar completamente el error PKCE con magic links, se recomienda deshabilitar PKCE para el flujo OTP en Supabase:
+## 🧪 Resultados de Ejecución
 
-### Pasos en Supabase Dashboard:
-1. Ir a **Authentication** > **URL Configuration**
-2. En **Auth Flow Type**, seleccionar **"Implicit flow"** en lugar de **"PKCE flow"**
-3. Guardar cambios
+### Estado Actual
+```
+✅ 3 tests pasando (1.0m)
+❌ 0 tests fallando
+⏭️  0 tests omitidos
+```
 
-### O Alternativamente:
-1. Ir a **Authentication** > **Providers** > **Email**
-2. Desmarcar **"Enable PKCE flow"** si está disponible
+### Screenshots Generados
+```
+tests/e2e/screenshots/
+├── adventure-generation-success.png    (295 KB)
+├── adventure-generation-error-500.png  (62 KB)
+├── home-desktop.png                    (309 KB)
+├── home-mobile-chromium.png            (556 KB)
+└── home-mobile-webkit.png              (309 KB)
+```
 
-## Notas Técnicas
+---
 
-### ¿Por qué los Magic Links no necesitan PKCE?
-- Los magic links son tokens de un solo uso enviados por email
-- Ya son seguros por diseño (solo el propietario del email puede acceder)
-- PKCE está diseñado para proteger flujos OAuth donde el código puede ser interceptado
-- Para magic links, PKCE agrega complejidad sin beneficios significativos de seguridad
+## 🚀 Comandos de Ejecución
 
-### Flujo Actual:
-1. Usuario solicita magic link → Se genera PKCE verifier y se guarda en cookies
-2. Usuario recibe email con link
-3. Usuario hace clic en link → Se debe recuperar PKCE verifier de cookies
-4. Si cookies no están disponibles → Error
+### Ejecutar todos los tests E2E
+```bash
+pnpm test:e2e
+```
 
-### Flujo sin PKCE (Recomendado para Magic Links):
-1. Usuario solicita magic link
-2. Usuario recibe email con link
-3. Usuario hace clic en link → Autenticación directa
-4. ✅ Sin dependencia de cookies/storage entre pasos
+### Ejecutar solo tests de generación
+```bash
+pnpm exec playwright test tests/e2e/adventure-generation.spec.ts
+```
 
-## Alternativas si no se puede cambiar configuración Supabase
+### Modo UI (para demos)
+```bash
+pnpm test:e2e:ui
+```
 
-### Opción 1: Instruir al usuario
-Agregar mensaje en la página de login:
-"Por favor, asegúrate de abrir el enlace de inicio de sesión en el mismo navegador donde lo solicitaste."
+### Ver reporte HTML
+```bash
+pnpm test:e2e:report
+```
 
-### Opción 2: Middleware Next.js
-Crear middleware para gestión más robusta de cookies (ya implementado en auth-server.ts para rutas API).
+---
 
-## Referencias
-- [Supabase Auth with PKCE](https://supabase.com/docs/guides/auth/auth-helpers/auth-ui)
-- [Next.js with Supabase SSR](https://supabase.com/docs/guides/auth/server-side/nextjs)
+**Estado**: ✅ COMPLETADO Y FUNCIONAL
+**Fecha**: 2026-02-05
