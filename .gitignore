@@ -46,3 +46,21 @@ next-env.d.ts
 
 # Misc
 .turbo
+
+
+.claude/
+
+# --- Playwright ---
+# Evita subir los reportes y resultados de ejecución
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
+
+# Evita subir las capturas de pantalla de los tests (evidencias locales)
+# Queremos el código del test, no las fotos que genera al fallar/funcionar
+**/screenshots/*.png
+**/screenshots/*.jpg
+**/screenshots/*.jpeg
+**/screenshots/*.webp
