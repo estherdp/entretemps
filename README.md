@@ -2,14 +2,37 @@
 
 ## Descripción general
 
-**Entretemps** es una aplicación web interactiva que permite a padres, educadores y organizadores de eventos crear aventuras personalizadas para fiestas y actividades infantiles. A través de un wizard intuitivo de 6 pasos, los usuarios configuran todos los aspectos de su aventura (ocasión, participantes, intereses, ubicación, tono y dificultad) y la aplicación genera automáticamente un pack completo que incluye:
+**Entretemps** es una aplicación web interactiva desarrollada como **Trabajo de Fin de Máster (TFM)** en Desarrollo Asistido por IA, que permite a padres, educadores y organizadores de eventos crear aventuras personalizadas para fiestas y actividades infantiles.
 
-- Una historia narrativa con personajes y ambientación
-- 3 fases de juego con 6 puzzles sin pantallas
-- Guía de preparación paso a paso
-- Materiales imprimibles listos para usar
+### ¿Qué ofrece Entretemps?
 
-El objetivo es facilitar la organización de actividades lúdicas y educativas que promuevan el juego activo, la resolución de problemas y la creatividad, sin depender de dispositivos electrónicos.
+A través de un **wizard intuitivo de 6 pasos**, los usuarios configuran todos los aspectos de su aventura (ocasión, participantes, intereses, ubicación, tono y dificultad) y la aplicación genera automáticamente mediante **IA generativa** un pack completo que incluye:
+
+- 📖 **Historia narrativa** con personajes y ambientación única
+- 🎮 **3 fases de juego** con 6 puzzles diseñados sin pantallas
+- 📋 **Guía de preparación** paso a paso para el organizador
+- 🖨️ **Materiales imprimibles** listos para usar (mapas, pistas, cartas)
+- 🖼️ **Portada ilustrada** generada con IA o búsqueda inteligente de imágenes
+- ✏️ **Edición colaborativa** Human-in-the-Loop con drag & drop
+
+### Objetivos del proyecto
+
+- 🎯 **Facilitar la organización** de actividades lúdicas y educativas
+- 🏃 **Promover el juego activo** sin depender de dispositivos electrónicos
+- 🧠 **Desarrollar habilidades** de resolución de problemas y creatividad
+- 🔧 **Demostrar Clean Architecture** con desacoplamiento de proveedores de IA
+- 🔄 **Intercambiabilidad de LLMs** sin afectar la lógica de negocio
+
+### Arquitectura y enfoque técnico
+
+Este proyecto implementa **Clean Architecture** siguiendo el patrón **Ports & Adapters**, lo que permite:
+
+- ✅ Cambiar de proveedor de IA (OpenAI ↔ Gemini ↔ N8N) sin modificar casos de uso
+- ✅ Testing independiente de cada capa
+- ✅ Mantenibilidad y escalabilidad a largo plazo
+- ✅ Separación clara entre UI, lógica de negocio e infraestructura
+
+**Palabras clave:** Clean Architecture, TypeScript, Next.js, IA Generativa, Multimodal AI, Supabase, Testing, TFM
 
 ## Stack tecnológico
 
@@ -41,55 +64,120 @@ El objetivo es facilitar la organización de actividades lúdicas y educativas q
 
 ### Requisitos previos
 
-- Node.js 20 o superior
-- pnpm 8 o superior
-- Cuenta de Supabase (gratuita)
-- Cuenta de n8n o webhook alternativo (opcional para generación real de contenido)
+- **Node.js** 20 o superior
+- **pnpm** 8 o superior
+- **Cuenta de Supabase** (plan gratuito disponible)
+- **Proveedor de IA** (al menos uno):
+  - Google Gemini API (recomendado, plan gratuito disponible)
+  - N8N con workflow configurado (opcional)
+  - OpenAI API (preparado pero usa mock por defecto)
 
-### 1. Clonar el repositorio
+### Guía de instalación paso a paso
+
+#### 1. Clonar el repositorio
 
 ```bash
 git clone <repository-url>
 cd entretemps
 ```
 
-### 2. Instalar dependencias
+#### 2. Instalar dependencias
 
 ```bash
 pnpm install
 ```
 
-### 3. Configurar variables de entorno
+#### 3. Configurar variables de entorno
 
-Crear un archivo [.env.local](.env.local) en la raíz del proyecto con las siguientes variables:
+Copia el archivo de ejemplo y configúralo con tus credenciales:
 
 ```bash
-# Supabase
-NEXT_PUBLIC_SUPABASE_URL=https://tu-proyecto.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=tu-anon-key-aqui
+# En Windows (PowerShell)
+copy .env.example .env.local
 
-# n8n Webhook (server-only, opcional - usa adaptador mock si no está configurado)
-N8N_WEBHOOK_URL=https://tu-instancia-n8n.com/webhook/entretemps
-
-# IA Providers (opcional - los adaptadores usan mocks por defecto)
-OPENAI_API_KEY=sk-tu-key-aqui                    # Para OpenAIAdapter
-GOOGLE_AI_API_KEY=tu-gemini-key-aqui             # Para GeminiAdapter
-NANOBANANA_API_KEY=tu-nanobanana-key-aqui        # Para NanobananaAdapter
-
-# Búsqueda de Imágenes (opcional - usa placeholder si no está configurado)
-PEXELS_API_KEY=tu-pexels-key-aqui                # Para búsqueda de imágenes reales
+# En macOS/Linux
+cp .env.example .env.local
 ```
 
-### 4. Configurar Supabase
+Abre `.env.local` y configura las siguientes variables:
 
-1. Crear un proyecto en [Supabase](https://supabase.com)
-2. Obtener la URL y la clave anónima desde Project Settings > API
-3. Ejecutar las migraciones de base de datos (si existen en `/supabase/migrations`)
-4. Configurar autenticación con Google/GitHub en Authentication > Providers
-5. Crear la tabla de caché de imágenes ejecutando en SQL Editor:
+##### Variables OBLIGATORIAS
+
+```bash
+# Supabase (obligatorio)
+NEXT_PUBLIC_SUPABASE_URL=https://tu-proyecto.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=tu-anon-key-aqui
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+
+# Proveedor de IA (obligatorio - elige uno)
+AI_PROVIDER=gemini                    # Opciones: 'gemini', 'n8n', 'openai'
+
+# Si AI_PROVIDER=gemini (RECOMENDADO)
+GEMINI_API_KEY=tu-gemini-api-key-aqui
+GEMINI_MODEL=gemini-2.5-flash-lite
+GEMINI_TEMPERATURE=0.6
+GEMINI_MAX_TOKENS=3500
+
+# Si AI_PROVIDER=n8n
+# N8N_WEBHOOK_URL=https://tu-instancia.n8n.cloud/webhook/entretemps
+```
+
+##### Variables OPCIONALES (mejoran la experiencia)
+
+```bash
+# Búsqueda de imágenes reales (recomendado)
+PEXELS_API_KEY=tu-pexels-key-aqui
+
+# Generación de imágenes con IA (opcional)
+IMAGE_GENERATOR_PROVIDER=pollinations  # Opciones: 'pollinations', 'nanobanana', undefined
+POLLINATIONS_API_KEY=tu-pollinations-key-aqui
+```
+
+**Notas importantes:**
+- Las variables con `NEXT_PUBLIC_` son accesibles desde el navegador
+- Las demás son **server-only** y nunca se exponen al cliente
+- Si no configuras `PEXELS_API_KEY`, se usarán imágenes placeholder
+- Si no configuras un generador de imágenes, solo se usará Pexels + placeholders
+
+#### 4. Configurar Supabase
+
+##### 4.1. Crear proyecto
+
+1. Ve a [Supabase](https://supabase.com) y crea una cuenta (plan gratuito)
+2. Crea un nuevo proyecto
+3. Espera a que se complete la configuración (2-3 minutos)
+
+##### 4.2. Obtener credenciales
+
+1. Ve a **Project Settings** > **API**
+2. Copia la **URL** del proyecto → `NEXT_PUBLIC_SUPABASE_URL`
+3. Copia la **anon/public key** → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+
+##### 4.3. Configurar autenticación OAuth
+
+1. Ve a **Authentication** > **Providers**
+2. Activa **Google** y/o **GitHub**
+3. Configura las credenciales OAuth de cada proveedor
+4. Añade `http://localhost:3000/auth/callback` a las URLs de redirección autorizadas
+
+##### 4.4. Crear tablas de base de datos
+
+Ejecuta las siguientes consultas SQL en **SQL Editor**:
 
 ```sql
--- Crear tabla image_cache para Pexels
+-- Tabla principal de adventure packs
+CREATE TABLE IF NOT EXISTS adventure_packs (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  pack_json JSONB NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_adventure_packs_user_id ON adventure_packs(user_id);
+CREATE INDEX idx_adventure_packs_created_at ON adventure_packs(created_at);
+
+-- Tabla de caché de imágenes para Pexels
 CREATE TABLE IF NOT EXISTS image_cache (
   query TEXT PRIMARY KEY,
   url TEXT NOT NULL,
@@ -98,25 +186,81 @@ CREATE TABLE IF NOT EXISTS image_cache (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX IF NOT EXISTS idx_image_cache_created_at ON image_cache(created_at);
+CREATE INDEX idx_image_cache_created_at ON image_cache(created_at);
 
+-- Habilitar Row Level Security
+ALTER TABLE adventure_packs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE image_cache ENABLE ROW LEVEL SECURITY;
 
+-- Políticas RLS para adventure_packs
+CREATE POLICY "Users can view their own packs"
+  ON adventure_packs FOR SELECT
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own packs"
+  ON adventure_packs FOR INSERT
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own packs"
+  ON adventure_packs FOR UPDATE
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own packs"
+  ON adventure_packs FOR DELETE
+  USING (auth.uid() = user_id);
+
+-- Políticas RLS para image_cache (acceso público)
 CREATE POLICY "image_cache_select_policy" ON image_cache FOR SELECT USING (true);
 CREATE POLICY "image_cache_insert_policy" ON image_cache FOR INSERT WITH CHECK (true);
 CREATE POLICY "image_cache_update_policy" ON image_cache FOR UPDATE USING (true);
 CREATE POLICY "image_cache_delete_policy" ON image_cache FOR DELETE USING (true);
 ```
 
-### 5. Ejecutar en desarrollo
+#### 5. Obtener credenciales de proveedores de IA
+
+##### Google Gemini (RECOMENDADO - Gratuito)
+
+1. Ve a [Google AI Studio](https://aistudio.google.com/apikey)
+2. Inicia sesión con tu cuenta de Google
+3. Haz clic en **"Create API Key"**
+4. Copia la key → `GEMINI_API_KEY` en `.env.local`
+
+**Plan gratuito:** 15 requests/minuto, 1500 requests/día, 1 millón requests/mes
+
+##### Pexels (OPCIONAL - Búsqueda de imágenes reales)
+
+1. Ve a [Pexels API](https://www.pexels.com/api/)
+2. Crea una cuenta gratuita
+3. Solicita una API key
+4. Copia la key → `PEXELS_API_KEY` en `.env.local`
+
+**Plan gratuito:** 200 requests/hora, 20,000 requests/mes
+
+##### Pollinations AI (OPCIONAL - Generación de imágenes)
+
+1. Ve a [Pollinations.ai](https://pollinations.ai/)
+2. Crea una cuenta y solicita una API key
+3. Copia la key → `POLLINATIONS_API_KEY` en `.env.local`
+
+#### 6. Ejecutar en desarrollo
 
 ```bash
 pnpm dev
 ```
 
-La aplicación estará disponible en [http://localhost:3000](http://localhost:3000)
+La aplicación estará disponible en **[http://localhost:3000](http://localhost:3000)**
 
-### 6. Ejecutar tests
+#### 7. Verificar la instalación
+
+1. Abre http://localhost:3000
+2. Haz clic en "Iniciar sesión"
+3. Autentícate con Google/GitHub
+4. Completa el wizard de 6 pasos
+5. Genera tu primera aventura
+
+Si todo funciona correctamente, deberías ver tu aventura generada con título, historia, personajes y misiones.
+
+#### 8. Ejecutar tests
 
 ```bash
 # Ejecutar todos los tests una vez
@@ -124,14 +268,47 @@ pnpm test:run
 
 # Ejecutar tests en modo watch
 pnpm test:watch
+
+# Ejecutar tests E2E con Playwright
+pnpm test:e2e
+
+# Ver reporte de tests E2E
+pnpm test:e2e:report
 ```
 
-### 7. Build para producción
+#### 9. Build para producción
 
 ```bash
 pnpm build
 pnpm start
 ```
+
+La aplicación estará disponible en **[http://localhost:3000](http://localhost:3000)** en modo producción.
+
+### Troubleshooting
+
+#### Error: "Supabase client not initialized"
+- Verifica que `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_ANON_KEY` estén configurados
+- Asegúrate de que las variables empiecen con `NEXT_PUBLIC_`
+
+#### Error: "AI Provider not configured"
+- Verifica que `AI_PROVIDER` esté configurado con un valor válido: `gemini`, `n8n`, o `openai`
+- Si usas `gemini`, verifica que `GEMINI_API_KEY` esté configurado
+
+#### Error: "Authentication failed"
+- Verifica que hayas configurado OAuth en Supabase
+- Asegúrate de que `http://localhost:3000/auth/callback` esté en las URLs de redirección
+- Comprueba que `NEXT_PUBLIC_SITE_URL` sea `http://localhost:3000`
+
+#### No se generan imágenes reales
+- Si no has configurado `PEXELS_API_KEY`, se usarán placeholders (esto es normal)
+- Verifica que la tabla `image_cache` exista en Supabase
+- Revisa los logs del servidor en la consola para ver mensajes de error
+
+#### Tests fallan
+- Ejecuta `pnpm install` para asegurarte de que todas las dependencias estén instaladas
+- Verifica que no haya conflictos de puertos (3000 ocupado)
+- Algunos tests E2E requieren variables de entorno configuradas
 
 ## Estructura del proyecto
 
@@ -447,6 +624,335 @@ await reorderMissions(packId, userId, [3, 1, 2])
 ```
 
 Ver implementación completa en: [src/app/my-adventures/[id]/page.tsx](src/app/my-adventures/[id]/page.tsx)
+
+## Despliegue en Producción
+
+### Opción 1: Vercel (Recomendado)
+
+Vercel es la plataforma oficial de Next.js y ofrece la mejor integración con el framework.
+
+#### 1. Preparar el proyecto
+
+```bash
+# Asegúrate de que el proyecto compile sin errores
+pnpm build
+
+# Ejecuta los tests
+pnpm test:run
+```
+
+#### 2. Desplegar en Vercel
+
+**Opción A: Desde la interfaz web**
+
+1. Ve a [Vercel](https://vercel.com) y crea una cuenta
+2. Haz clic en **"Add New Project"**
+3. Importa tu repositorio desde GitHub/GitLab/Bitbucket
+4. Configura las variables de entorno (ver paso 3)
+5. Haz clic en **"Deploy"**
+
+**Opción B: Desde la CLI**
+
+```bash
+# Instalar Vercel CLI
+pnpm install -g vercel
+
+# Login
+vercel login
+
+# Desplegar
+vercel
+```
+
+#### 3. Configurar variables de entorno en Vercel
+
+Ve a **Project Settings** > **Environment Variables** y añade:
+
+**Variables OBLIGATORIAS:**
+```
+NEXT_PUBLIC_SUPABASE_URL=https://tu-proyecto.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=tu-anon-key
+NEXT_PUBLIC_SITE_URL=https://tu-app.vercel.app
+
+AI_PROVIDER=gemini
+GEMINI_API_KEY=tu-gemini-key
+GEMINI_MODEL=gemini-2.5-flash-lite
+GEMINI_TEMPERATURE=0.6
+GEMINI_MAX_TOKENS=3500
+```
+
+**Variables OPCIONALES:**
+```
+PEXELS_API_KEY=tu-pexels-key
+IMAGE_GENERATOR_PROVIDER=pollinations
+POLLINATIONS_API_KEY=tu-pollinations-key
+```
+
+**IMPORTANTE:**
+- Marca las variables **server-only** (sin `NEXT_PUBLIC_`) como **Environment Variables** (no Server Functions)
+- Las variables `NEXT_PUBLIC_*` pueden estar en cualquier entorno
+- Actualiza `NEXT_PUBLIC_SITE_URL` con tu dominio de producción
+
+#### 4. Configurar OAuth en Supabase
+
+1. Ve a tu proyecto en Supabase > **Authentication** > **URL Configuration**
+2. Añade la URL de producción a **Site URL**: `https://tu-app.vercel.app`
+3. Añade a **Redirect URLs**: `https://tu-app.vercel.app/auth/callback`
+4. Si usas dominio personalizado, añade también: `https://tu-dominio.com/auth/callback`
+
+#### 5. Configurar dominio personalizado (Opcional)
+
+1. En Vercel, ve a **Project Settings** > **Domains**
+2. Añade tu dominio personalizado
+3. Sigue las instrucciones para configurar DNS
+4. Actualiza `NEXT_PUBLIC_SITE_URL` con tu dominio personalizado
+5. Actualiza las **Redirect URLs** en Supabase
+
+#### 6. Configurar analytics y monitoreo (Opcional)
+
+Vercel ofrece analytics integrados:
+
+1. Ve a **Analytics** en tu proyecto
+2. Activa **Web Analytics** para métricas de rendimiento
+3. Activa **Speed Insights** para Core Web Vitals
+
+### Opción 2: Railway
+
+Railway es una plataforma moderna con soporte nativo para Next.js.
+
+#### 1. Preparar el proyecto
+
+Crea un archivo `railway.json` en la raíz:
+
+```json
+{
+  "build": {
+    "builder": "NIXPACKS"
+  },
+  "deploy": {
+    "startCommand": "pnpm start",
+    "restartPolicyType": "ON_FAILURE"
+  }
+}
+```
+
+#### 2. Desplegar
+
+1. Ve a [Railway](https://railway.app) y crea una cuenta
+2. Crea un nuevo proyecto desde GitHub
+3. Railway detectará automáticamente Next.js
+4. Configura las variables de entorno (mismo formato que Vercel)
+5. Despliega con **"Deploy Now"**
+
+### Opción 3: Render
+
+Render ofrece hosting gratuito con algunas limitaciones.
+
+#### 1. Configurar
+
+Crea un archivo `render.yaml` en la raíz:
+
+```yaml
+services:
+  - type: web
+    name: entretemps
+    env: node
+    buildCommand: pnpm install && pnpm build
+    startCommand: pnpm start
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+```
+
+#### 2. Desplegar
+
+1. Ve a [Render](https://render.com) y crea una cuenta
+2. Crea un nuevo **Web Service** desde GitHub
+3. Configura las variables de entorno
+4. Despliega con **"Create Web Service"**
+
+### Opción 4: Docker (Auto-hosting)
+
+Si prefieres desplegar en tu propio servidor, usa Docker.
+
+#### 1. Crear Dockerfile
+
+Crea un `Dockerfile` en la raíz (ya debería existir):
+
+```dockerfile
+FROM node:20-alpine AS base
+
+# Install dependencies only when needed
+FROM base AS deps
+RUN corepack enable pnpm
+WORKDIR /app
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
+
+# Rebuild the source code only when needed
+FROM base AS builder
+RUN corepack enable pnpm
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+RUN pnpm build
+
+# Production image
+FROM base AS runner
+WORKDIR /app
+ENV NODE_ENV production
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+
+COPY --from=builder /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+USER nextjs
+EXPOSE 3000
+ENV PORT 3000
+
+CMD ["node", "server.js"]
+```
+
+#### 2. Crear docker-compose.yml
+
+```yaml
+version: '3.8'
+services:
+  entretemps:
+    build: .
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env.production
+    restart: unless-stopped
+```
+
+#### 3. Desplegar
+
+```bash
+# Build
+docker compose build
+
+# Run
+docker compose up -d
+
+# Ver logs
+docker compose logs -f
+```
+
+### Consideraciones de Seguridad en Producción
+
+#### 1. Variables de entorno
+
+- ❌ **NUNCA** commitees archivos `.env.local` o `.env.production` al repositorio
+- ✅ Usa **secrets management** de tu plataforma (Vercel Secrets, Railway Variables, etc.)
+- ✅ Rota las API keys periódicamente
+- ✅ Usa variables separadas para development/staging/production
+
+#### 2. Supabase
+
+- ✅ Habilita **Row Level Security (RLS)** en todas las tablas
+- ✅ Configura políticas RLS restrictivas (users can only access their own data)
+- ✅ Usa la **anon key** (no la service role key) en el frontend
+- ✅ Limita los **CORS origins** en Supabase > API Settings
+
+#### 3. APIs externas
+
+- ✅ Todas las llamadas a APIs (Gemini, Pexels, etc.) deben ser **server-only**
+- ✅ Implementa **rate limiting** para evitar abuse
+- ✅ Monitorea el uso de APIs para detectar anomalías
+- ✅ Configura **billing alerts** en Google Cloud (Gemini)
+
+#### 4. Autenticación
+
+- ✅ Configura **OAuth redirect URLs** solo para dominios autorizados
+- ✅ Habilita **email verification** en Supabase
+- ✅ Configura **session timeout** apropiado
+- ✅ Implementa **CSRF protection** (Next.js lo hace por defecto)
+
+#### 5. Headers de seguridad
+
+Next.js configura automáticamente headers de seguridad, pero puedes reforzarlos en `next.config.js`:
+
+```javascript
+const securityHeaders = [
+  {
+    key: 'X-DNS-Prefetch-Control',
+    value: 'on'
+  },
+  {
+    key: 'Strict-Transport-Security',
+    value: 'max-age=63072000; includeSubDomains; preload'
+  },
+  {
+    key: 'X-Frame-Options',
+    value: 'SAMEORIGIN'
+  },
+  {
+    key: 'X-Content-Type-Options',
+    value: 'nosniff'
+  },
+  {
+    key: 'Referrer-Policy',
+    value: 'origin-when-cross-origin'
+  }
+]
+
+module.exports = {
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: securityHeaders,
+      },
+    ]
+  },
+}
+```
+
+### Monitoreo y Logs
+
+#### Vercel
+
+- **Build logs**: Automáticos en cada deploy
+- **Runtime logs**: Disponibles en **Deployments** > **Function Logs**
+- **Analytics**: Web Analytics y Speed Insights integrados
+
+#### Sentry (Opcional)
+
+Para error tracking avanzado:
+
+```bash
+pnpm add @sentry/nextjs
+```
+
+Configura en `sentry.client.config.js` y `sentry.server.config.js`.
+
+#### Uptime monitoring
+
+Usa servicios como:
+- **Uptime Robot** (gratuito)
+- **Better Uptime**
+- **Pingdom**
+
+### Checklist de pre-deploy
+
+Antes de desplegar a producción, verifica:
+
+- [ ] Tests pasan correctamente (`pnpm test:run`)
+- [ ] Build local exitoso (`pnpm build`)
+- [ ] Variables de entorno configuradas en plataforma
+- [ ] Supabase RLS habilitado y políticas configuradas
+- [ ] OAuth redirect URLs actualizadas
+- [ ] Tabla `image_cache` creada en Supabase
+- [ ] Tabla `adventure_packs` creada con índices
+- [ ] API keys válidas y con límites apropiados
+- [ ] Dominio personalizado configurado (si aplica)
+- [ ] SSL/TLS habilitado (automático en Vercel/Railway)
+- [ ] Headers de seguridad configurados
+- [ ] Monitoreo de errores activo
 
 ## Wizard Flow
 
