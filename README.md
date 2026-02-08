@@ -477,7 +477,6 @@ Al finalizar el wizard, la aplicación genera un pack que incluye:
 - **6 Puzzles sin pantallas**: 2 puzzles por fase, variados y adaptados a las edades
 - **Guía de preparación**: Instrucciones paso a paso para el organizador
 - **Lista de materiales**: Todo lo necesario para preparar la aventura
-- **Materiales imprimibles**: PDFs listos para imprimir (mapas, pistas, cartas, etc.)
 
 ### 3. Biblioteca de aventuras
 
@@ -813,33 +812,6 @@ EXPOSE 3000
 ENV PORT 3000
 
 CMD ["node", "server.js"]
-```
-
-#### 2. Crear docker-compose.yml
-
-```yaml
-version: '3.8'
-services:
-  entretemps:
-    build: .
-    ports:
-      - "3000:3000"
-    env_file:
-      - .env.production
-    restart: unless-stopped
-```
-
-#### 3. Desplegar
-
-```bash
-# Build
-docker compose build
-
-# Run
-docker compose up -d
-
-# Ver logs
-docker compose logs -f
 ```
 
 ### Consideraciones de Seguridad en Producción
