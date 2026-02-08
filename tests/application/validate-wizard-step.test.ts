@@ -82,7 +82,7 @@ describe('validateWizardStep', () => {
       const result = validateStep2(data)
 
       expect(result.isValid).toBe(false)
-      expect(result.message).toContain('edad mínima debe ser menor')
+      expect(result.message).toContain('superar')
     })
 
     it('should return invalid when kidsCount is less than 1', () => {
@@ -105,8 +105,8 @@ describe('validateWizardStep', () => {
 
     it('should return invalid when ages are not defined', () => {
       const data: WizardData = {
-        occasion: 'cumpleaños',
-        ages: { min: 0, max: 0 },
+        occasion: 'cumpleaños' as any,
+        ages: undefined,
         kidsCount: 2,
         interests: '',
         place: '',

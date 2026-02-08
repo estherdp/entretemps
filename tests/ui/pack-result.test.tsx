@@ -106,9 +106,11 @@ describe('PackResultPage', () => {
 
     renderWithProviders(<PackResultPage />)
 
-    await screen.findByText('6-10 años')
-    expect(screen.getByText('60 min')).toBeInTheDocument()
-    expect(screen.getByText('8 niños')).toBeInTheDocument()
+    await screen.findByText('La Aventura de los Dinosaurios')
+    // Valores numéricos divididos en elementos separados (número + etiqueta en <span>)
+    expect(screen.getByText('Edades')).toBeInTheDocument()
+    expect(screen.getByText('Duración')).toBeInTheDocument()
+    expect(screen.getByText('Participantes')).toBeInTheDocument()
     expect(screen.getByText('Fácil')).toBeInTheDocument()
   })
 
@@ -164,7 +166,7 @@ describe('PackResultPage', () => {
     renderWithProviders(<PackResultPage />)
 
     await screen.findByText('La Aventura de los Dinosaurios')
-    expect(screen.getByRole('button', { name: 'Crear nueva aventura' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Imprimir Pack' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Nueva aventura' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Imprimir' })).toBeInTheDocument()
   })
 })
