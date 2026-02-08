@@ -28,21 +28,21 @@ export function WizardShell({
   const progressValue = (currentStep / totalSteps) * 100
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
+    <div className="min-h-screen bg-white dark:bg-background">
       {/* Single column layout */}
-      <div className="max-w-4xl mx-auto px-4 pt-20 pb-8">
-        <div className="space-y-8">
+      <div className="max-w-4xl mx-auto px-4 pt-24 pb-8">
+        <div className="space-y-10">
           {/* Progress */}
-          <div>
-            <div className="flex items-center justify-between text-sm mb-2">
-              <span className="text-muted-foreground">
+          <div className="space-y-3">
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-slate-600 dark:text-slate-400 font-medium">
                 Paso {currentStep} de {totalSteps}
               </span>
-              <span className="text-accent font-semibold">
+              <span className="text-primary font-semibold">
                 {Math.round(progressValue)}%
               </span>
             </div>
-            <Progress value={progressValue} className="h-2 bg-muted [&>div]:bg-accent" />
+            <Progress value={progressValue} className="h-2 bg-slate-100 dark:bg-slate-800 [&>div]:bg-primary" />
           </div>
 
           {/* Form content */}
@@ -51,15 +51,15 @@ export function WizardShell({
           </div>
 
           {/* Desktop navigation buttons (hidden on mobile) */}
-          <div className="hidden lg:block space-y-3">
+          <div className="hidden lg:block space-y-4">
             {validationMessage && (
-              <div className="text-sm text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 px-4 py-3 rounded-lg border border-amber-200 dark:border-amber-900">
+              <div className="text-sm text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-900/20 px-5 py-3.5 rounded-xl border border-amber-200 dark:border-amber-800">
                 {validationMessage}
               </div>
             )}
-            <div className="flex gap-3">
+            <div className="flex gap-4">
               {prevHref ? (
-                <Button variant="outline" asChild>
+                <Button variant="outline" asChild className="h-12 px-6 rounded-xl border-slate-300 dark:border-slate-700">
                   <Link href={prevHref}>Atrás</Link>
                 </Button>
               ) : null}
@@ -68,6 +68,7 @@ export function WizardShell({
                   <Button
                     asChild
                     disabled={nextDisabled}
+                    className="h-12 px-8 rounded-xl font-semibold"
                   >
                     <Link href={nextDisabled ? '#' : nextHref}>{nextLabel}</Link>
                   </Button>
@@ -75,6 +76,7 @@ export function WizardShell({
                   <Button
                     disabled={nextDisabled}
                     onClick={onNext}
+                    className="h-12 px-8 rounded-xl font-semibold"
                   >
                     {nextLabel}
                   </Button>
@@ -86,16 +88,16 @@ export function WizardShell({
       </div>
 
       {/* Mobile sticky footer (hidden on desktop) */}
-      <div className="fixed bottom-0 left-0 right-0 lg:hidden bg-background/90 backdrop-blur-xl border-t border-border/40 shadow-[0_-4px_20px_-4px_rgba(0,0,0,0.05)]">
-        <div className="px-6 py-4 pb-8 space-y-3">
+      <div className="fixed bottom-0 left-0 right-0 lg:hidden bg-white/95 dark:bg-slate-950/95 backdrop-blur-xl border-t border-slate-200 dark:border-slate-800 shadow-[0_-4px_20px_-4px_rgba(0,0,0,0.08)]">
+        <div className="px-6 py-4 pb-8 space-y-4">
           {validationMessage && (
-            <div className="text-sm text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 px-4 py-3 rounded-lg border border-amber-200 dark:border-amber-900">
+            <div className="text-sm text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-900/20 px-5 py-3.5 rounded-xl border border-amber-200 dark:border-amber-800">
               {validationMessage}
             </div>
           )}
           <div className="flex gap-3">
             {prevHref ? (
-              <Button variant="outline" asChild className="flex-1 h-12">
+              <Button variant="outline" asChild className="flex-1 h-14 rounded-xl border-slate-300 dark:border-slate-700 font-semibold">
                 <Link href={prevHref}>Atrás</Link>
               </Button>
             ) : null}
@@ -103,14 +105,14 @@ export function WizardShell({
               {nextHref ? (
                 <Button
                   asChild
-                  className="w-full h-12"
+                  className="w-full h-14 rounded-xl font-semibold"
                   disabled={nextDisabled}
                 >
                   <Link href={nextDisabled ? '#' : nextHref}>{nextLabel}</Link>
                 </Button>
               ) : (
                 <Button
-                  className="w-full h-12"
+                  className="w-full h-14 rounded-xl font-semibold"
                   disabled={nextDisabled}
                   onClick={onNext}
                 >

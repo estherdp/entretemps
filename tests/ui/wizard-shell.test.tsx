@@ -56,7 +56,7 @@ describe('WizardShell', () => {
     expect(screen.getAllByText('Generar aventura').length).toBeGreaterThanOrEqual(1)
   })
 
-  it('should have gradient background', () => {
+  it('should have clean white background', () => {
     const { container } = render(
       <WizardShell currentStep={1} totalSteps={5}>
         <p>Content</p>
@@ -64,7 +64,7 @@ describe('WizardShell', () => {
     )
 
     const wrapper = container.firstChild as HTMLElement
-    expect(wrapper.className).toContain('bg-gradient-to-b')
+    expect(wrapper.className).toContain('bg-white')
   })
 
   it('should render mobile sticky footer', () => {

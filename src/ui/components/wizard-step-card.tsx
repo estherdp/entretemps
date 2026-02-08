@@ -12,30 +12,30 @@ export function WizardStepCard({
   children
 }: WizardStepCardProps) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Step header */}
-      <div className="space-y-3">
+      <div className="space-y-4">
         {/* Badge */}
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent/10 text-accent text-xs font-medium">
+        <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/5 text-primary text-xs font-semibold tracking-wide uppercase border border-primary/10">
           <span>✨</span>
           {badge}
         </span>
 
         {/* Title */}
-        <h2 className="text-2xl md:text-3xl font-semibold leading-tight tracking-tight text-foreground">
+        <h2 className="text-3xl md:text-4xl font-bold leading-tight tracking-tight text-slate-900 dark:text-slate-50">
           {title}
         </h2>
 
         {/* Description */}
         {description && (
-          <p className="text-base text-muted-foreground leading-relaxed">
+          <p className="text-lg text-slate-600 dark:text-slate-400 leading-relaxed max-w-2xl">
             {description}
           </p>
         )}
       </div>
 
       {/* Card content */}
-      <div className="bg-card rounded-2xl p-5 shadow-sm border border-border/50">
+      <div className="bg-white dark:bg-card rounded-2xl p-8 shadow-sm border border-slate-200 dark:border-slate-800">
         {children}
       </div>
     </div>

@@ -14,31 +14,30 @@ export default function Home() {
   const { templates, myAdventures, hasUser } = data
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-background to-muted/20">
+    <main className="min-h-screen bg-white dark:bg-background">
       {/* Hero Section - Different content based on auth */}
       {!hasUser ? (
         // Landing page for non-authenticated users
         <>
-          <section className="relative px-4 pt-20 pb-16 md:pt-32 md:pb-24 text-center overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-b from-orange-50 dark:from-orange-950/10 to-transparent pointer-events-none" />
-            <div className="relative max-w-4xl mx-auto space-y-6">
-              <span className="inline-block text-sm font-medium text-orange-600 dark:text-orange-400 bg-orange-100 dark:bg-orange-950/30 px-4 py-1.5 rounded-full">
-                ✨ Entretemps
+          <section className="relative px-4 pt-24 pb-20 md:pt-40 md:pb-32 text-center">
+            <div className="relative max-w-5xl mx-auto space-y-8">
+              <span className="inline-block text-xs font-semibold tracking-wide uppercase text-slate-600 dark:text-slate-400 px-4 py-2 rounded-full border border-slate-200 dark:border-slate-800">
+                Entretemps
               </span>
-              <h1 className="text-4xl md:text-6xl font-bold leading-tight">
+              <h1 className="text-5xl md:text-7xl font-extrabold leading-[1.1] tracking-tight text-slate-900 dark:text-slate-50 max-w-4xl mx-auto">
                 La magia de jugar juntos,{' '}
-                <span className="bg-gradient-to-r from-orange-500 to-purple-600 bg-clip-text text-transparent">
+                <span className="text-slate-900 dark:text-slate-50">
                   a un clic de distancia
                 </span>
               </h1>
-              <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto">
+              <p className="text-xl md:text-2xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto leading-relaxed">
                 Crea aventuras épicas para tus hijos en minutos. Sin pantallas, sin complicaciones — solo risas y momentos inolvidables.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-                <Button size="lg" onClick={() => router.push('/login')} className="rounded-2xl text-base px-8">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
+                <Button size="lg" onClick={() => router.push('/login')} className="rounded-xl text-base px-10 h-14 font-semibold shadow-lg hover:shadow-xl transition-all">
                   ¡Crear mi primera aventura!
                 </Button>
-                <Button size="lg" variant="outline" onClick={() => router.push('/login')} className="rounded-2xl text-base px-8">
+                <Button size="lg" variant="outline" onClick={() => router.push('/login')} className="rounded-xl text-base px-10 h-14 font-semibold border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-900">
                   Ya tengo cuenta
                 </Button>
               </div>
@@ -46,58 +45,58 @@ export default function Home() {
           </section>
 
           {/* Features Section */}
-          <section className="px-4 pb-16">
-            <div className="max-w-6xl mx-auto">
-              <h2 className="text-3xl font-bold text-center mb-3">
+          <section className="px-4 pb-24">
+            <div className="max-w-7xl mx-auto">
+              <h2 className="text-4xl md:text-5xl font-bold text-center mb-4 text-slate-900 dark:text-slate-50 tracking-tight">
                 Todo lo que necesitas para una aventura épica
               </h2>
-              <p className="text-center text-muted-foreground mb-12 max-w-xl mx-auto">
+              <p className="text-center text-slate-600 dark:text-slate-400 mb-16 max-w-2xl mx-auto text-lg">
                 Configuras, la IA crea, vosotros disfrutáis.
               </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <Card className="rounded-3xl">
-                  <CardContent className="pt-6 text-center space-y-3">
-                    <div className="w-12 h-12 mx-auto rounded-full bg-amber-100 dark:bg-amber-900/20 flex items-center justify-center">
-                      <Star className="w-6 h-6 text-amber-500 dark:text-amber-400" />
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <Card className="rounded-2xl border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow group">
+                  <CardContent className="pt-8 pb-6 text-center space-y-4">
+                    <div className="w-14 h-14 mx-auto rounded-2xl bg-slate-100 dark:bg-slate-800/50 flex items-center justify-center group-hover:bg-primary/10 dark:group-hover:bg-primary/20 transition-colors">
+                      <Star className="w-7 h-7 text-slate-500 dark:text-slate-400 group-hover:text-primary transition-colors" />
                     </div>
-                    <h3 className="font-semibold">Aventuras únicas en minutos</h3>
-                    <p className="text-sm text-muted-foreground">
+                    <h3 className="font-semibold text-slate-900 dark:text-slate-50 text-lg">Aventuras únicas en minutos</h3>
+                    <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
                       La IA diseña historias, puzzles y personajes adaptados a tu familia. Tú solo disfrutas.
                     </p>
                   </CardContent>
                 </Card>
 
-                <Card className="rounded-3xl">
-                  <CardContent className="pt-6 text-center space-y-3">
-                    <div className="w-12 h-12 mx-auto rounded-full bg-rose-100 dark:bg-rose-900/20 flex items-center justify-center">
-                      <Heart className="w-6 h-6 text-rose-500 dark:text-rose-400" />
+                <Card className="rounded-2xl border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow group">
+                  <CardContent className="pt-8 pb-6 text-center space-y-4">
+                    <div className="w-14 h-14 mx-auto rounded-2xl bg-slate-100 dark:bg-slate-800/50 flex items-center justify-center group-hover:bg-primary/10 dark:group-hover:bg-primary/20 transition-colors">
+                      <Heart className="w-7 h-7 text-slate-500 dark:text-slate-400 group-hover:text-primary transition-colors" />
                     </div>
-                    <h3 className="font-semibold">Hecha para tu familia</h3>
-                    <p className="text-sm text-muted-foreground">
+                    <h3 className="font-semibold text-slate-900 dark:text-slate-50 text-lg">Hecha para tu familia</h3>
+                    <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
                       Adapta cada aventura a las edades e intereses de tus hijos. Siempre a su medida.
                     </p>
                   </CardContent>
                 </Card>
 
-                <Card className="rounded-3xl">
-                  <CardContent className="pt-6 text-center space-y-3">
-                    <div className="w-12 h-12 mx-auto rounded-full bg-teal-100 dark:bg-teal-900/20 flex items-center justify-center">
-                      <Compass className="w-6 h-6 text-teal-600 dark:text-teal-400" />
+                <Card className="rounded-2xl border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow group">
+                  <CardContent className="pt-8 pb-6 text-center space-y-4">
+                    <div className="w-14 h-14 mx-auto rounded-2xl bg-slate-100 dark:bg-slate-800/50 flex items-center justify-center group-hover:bg-primary/10 dark:group-hover:bg-primary/20 transition-colors">
+                      <Compass className="w-7 h-7 text-slate-500 dark:text-slate-400 group-hover:text-primary transition-colors" />
                     </div>
-                    <h3 className="font-semibold">Explora cualquier espacio</h3>
-                    <p className="text-sm text-muted-foreground">
+                    <h3 className="font-semibold text-slate-900 dark:text-slate-50 text-lg">Explora cualquier espacio</h3>
+                    <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
                       Casa, jardín, parque... transforma tu entorno cotidiano en el escenario de una épica misión.
                     </p>
                   </CardContent>
                 </Card>
 
-                <Card className="rounded-3xl">
-                  <CardContent className="pt-6 text-center space-y-3">
-                    <div className="w-12 h-12 mx-auto rounded-full bg-purple-100 dark:bg-purple-900/20 flex items-center justify-center">
-                      <Wand2 className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+                <Card className="rounded-2xl border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow group">
+                  <CardContent className="pt-8 pb-6 text-center space-y-4">
+                    <div className="w-14 h-14 mx-auto rounded-2xl bg-slate-100 dark:bg-slate-800/50 flex items-center justify-center group-hover:bg-primary/10 dark:group-hover:bg-primary/20 transition-colors">
+                      <Wand2 className="w-7 h-7 text-slate-500 dark:text-slate-400 group-hover:text-primary transition-colors" />
                     </div>
-                    <h3 className="font-semibold">Tú tienes el control</h3>
-                    <p className="text-sm text-muted-foreground">
+                    <h3 className="font-semibold text-slate-900 dark:text-slate-50 text-lg">Tú tienes el control</h3>
+                    <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
                       Edita, mejora y personaliza cada misión antes del gran día. Con un toque de magia.
                     </p>
                   </CardContent>
@@ -107,28 +106,28 @@ export default function Home() {
           </section>
 
           {/* Para padres, por padres */}
-          <section className="px-4 pb-16">
-            <div className="max-w-3xl mx-auto text-center space-y-4 bg-gradient-to-br from-orange-50 to-amber-50/40 dark:from-orange-950/20 dark:to-amber-950/10 rounded-3xl p-8 md:p-12">
-              <span className="text-3xl">🏠</span>
-              <h2 className="text-2xl md:text-3xl font-bold">
+          <section className="px-4 pb-24">
+            <div className="max-w-4xl mx-auto text-center space-y-6 bg-slate-50 dark:bg-slate-900/30 rounded-3xl p-12 md:p-16 border border-slate-200 dark:border-slate-800">
+              <span className="text-4xl">🏠</span>
+              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-slate-50 tracking-tight">
                 Para padres, por padres
               </h2>
-              <p className="text-muted-foreground leading-relaxed">
+              <p className="text-lg text-slate-600 dark:text-slate-400 leading-relaxed max-w-2xl mx-auto">
                 Sabemos que el tiempo libre es oro. Entretemps convierte tu salón, tu jardín o el parque del barrio en el escenario de una aventura épica. Sin pantallas. Sin complicaciones. Solo risas, misiones y momentos que tus hijos recordarán para siempre.
               </p>
             </div>
           </section>
 
           {/* CTA Section */}
-          <section className="px-4 pb-20">
-            <div className="max-w-3xl mx-auto text-center space-y-6 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-950/20 dark:to-blue-950/20 rounded-3xl p-8 md:p-12">
-              <h2 className="text-2xl md:text-3xl font-bold">
+          <section className="px-4 pb-32">
+            <div className="max-w-4xl mx-auto text-center space-y-8 bg-slate-900 dark:bg-slate-800 rounded-3xl p-12 md:p-16">
+              <h2 className="text-3xl md:text-4xl font-bold text-white tracking-tight">
                 ¿Listo para la primera aventura?
               </h2>
-              <p className="text-muted-foreground">
+              <p className="text-lg text-slate-300 max-w-2xl mx-auto">
                 Únete a las familias que ya crean momentos mágicos con Entretemps.
               </p>
-              <Button size="lg" onClick={() => router.push('/login')} className="rounded-2xl text-base px-8">
+              <Button size="lg" onClick={() => router.push('/login')} className="rounded-xl text-base px-10 h-14 font-semibold bg-white text-slate-900 hover:bg-slate-100 shadow-lg hover:shadow-xl transition-all">
                 ¡Vamos allá!
               </Button>
             </div>
@@ -136,45 +135,45 @@ export default function Home() {
         </>
       ) : (
         // Authenticated user - home page
-        <section className="px-4 pt-20 pb-12 md:pt-24 md:pb-16 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
+        <section className="px-4 pt-24 pb-16 md:pt-32 md:pb-20 text-center">
+          <h1 className="text-5xl md:text-6xl font-extrabold mb-6 text-slate-900 dark:text-slate-50 tracking-tight">
             ¡Hola, explorador! 🗺️
           </h1>
-          <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
+          <p className="text-xl text-slate-600 dark:text-slate-400 mb-10 max-w-2xl mx-auto leading-relaxed">
             ¿Qué aventura viviremos hoy? Crea una nueva o continúa con tus favoritas.
           </p>
-          <Button size="lg" onClick={() => router.push('/wizard/step-1')} className="rounded-2xl">
+          <Button size="lg" onClick={() => router.push('/wizard/step-1')} className="rounded-xl text-base px-10 h-14 font-semibold shadow-lg hover:shadow-xl transition-all">
             ✨ ¡Nueva aventura!
           </Button>
         </section>
       )}
 
-      <div className="max-w-7xl mx-auto px-4 pb-16 space-y-12">
+      <div className="max-w-7xl mx-auto px-4 pb-24 space-y-20">
         {/* Mis Aventuras */}
         {hasUser && (
           <section>
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center justify-between mb-8">
               <div>
-                <h2 className="text-2xl md:text-3xl font-bold">Mis Aventuras</h2>
-                <p className="text-sm text-muted-foreground mt-1">
+                <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-slate-50 tracking-tight">Mis Aventuras</h2>
+                <p className="text-base text-slate-600 dark:text-slate-400 mt-2">
                   Tus creaciones guardadas
                 </p>
               </div>
               {myAdventures.length > 6 && (
-                <Button variant="ghost" onClick={() => router.push('/my-adventures')}>
+                <Button variant="ghost" onClick={() => router.push('/my-adventures')} className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-50">
                   Ver todas →
                 </Button>
               )}
             </div>
 
             {isLoading ? (
-              <div className="text-center py-12 text-muted-foreground">
+              <div className="text-center py-16 text-slate-500 dark:text-slate-400">
                 Buscando tus aventuras...
               </div>
             ) : myAdventures.length === 0 ? (
-              <div className="text-center py-12 text-muted-foreground">
-                <p className="mb-4">Aún no has creado ninguna aventura.</p>
-                <Button variant="outline" onClick={() => router.push('/wizard/step-1')} className="rounded-2xl">
+              <div className="text-center py-16">
+                <p className="mb-6 text-slate-600 dark:text-slate-400 text-lg">Aún no has creado ninguna aventura.</p>
+                <Button variant="outline" onClick={() => router.push('/wizard/step-1')} className="rounded-xl h-12 px-8 font-semibold border-slate-300 dark:border-slate-700">
                   Crear tu primera aventura
                 </Button>
               </div>
@@ -199,9 +198,9 @@ export default function Home() {
         {/* Plantillas - Only for authenticated users */}
         {hasUser && (
           <section id="plantillas">
-            <div className="mb-6">
-              <h2 className="text-2xl md:text-3xl font-bold">Plantillas</h2>
-              <p className="text-sm text-muted-foreground mt-1">
+            <div className="mb-8">
+              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-slate-50 tracking-tight">Plantillas</h2>
+              <p className="text-base text-slate-600 dark:text-slate-400 mt-2">
                 Aventuras listas para jugar
               </p>
             </div>
