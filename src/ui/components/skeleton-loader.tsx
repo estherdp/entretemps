@@ -11,7 +11,7 @@ interface SkeletonLoaderProps {
   message?: string
 }
 
-export function SkeletonLoader({ message = 'Generando tu aventura mágica...' }: SkeletonLoaderProps) {
+export function SkeletonLoader({ message = 'Preparando las pistas secretas...' }: SkeletonLoaderProps) {
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-b from-background to-muted/20">
       <div className="max-w-2xl w-full space-y-8">
@@ -29,7 +29,7 @@ export function SkeletonLoader({ message = 'Generando tu aventura mágica...' }:
         <div className="text-center space-y-2">
           <h2 className="text-2xl font-bold text-foreground">{message}</h2>
           <p className="text-muted-foreground">
-            Estamos creando una experiencia única personalizada para ti
+            Reuniendo a los personajes de tu historia...
           </p>
         </div>
 
@@ -69,7 +69,7 @@ export function SkeletonLoader({ message = 'Generando tu aventura mágica...' }:
             <div className="h-full bg-gradient-to-r from-primary/60 via-primary to-primary/60 animate-[shimmer_2s_ease-in-out_infinite] w-1/2" />
           </div>
           <p className="text-xs text-center text-muted-foreground">
-            Esto puede tardar 10-30 segundos
+            La magia lleva su tiempo... ¡ya casi!
           </p>
         </div>
       </div>

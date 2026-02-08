@@ -25,90 +25,80 @@ test.describe('Home Page - Landing (No Auth)', () => {
     await page.goto('/')
 
     // 2. VERIFICACIÓN DE IDENTIDAD: Comprobar que el título de la página es correcto
-    // Esto asegura que estamos en la aplicación correcta
     await expect(page).toHaveTitle(/Entretemps/)
 
-    // 3. VERIFICACIÓN DE HERO SECTION: El título principal debe ser visible
-    // Este es el primer elemento que ve un usuario al entrar
-    const heroTitle = page.getByRole('heading', { name: 'Entretemps', level: 1 })
+    // 3. VERIFICACIÓN DE HERO SECTION: El badge de marca y el titular principal
+    const brandBadge = page.getByText(/Entretemps/)
+    await expect(brandBadge.first()).toBeVisible()
+
+    const heroTitle = page.getByRole('heading', { name: /La magia de jugar juntos/i, level: 1 })
     await expect(heroTitle).toBeVisible()
 
-    // 4. VERIFICACIÓN DE SUBTÍTULO: Descripción principal del servicio
-    const subtitle = page.getByText('Aventuras infantiles personalizadas con IA')
+    // 4. VERIFICACIÓN DE SUBTÍTULO: Descripción centrada en familia
+    const subtitle = page.getByText(/Crea aventuras épicas para tus hijos en minutos/i)
     await expect(subtitle).toBeVisible()
 
     // 5. VERIFICACIÓN DE LLAMADAS A LA ACCIÓN (CTAs) en el Hero Section
-    // Nota: Usamos locator de la main section para evitar conflictos con el navbar
-    // Botón de "Iniciar Sesión" en el hero - debe estar presente y habilitado
     const heroSection = page.locator('main section').first()
-    const loginButton = heroSection.getByRole('button', { name: /Iniciar Sesión/i })
+    const ctaButton = heroSection.getByRole('button', { name: /¡Crear mi primera aventura!/i })
+    await expect(ctaButton).toBeVisible()
+    await expect(ctaButton).toBeEnabled()
+
+    const loginButton = heroSection.getByRole('button', { name: /Ya tengo cuenta/i })
     await expect(loginButton).toBeVisible()
     await expect(loginButton).toBeEnabled()
 
-    // Botón de "Registrarse" - debe estar presente y habilitado
-    const registerButton = heroSection.getByRole('button', { name: 'Registrarse' })
-    await expect(registerButton).toBeVisible()
-    await expect(registerButton).toBeEnabled()
-
     // 6. VERIFICACIÓN DE SECCIÓN DE CARACTERÍSTICAS
-    // Esta sección explica el valor de la plataforma
     const featuresHeading = page.getByRole('heading', {
-      name: '¿Qué puedes hacer con Entretemps?'
+      name: /Todo lo que necesitas para una aventura épica/i
     })
     await expect(featuresHeading).toBeVisible()
 
     // Verificar que las 4 características principales están presentes
-    await expect(page.getByText('Generación con IA')).toBeVisible()
-    await expect(page.getByText('Personalización')).toBeVisible()
-    await expect(page.getByText('Edición Human-in-the-Loop')).toBeVisible()
-    await expect(page.getByText('Guías para Padres')).toBeVisible()
+    await expect(page.getByText('Aventuras únicas en minutos')).toBeVisible()
+    await expect(page.getByText('Hecha para tu familia')).toBeVisible()
+    await expect(page.getByText('Explora cualquier espacio')).toBeVisible()
+    await expect(page.getByText('Tú tienes el control')).toBeVisible()
 
-    // 7. VERIFICACIÓN DE CTA FINAL
-    // Botón principal de conversión al final de la página
-    const ctaButton = page.getByRole('button', { name: 'Comenzar Ahora' })
-    await expect(ctaButton).toBeVisible()
-    await expect(ctaButton).toBeEnabled()
+    // 7. VERIFICACIÓN DE SECCIÓN "Para padres, por padres"
+    const parentsSection = page.getByRole('heading', { name: /Para padres, por padres/i })
+    await expect(parentsSection).toBeVisible()
 
-    // 8. CAPTURA DE EVIDENCIA VISUAL (Desktop)
-    // Esta captura se usará en la documentación del TFM
+    // 8. VERIFICACIÓN DE CTA FINAL
+    const finalCtaButton = page.getByRole('button', { name: /¡Vamos allá!/i })
+    await expect(finalCtaButton).toBeVisible()
+    await expect(finalCtaButton).toBeEnabled()
+
+    // 9. CAPTURA DE EVIDENCIA VISUAL (Desktop)
     await page.screenshot({
       path: 'tests/e2e/screenshots/home-desktop.png',
-      fullPage: true // Captura toda la página, no solo el viewport
+      fullPage: true
     })
   })
 
   /**
-   * Test de funcionalidad: Navegación a login
-   *
-   * Verifica que los botones de CTA en el hero llevan correctamente a la página de login
+   * Test de funcionalidad: Navegación a login desde CTA principal
    */
-  test('debe navegar a login al hacer click en "Iniciar Sesión"', async ({ page }) => {
+  test('debe navegar a login al hacer click en "¡Crear mi primera aventura!"', async ({ page }) => {
     await page.goto('/')
 
-    // Click en el botón de "Iniciar Sesión" del hero section
     const heroSection = page.locator('main section').first()
-    const loginButton = heroSection.getByRole('button', { name: /Iniciar Sesión/i })
-    await loginButton.click()
+    const ctaButton = heroSection.getByRole('button', { name: /¡Crear mi primera aventura!/i })
+    await ctaButton.click()
 
-    // Verificar que navegamos a la página de login
     await expect(page).toHaveURL(/\/login/)
   })
 
   /**
-   * Test de funcionalidad: Navegación desde CTA secundario
-   *
-   * Verifica que el botón "Comenzar Ahora" también funciona correctamente
+   * Test de funcionalidad: Navegación desde CTA final
    */
-  test('debe navegar a login al hacer click en "Comenzar Ahora"', async ({ page }) => {
+  test('debe navegar a login al hacer click en "¡Vamos allá!"', async ({ page }) => {
     await page.goto('/')
 
-    // Scroll hasta el botón (está al final de la página)
-    const ctaButton = page.getByRole('button', { name: 'Comenzar Ahora' })
+    const ctaButton = page.getByRole('button', { name: /¡Vamos allá!/i })
     await ctaButton.scrollIntoViewIfNeeded()
-
     await ctaButton.click()
 
-    // Verificar navegación
     await expect(page).toHaveURL(/\/login/)
   })
 })
@@ -116,15 +106,8 @@ test.describe('Home Page - Landing (No Auth)', () => {
 test.describe('Home Page - Responsive Design', () => {
   /**
    * Test de responsividad en dispositivos móviles
-   *
-   * Verifica que la página se adapta correctamente a pantallas móviles
-   * y que todos los elementos principales siguen siendo accesibles.
-   *
-   * IMPORTANTE para el TFM: La accesibilidad móvil es crítica porque
-   * muchos padres accederán desde sus smartphones.
    */
   test('debe mostrar correctamente la landing page en móvil', async ({ page, isMobile }) => {
-    // Solo ejecutar este test en dispositivos móviles
     test.skip(!isMobile, 'Este test es solo para dispositivos móviles')
 
     await page.goto('/')
@@ -133,31 +116,27 @@ test.describe('Home Page - Responsive Design', () => {
     await expect(page).toHaveTitle(/Entretemps/)
 
     // 2. VERIFICACIÓN DE HERO ADAPTADO
-    // En móvil, el texto debe adaptarse pero seguir visible
-    const heroTitle = page.getByRole('heading', { name: 'Entretemps', level: 1 })
+    const heroTitle = page.getByRole('heading', { name: /La magia de jugar juntos/i, level: 1 })
     await expect(heroTitle).toBeVisible()
 
     // 3. VERIFICACIÓN DE BOTONES EN LAYOUT MÓVIL
-    // Los botones deben apilarse verticalmente en móvil (flex-col)
-    const loginButton = page.getByRole('button', { name: 'Iniciar Sesión' })
-    await expect(loginButton).toBeVisible()
-    await expect(loginButton).toBeEnabled()
+    const ctaButton = page.getByRole('button', { name: /¡Crear mi primera aventura!/i })
+    await expect(ctaButton).toBeVisible()
+    await expect(ctaButton).toBeEnabled()
 
     // 4. VERIFICACIÓN DE CONTENIDO SCROLLEABLE
-    // Todo el contenido debe ser accesible mediante scroll
     const featuresHeading = page.getByRole('heading', {
-      name: '¿Qué puedes hacer con Entretemps?'
+      name: /Todo lo que necesitas para una aventura épica/i
     })
     await featuresHeading.scrollIntoViewIfNeeded()
     await expect(featuresHeading).toBeVisible()
 
     // 5. VERIFICACIÓN DE CTA FINAL EN MÓVIL
-    const ctaButton = page.getByRole('button', { name: 'Comenzar Ahora' })
-    await ctaButton.scrollIntoViewIfNeeded()
-    await expect(ctaButton).toBeVisible()
+    const finalCtaButton = page.getByRole('button', { name: /¡Vamos allá!/i })
+    await finalCtaButton.scrollIntoViewIfNeeded()
+    await expect(finalCtaButton).toBeVisible()
 
     // 6. CAPTURA DE EVIDENCIA VISUAL (Mobile)
-    // Esta captura demuestra la adaptación responsive
     const deviceName = page.context().browser()?.browserType().name() || 'mobile'
     await page.screenshot({
       path: `tests/e2e/screenshots/home-mobile-${deviceName}.png`,
@@ -167,15 +146,12 @@ test.describe('Home Page - Responsive Design', () => {
 
   /**
    * Test de layout responsive: Grid de características
-   *
-   * Verifica que el grid de 4 características se adapta correctamente
-   * en diferentes tamaños de pantalla.
    */
-  test('debe adaptar el grid de características correctamente', async ({ page, viewport }) => {
+  test('debe adaptar el grid de características correctamente', async ({ page }) => {
     await page.goto('/')
 
     const featuresSection = page.locator('section').filter({
-      hasText: '¿Qué puedes hacer con Entretemps?'
+      hasText: /Todo lo que necesitas para una aventura épica/i
     })
 
     await featuresSection.scrollIntoViewIfNeeded()
@@ -184,7 +160,7 @@ test.describe('Home Page - Responsive Design', () => {
     const featureCards = featuresSection.locator('[class*="grid"] > div')
     await expect(featureCards).toHaveCount(4)
 
-    // Verificar que todas son visibles (aunque estén apiladas en móvil)
+    // Verificar que todas son visibles
     for (let i = 0; i < 4; i++) {
       await expect(featureCards.nth(i)).toBeVisible()
     }
@@ -200,33 +176,27 @@ test.describe('Home Page - Authenticated User', () => {
    * este test debe modificarse para verificar el contenido autenticado.
    *
    * Comportamiento esperado CON autenticación:
-   * - H1: "Bienvenido a Entretemps"
-   * - Botón: "✨ Crear nueva aventura"
+   * - H1: "¡Hola, explorador! 🗺️"
+   * - Botón: "✨ ¡Nueva aventura!"
    * - Sección: "Mis Aventuras"
    * - Sección: "Plantillas"
    */
   test.skip('debe mostrar la vista de usuario autenticado', async ({ page }) => {
     // TODO: Implementar autenticación en tests
-    // - Configurar Supabase test client
-    // - Crear usuario de prueba
-    // - Realizar login programático
-
     await page.goto('/')
 
-    // Verificaciones para usuario autenticado
     const welcomeTitle = page.getByRole('heading', {
-      name: 'Bienvenido a Entretemps',
+      name: /¡Hola, explorador!/i,
       level: 1
     })
     await expect(welcomeTitle).toBeVisible()
 
     const createButton = page.getByRole('button', {
-      name: /Crear nueva aventura/
+      name: /¡Nueva aventura!/i
     })
     await expect(createButton).toBeVisible()
     await expect(createButton).toBeEnabled()
 
-    // Captura para usuario autenticado
     await page.screenshot({
       path: 'tests/e2e/screenshots/home-authenticated-desktop.png',
       fullPage: true

@@ -14,7 +14,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "Entretemps",
-  description: "Crea experiencias tipo escape room para tu familia",
+  description: "Crea aventuras épicas para tus hijos en minutos. Sin pantallas, solo risas y momentos inolvidables.",
 }
 
 export default function RootLayout({

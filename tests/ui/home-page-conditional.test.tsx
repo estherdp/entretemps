@@ -23,10 +23,10 @@ vi.mock('@/ui/components/adventure-card', () => ({
 
 // Mock lucide-react icons
 vi.mock('lucide-react', () => ({
-  Sparkles: () => <div>Sparkles Icon</div>,
-  Users: () => <div>Users Icon</div>,
+  Star: () => <div>Star Icon</div>,
+  Heart: () => <div>Heart Icon</div>,
+  Compass: () => <div>Compass Icon</div>,
   Wand2: () => <div>Wand2 Icon</div>,
-  BookOpen: () => <div>BookOpen Icon</div>,
 }))
 
 const mockTemplates = [
@@ -75,50 +75,55 @@ describe('Home Page - Conditional Rendering', () => {
       })
     })
 
-    it('should show landing page hero with Entretemps title', () => {
+    it('should show landing page hero with brand badge and tagline', () => {
       render(<Home />)
 
-      expect(screen.getByText('Entretemps')).toBeInTheDocument()
-      expect(screen.getByText('Aventuras infantiles personalizadas con IA')).toBeInTheDocument()
+      expect(screen.getAllByText(/Entretemps/).length).toBeGreaterThan(0)
+      expect(screen.getByRole('heading', { name: /La magia de jugar juntos/i })).toBeInTheDocument()
     })
 
     it('should show landing page description', () => {
       render(<Home />)
 
       expect(
-        screen.getByText(/Crea experiencias tipo escape room únicas para niños/i)
+        screen.getByText(/Crea aventuras épicas para tus hijos en minutos/i)
       ).toBeInTheDocument()
     })
 
-    it('should show login and register buttons', () => {
+    it('should show CTA buttons', () => {
       render(<Home />)
 
-      const buttons = screen.getAllByText(/iniciar sesión|registrarse/i)
-      expect(buttons.length).toBeGreaterThanOrEqual(2)
+      expect(screen.getByText('¡Crear mi primera aventura!')).toBeInTheDocument()
+      expect(screen.getByText('Ya tengo cuenta')).toBeInTheDocument()
     })
 
     it('should show features section with 4 feature cards', () => {
       render(<Home />)
 
-      expect(screen.getByText('¿Qué puedes hacer con Entretemps?')).toBeInTheDocument()
-      expect(screen.getByText('Generación con IA')).toBeInTheDocument()
-      expect(screen.getByText('Personalización')).toBeInTheDocument()
-      expect(screen.getByText('Edición Human-in-the-Loop')).toBeInTheDocument()
-      expect(screen.getByText('Guías para Padres')).toBeInTheDocument()
+      expect(screen.getByText('Todo lo que necesitas para una aventura épica')).toBeInTheDocument()
+      expect(screen.getByText('Aventuras únicas en minutos')).toBeInTheDocument()
+      expect(screen.getByText('Hecha para tu familia')).toBeInTheDocument()
+      expect(screen.getByText('Explora cualquier espacio')).toBeInTheDocument()
+      expect(screen.getByText('Tú tienes el control')).toBeInTheDocument()
+    })
+
+    it('should show "Para padres, por padres" section', () => {
+      render(<Home />)
+
+      expect(screen.getByText('Para padres, por padres')).toBeInTheDocument()
     })
 
     it('should show CTA section', () => {
       render(<Home />)
 
-      expect(screen.getByText('¿Listo para crear tu primera aventura?')).toBeInTheDocument()
-      expect(screen.getByText('Comenzar Ahora')).toBeInTheDocument()
+      expect(screen.getByText('¿Listo para la primera aventura?')).toBeInTheDocument()
+      expect(screen.getByText('¡Vamos allá!')).toBeInTheDocument()
     })
 
     it('should NOT show "Nueva aventura" button', () => {
       render(<Home />)
 
-      // The "Nueva aventura" button with sparkle emoji should not be visible
-      const newAdventureButtons = screen.queryAllByText(/✨ Crear nueva aventura/i)
+      const newAdventureButtons = screen.queryAllByText(/¡Nueva aventura!/i)
       expect(newAdventureButtons.length).toBe(0)
     })
 
@@ -152,13 +157,13 @@ describe('Home Page - Conditional Rendering', () => {
     it('should show authenticated user welcome message', () => {
       render(<Home />)
 
-      expect(screen.getByText('Bienvenido a Entretemps')).toBeInTheDocument()
+      expect(screen.getByText(/¡Hola, explorador!/)).toBeInTheDocument()
     })
 
-    it('should show "Crear nueva aventura" button', () => {
+    it('should show "Nueva aventura" button', () => {
       render(<Home />)
 
-      expect(screen.getByText(/✨ Crear nueva aventura/i)).toBeInTheDocument()
+      expect(screen.getByText(/¡Nueva aventura!/i)).toBeInTheDocument()
     })
 
     it('should show "Mis Aventuras" section', () => {
@@ -191,27 +196,26 @@ describe('Home Page - Conditional Rendering', () => {
     it('should NOT show landing page features section', () => {
       render(<Home />)
 
-      expect(screen.queryByText('¿Qué puedes hacer con Entretemps?')).not.toBeInTheDocument()
-      expect(screen.queryByText('Generación con IA')).not.toBeInTheDocument()
+      expect(screen.queryByText('Todo lo que necesitas para una aventura épica')).not.toBeInTheDocument()
+      expect(screen.queryByText('Aventuras únicas en minutos')).not.toBeInTheDocument()
     })
 
     it('should NOT show landing page CTA', () => {
       render(<Home />)
 
-      expect(screen.queryByText('¿Listo para crear tu primera aventura?')).not.toBeInTheDocument()
-      expect(screen.queryByText('Comenzar Ahora')).not.toBeInTheDocument()
+      expect(screen.queryByText('¿Listo para la primera aventura?')).not.toBeInTheDocument()
+      expect(screen.queryByText('¡Vamos allá!')).not.toBeInTheDocument()
     })
 
-    it('should NOT show "Iniciar Sesión" or "Registrarse" buttons in hero', () => {
+    it('should NOT show landing page auth buttons in hero', () => {
       render(<Home />)
 
-      // Check that login/register buttons from landing page are not present
       const allButtons = screen.getAllByRole('button')
-      const loginButtons = allButtons.filter(btn =>
-        btn.textContent?.includes('Iniciar Sesión') ||
-        btn.textContent?.includes('Registrarse')
+      const landingButtons = allButtons.filter(btn =>
+        btn.textContent?.includes('¡Crear mi primera aventura!') ||
+        btn.textContent?.includes('Ya tengo cuenta')
       )
-      expect(loginButtons.length).toBe(0)
+      expect(landingButtons.length).toBe(0)
     })
   })
 
@@ -256,12 +260,12 @@ describe('Home Page - Conditional Rendering', () => {
 
       render(<Home />)
 
-      expect(screen.getByText('Cargando aventuras...')).toBeInTheDocument()
+      expect(screen.getByText('Buscando tus aventuras...')).toBeInTheDocument()
     })
   })
 
   describe('Navigation', () => {
-    it('should navigate to wizard when clicking "Crear nueva aventura" button', async () => {
+    it('should navigate to wizard when clicking "Nueva aventura" button', async () => {
       mockUseHomeData.mockReturnValue({
         data: {
           templates: mockTemplates,
@@ -273,7 +277,7 @@ describe('Home Page - Conditional Rendering', () => {
 
       render(<Home />)
 
-      const createButton = screen.getByText(/✨ Crear nueva aventura/i)
+      const createButton = screen.getByText(/¡Nueva aventura!/i)
       createButton.click()
 
       await waitFor(() => {
@@ -281,7 +285,7 @@ describe('Home Page - Conditional Rendering', () => {
       })
     })
 
-    it('should navigate to login when clicking "Iniciar Sesión" on landing page', async () => {
+    it('should navigate to login when clicking "¡Crear mi primera aventura!" on landing page', async () => {
       mockUseHomeData.mockReturnValue({
         data: {
           templates: [],
@@ -293,8 +297,8 @@ describe('Home Page - Conditional Rendering', () => {
 
       render(<Home />)
 
-      const loginButtons = screen.getAllByText('Iniciar Sesión')
-      loginButtons[0].click()
+      const ctaButton = screen.getByText('¡Crear mi primera aventura!')
+      ctaButton.click()
 
       await waitFor(() => {
         expect(mockPush).toHaveBeenCalledWith('/login')

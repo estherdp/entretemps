@@ -53,10 +53,10 @@ export function validateStep2(data: WizardData): ValidationResult {
     }
   }
 
-  if (min >= max) {
+  if (min > max) {
     return {
       isValid: false,
-      message: 'La edad mínima debe ser menor que la máxima',
+      message: 'La edad mínima no puede superar la máxima',
     }
   }
 
