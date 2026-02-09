@@ -72,16 +72,16 @@ export class ImageCacheRepository implements IImageCacheRepository {
    * Guarda o actualiza una entrada en caché.
    * Usa upsert para manejar duplicados automáticamente.
    *
-   * @param entry - Datos a almacenar en caché
+   * @param cache - Datos a almacenar en caché
    */
-  async set(entry: Omit<ImageCache, 'createdAt'>): Promise<void> {
+  async save(cache: Omit<ImageCache, 'createdAt'>): Promise<void> {
     try {
       const { error } = await supabase.from('image_cache').upsert(
         {
-          query: entry.query,
-          url: entry.url,
-          photographer: entry.photographer,
-          source_url: entry.sourceUrl,
+          query: cache.query,
+          url: cache.url,
+          photographer: cache.photographer,
+          source_url: cache.sourceUrl,
           created_at: new Date().toISOString(),
         },
         {
@@ -101,12 +101,13 @@ export class ImageCacheRepository implements IImageCacheRepository {
    * Elimina entradas expiradas de la caché.
    * Útil para ejecutar en un cron job o background task.
    *
+   * @param hoursToExpire - Número de horas después de las cuales una entrada expira (por defecto 24)
    * @returns Número de entradas eliminadas
    */
-  async cleanExpired(): Promise<number> {
+  async cleanExpired(hoursToExpire: number = this.cacheExpirationHours): Promise<void> {
     try {
       const expirationDate = new Date()
-      expirationDate.setHours(expirationDate.getHours() - this.cacheExpirationHours)
+      expirationDate.setHours(expirationDate.getHours() - hoursToExpire)
 
       const { data, error } = await supabase
         .from('image_cache')
@@ -116,13 +117,15 @@ export class ImageCacheRepository implements IImageCacheRepository {
 
       if (error) {
         console.error('[ImageCacheRepository] Error cleaning cache:', error)
-        return 0
+        return
       }
 
-      return data?.length || 0
+      // Log del número de entradas eliminadas
+      if (data?.length) {
+        console.log(`[ImageCacheRepository] Cleaned ${data.length} expired entries`)
+      }
     } catch (error) {
       console.error('[ImageCacheRepository] Unexpected error cleaning cache:', error)
-      return 0
     }
   }
 }

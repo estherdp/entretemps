@@ -154,7 +154,7 @@ export async function generateAdventureMultimodal(
 
           // 3.3: Guardar en caché si se encontró resultado
           if (searchResult && imageCacheRepo) {
-            await imageCacheRepo.set({
+            await imageCacheRepo.save({
               query: searchQuery,
               url: searchResult.url,
               photographer: searchResult.attribution?.photographer ?? null,
