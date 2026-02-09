@@ -1,7 +1,7 @@
 // src/application/reorder-missions.ts
 
 import type { GeneratedAdventurePackMission } from '@/domain/generated-adventure-pack'
-import type { AdventurePackRepository } from '@/infrastructure/supabase/adventure-pack-repository'
+import type { IAdventurePackRepository } from '@/domain/repositories'
 
 /**
  * Caso de uso: Reordenar las misiones de un pack guardado.
@@ -28,7 +28,7 @@ export async function reorderMissions(
   packId: string,
   userId: string,
   newOrder: number[],
-  repository: AdventurePackRepository
+  repository: IAdventurePackRepository
 ): Promise<GeneratedAdventurePackMission[]> {
   // 1. Recuperar el pack guardado
   const savedPack = await repository.getById(packId)

@@ -1,6 +1,6 @@
 // src/application/delete-my-adventure-pack.ts
 
-import type { AdventurePackRepository } from '@/infrastructure/supabase/adventure-pack-repository'
+import type { IAdventurePackRepository } from '@/domain/repositories'
 
 export interface DeleteMyAdventurePackRequest {
   packId: string
@@ -31,7 +31,7 @@ export interface DeleteMyAdventurePackResult {
  */
 export async function deleteMyAdventurePack(
   request: DeleteMyAdventurePackRequest,
-  repository: AdventurePackRepository
+  repository: IAdventurePackRepository
 ): Promise<DeleteMyAdventurePackResult> {
   try {
     const { packId, userId } = request

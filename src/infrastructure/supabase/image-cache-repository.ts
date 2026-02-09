@@ -2,9 +2,10 @@
 
 import { supabase } from './supabase-client'
 import type { ImageCache } from '@/domain/image-cache'
+import type { IImageCacheRepository } from '@/domain/repositories'
 
 /**
- * Repositorio para gestionar la caché de búsquedas de imágenes.
+ * Implementación de IImageCacheRepository usando Supabase.
  *
  * Reduce llamadas a APIs externas almacenando resultados por query.
  * Implementa expiración de 24 horas para mantener contenido fresco.
@@ -23,7 +24,7 @@ import type { ImageCache } from '@/domain/image-cache'
  * CREATE INDEX idx_image_cache_created_at ON image_cache(created_at);
  * ```
  */
-export class ImageCacheRepository {
+export class ImageCacheRepository implements IImageCacheRepository {
   private readonly cacheExpirationHours = 24
 
   /**

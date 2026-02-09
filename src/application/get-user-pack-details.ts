@@ -3,8 +3,8 @@
  * Recupera un pack específico y valida que pertenece al usuario actual
  */
 
-import type { AuthService } from '@/infrastructure/services/auth-service'
-import type { AdventurePackRepository } from '@/infrastructure/supabase/adventure-pack-repository'
+import type { IAuthService } from '@/domain/services'
+import type { IAdventurePackRepository } from '@/domain/repositories'
 import type { SavedAdventurePack } from '@/domain/saved-adventure-pack'
 
 export interface GetUserPackDetailsResult {
@@ -15,8 +15,8 @@ export interface GetUserPackDetailsResult {
 
 export async function getUserPackDetails(
   packId: string,
-  authService: AuthService,
-  repository: AdventurePackRepository
+  authService: IAuthService,
+  repository: IAdventurePackRepository
 ): Promise<GetUserPackDetailsResult> {
   try {
     // Verificar autenticación

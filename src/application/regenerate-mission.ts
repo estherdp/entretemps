@@ -2,7 +2,7 @@
 
 import type { IMissionEditor, AdventureContext } from '@/domain/services'
 import type { GeneratedAdventurePackMission } from '@/domain/generated-adventure-pack'
-import type { AdventurePackRepository } from '@/infrastructure/supabase/adventure-pack-repository'
+import type { IAdventurePackRepository } from '@/domain/repositories'
 
 /**
  * Caso de uso: Regenerar una misión individual de un pack guardado.
@@ -34,7 +34,7 @@ export async function regenerateMission(
   missionOrder: number,
   feedback: string | undefined,
   missionEditor: IMissionEditor,
-  repository: AdventurePackRepository,
+  repository: IAdventurePackRepository,
   locale: string = 'es'
 ): Promise<GeneratedAdventurePackMission> {
   // 1. Recuperar el pack guardado

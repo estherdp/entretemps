@@ -115,6 +115,9 @@ entretemps/
     │   ├── hooks/           # useRegenerateMission, useSaveAdventurePack…
     │   └── wizard/          # Contexto y labels del wizard
     │
+    ├── 📊 data/             # Datos estáticos y plantillas
+    │   └── templates/       # Aventuras de ejemplo precargadas (examples.json)
+    │
     └── 📚 lib/              # Schemas Zod, utilidades transversales
 ```
 

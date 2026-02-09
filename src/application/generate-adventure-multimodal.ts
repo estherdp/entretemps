@@ -3,7 +3,7 @@
 import type { WizardData } from '@/domain/wizard-data'
 import type { GeneratedAdventurePack } from '@/domain/generated-adventure-pack'
 import type { IAdventureProvider, IImageGenerator, IImageSearcher } from '@/domain/services'
-import type { ImageCacheRepository } from '@/infrastructure/supabase/image-cache-repository'
+import type { IImageCacheRepository } from '@/domain/repositories'
 
 interface GenerateAdventureMultimodalResult {
   ok: boolean
@@ -94,7 +94,7 @@ export async function generateAdventureMultimodal(
   wizardData: WizardData,
   adventureProvider: IAdventureProvider,
   imageSearcher?: IImageSearcher,
-  imageCacheRepo?: ImageCacheRepository,
+  imageCacheRepo?: IImageCacheRepository,
   imageGenerator?: IImageGenerator
 ): Promise<GenerateAdventureMultimodalResult> {
   const warnings: string[] = []

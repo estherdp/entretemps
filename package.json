@@ -1,6 +1,7 @@
 {
   "name": "entretemps",
   "version": "0.1.0",
+  "description": "Plataforma web que usa IA generativa para crear aventuras infantiles personalizadas sin pantallas",
   "private": true,
   "scripts": {
     "dev": "next dev",

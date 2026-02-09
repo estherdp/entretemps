@@ -1,16 +1,19 @@
 /**
- * Servicio de autenticación
- * Abstrae la lógica de autenticación para permitir inyección de dependencias
+ * Implementación del servicio de autenticación usando Supabase.
  */
 
 import { getCurrentUser as getSupabaseUser } from '../supabase/auth'
 import type { User } from '@/domain/user'
+import type { IAuthService } from '@/domain/services'
 
 export interface AuthService {
   getCurrentUser(): Promise<User | null>
 }
 
-export class SupabaseAuthService implements AuthService {
+/**
+ * Implementación de IAuthService usando Supabase Auth.
+ */
+export class SupabaseAuthService implements IAuthService {
   async getCurrentUser(): Promise<User | null> {
     return getSupabaseUser()
   }

@@ -1,6 +1,7 @@
 import { supabase } from './supabase-client'
 import { GeneratedAdventurePack } from '@/domain/generated-adventure-pack'
 import { SavedAdventurePack } from '@/domain/saved-adventure-pack'
+import type { IAdventurePackRepository } from '@/domain/repositories'
 import type { SupabaseClient } from '@supabase/supabase-js'
 
 export interface SaveAdventurePackParams {
@@ -9,7 +10,10 @@ export interface SaveAdventurePackParams {
   pack: GeneratedAdventurePack
 }
 
-export class AdventurePackRepository {
+/**
+ * Implementación de IAdventurePackRepository usando Supabase.
+ */
+export class AdventurePackRepository implements IAdventurePackRepository {
   private client: SupabaseClient
 
   constructor(client?: SupabaseClient) {
@@ -111,39 +115,30 @@ export class AdventurePackRepository {
   }
 
   async deleteById(id: string, userId: string): Promise<boolean> {
-    console.log('[Repository] deleteById - Iniciando eliminación', { id, userId })
-
     // Verificar que el pack pertenece al usuario antes de eliminar
     const pack = await this.getById(id)
-    console.log('[Repository] Pack obtenido:', pack)
 
     if (!pack) {
-      console.error('[Repository] Pack no encontrado')
       throw new Error('Pack no encontrado')
     }
 
     if (pack.userId !== userId) {
-      console.error('[Repository] Usuario no es propietario', { packUserId: pack.userId, userId })
       throw new Error('No tienes permisos para eliminar este pack')
     }
 
-    console.log('[Repository] Ejecutando DELETE en Supabase...')
     // Eliminar el pack (doble check con user_id en la query)
-    const { error, data, count } = await this.client
+    const { error } = await this.client
       .from('adventure_packs')
       .delete()
       .eq('id', id)
       .eq('user_id', userId)
       .select()
 
-    console.log('[Repository] Resultado del DELETE:', { error, data, count })
-
     if (error) {
-      console.error('[Repository] Error de Supabase:', error)
+      console.error('[Repository] Error al eliminar:', error)
       throw new Error(`Error al eliminar el pack: ${error.message}`)
     }
 
-    console.log('[Repository] Eliminación completada exitosamente')
     return true
   }
 }

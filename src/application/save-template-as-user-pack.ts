@@ -3,8 +3,8 @@
  * Valida autenticación y guarda una plantilla como pack del usuario
  */
 
-import type { AuthService } from '@/infrastructure/services/auth-service'
-import type { AdventurePackRepository } from '@/infrastructure/supabase/adventure-pack-repository'
+import type { IAuthService } from '@/domain/services'
+import type { IAdventurePackRepository } from '@/domain/repositories'
 import type { GeneratedAdventurePack } from '@/domain/generated-adventure-pack'
 import type { SavedAdventurePack } from '@/domain/saved-adventure-pack'
 import { saveTemplateAsMyPack as saveTemplate } from './save-template-as-my-pack'
@@ -17,8 +17,8 @@ export interface SaveTemplateResult {
 
 export async function saveTemplateAsUserPack(
   pack: GeneratedAdventurePack,
-  authService: AuthService,
-  repository: AdventurePackRepository
+  authService: IAuthService,
+  repository: IAdventurePackRepository
 ): Promise<SaveTemplateResult> {
   try {
     // Verificar autenticación

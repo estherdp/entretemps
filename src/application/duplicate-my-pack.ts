@@ -1,10 +1,10 @@
-import { AdventurePackRepository } from '@/infrastructure/supabase/adventure-pack-repository'
+import type { IAdventurePackRepository } from '@/domain/repositories'
 import { SavedAdventurePack } from '@/domain/saved-adventure-pack'
 
 export async function duplicateMyPack(
   packId: string,
   userId: string,
-  repository: AdventurePackRepository
+  repository: IAdventurePackRepository
 ): Promise<SavedAdventurePack> {
   const existingPack = await repository.getById(packId)
 

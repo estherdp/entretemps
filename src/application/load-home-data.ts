@@ -5,8 +5,8 @@
 
 import { listTemplates, type TemplateListItem } from './list-templates'
 import { listMyAdventurePacks } from './list-my-adventure-packs'
-import type { AuthService } from '@/infrastructure/services/auth-service'
-import type { AdventurePackRepository } from '@/infrastructure/supabase/adventure-pack-repository'
+import type { IAuthService } from '@/domain/services'
+import type { IAdventurePackRepository } from '@/domain/repositories'
 import type { SavedAdventurePack } from '@/domain/saved-adventure-pack'
 
 export interface HomeData {
@@ -16,8 +16,8 @@ export interface HomeData {
 }
 
 export async function loadHomeData(
-  authService: AuthService,
-  repository: AdventurePackRepository,
+  authService: IAuthService,
+  repository: IAdventurePackRepository,
   maxAdventures = 6
 ): Promise<HomeData> {
   // Cargar plantillas (siempre disponibles)
