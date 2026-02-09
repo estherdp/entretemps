@@ -92,6 +92,11 @@ export default function AdventureDetailPage() {
     })
   )
 
+  // Scroll to top cuando se carga la página
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [params.id])
+
   // Redirect if needs authentication
   useEffect(() => {
     if (needsAuth) {

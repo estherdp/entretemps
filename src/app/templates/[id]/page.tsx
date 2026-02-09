@@ -22,6 +22,11 @@ export default function TemplateDetailPage() {
   
   const { saveTemplate, isSaving, error: saveError } = useSaveTemplateAsMyPack()
 
+  // Scroll to top cuando se carga la página
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [params.id])
+
   useEffect(() => {
     const templateId = params.id as string
     const template = getTemplateById(templateId)
@@ -62,12 +67,29 @@ export default function TemplateDetailPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
       {/* Hero Image */}
-      <div className="relative w-full h-64 md:h-96 bg-gradient-to-br from-purple-500/20 to-blue-500/20 overflow-hidden">
-        <div className="w-full h-full flex items-center justify-center">
-          <div className="text-center space-y-2 p-6">
-            <h1 className="text-3xl md:text-5xl font-bold text-foreground">{pack.title}</h1>
+      <div className="relative w-full h-64 md:h-96 overflow-hidden">
+        {pack.image?.url ? (
+          <>
+            <img
+              src={pack.image.url}
+              alt={pack.title}
+              className="w-full h-full object-cover"
+            />
+            {/* Overlay oscuro para mejorar legibilidad del título */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+            <div className="absolute inset-0 flex items-end justify-center pb-8 md:pb-12">
+              <h1 className="text-3xl md:text-5xl font-bold text-white text-center px-4 drop-shadow-lg">
+                {pack.title}
+              </h1>
+            </div>
+          </>
+        ) : (
+          <div className="w-full h-full bg-gradient-to-br from-purple-500/20 to-blue-500/20 flex items-center justify-center">
+            <div className="text-center space-y-2 p-6">
+              <h1 className="text-3xl md:text-5xl font-bold text-foreground">{pack.title}</h1>
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Main Content */}
