@@ -2,6 +2,7 @@
   {
     "id": "pack_demo_001",
     "title": "La Selva Perdida y el Tesoro Encendido",
+    "imageUrl": "/images/templates/pack_001.png",
     "estimatedDurationMinutes": 45,
     "ageRange": { "min": 5, "max": 10 },
     "participants": 4,
@@ -15,26 +16,15 @@
       "setupForParents": "Prepara el jardín y esconde la caja final en un lugar elevado o tras un arbusto."
     },
     "missions": [
-      {
-        "order": 1,
-        "title": "El Río de Cojines",
-        "story": "Debéis cruzar el río de lava saltando solo sobre los cojines sin tocar el césped."
-      },
-      {
-        "order": 2,
-        "title": "El Tótem de Cartón",
-        "story": "Construid un tótem de 1 metro de altura usando solo cajas. Si se cae, los monos de la selva os descubrirán."
-      },
-      {
-        "order": 3,
-        "title": "La Cueva de los Luciérnagas",
-        "story": "Usad las linternas para encontrar los 5 símbolos brillantes ocultos en la oscuridad de los arbustos."
-      }
+      { "order": 1, "title": "El Río de Cojines", "story": "Debéis cruzar el río de lava saltando solo sobre los cojines sin tocar el césped." },
+      { "order": 2, "title": "El Tótem de Cartón", "story": "Construid un tótem de 1 metro de altura usando solo cajas. Si se cae, los monos os descubrirán." },
+      { "order": 3, "title": "La Cueva de las Luciérnagas", "story": "Usad las linternas para encontrar los 5 símbolos brillantes ocultos en la oscuridad." }
     ]
   },
   {
     "id": "pack_kids_002",
-    "title": "Misión Espacial: El Oxígeno se Agota",
+    "title": "Misión Espacial: Oxígeno Crítico",
+    "imageUrl": "/images/templates/pack_002.png",
     "estimatedDurationMinutes": 30,
     "ageRange": { "min": 6, "max": 12 },
     "participants": 5,
@@ -44,30 +34,19 @@
     "place": "indoor",
     "materials": ["Botellas de plástico", "Papel de aluminio", "Globos azules", "Cronómetro"],
     "introduction": {
-      "story": "¡Atención tripulación! El sistema de aire falla. Tienen 30 minutos para recalibrar la nave.",
+      "story": "¡Atención tripulación! El sistema de aire falla. Tenéis 30 minutos para recalibrar la nave.",
       "setupForParents": "Esconde los 'tanques de oxígeno' (globos) y prepara una clave numérica en la calculadora."
     },
     "missions": [
-      {
-        "order": 1,
-        "title": "Código de Emergencia",
-        "story": "Descifrad la clave numérica mirando las constelaciones pegadas bajo las sillas."
-      },
-      {
-        "order": 2,
-        "title": "Gravedad Zero",
-        "story": "Transportad los globos de oxígeno de un lado a otro de la sala usando solo la cabeza o soplándolos."
-      },
-      {
-        "order": 3,
-        "title": "Reparación del Casco",
-        "story": "Unid las botellas con cinta para crear un conducto de ventilación que llegue hasta la 'unidad central'."
-      }
+      { "order": 1, "title": "Código de Emergencia", "story": "Descifrad la clave numérica mirando bajo las sillas con visión de rayos X." },
+      { "order": 2, "title": "Gravedad Zero", "story": "Transportad los globos de oxígeno al reactor usando solo la cabeza." },
+      { "order": 3, "title": "Reparación del Casco", "story": "Unid las botellas con cinta para crear un conducto de ventilación estanco." }
     ]
   },
   {
     "id": "pack_kids_003",
     "title": "La Escuela de Magia: El Examen Final",
+    "imageUrl": "/images/templates/pack_003.png",
     "estimatedDurationMinutes": 60,
     "ageRange": { "min": 7, "max": 11 },
     "participants": 6,
@@ -78,29 +57,19 @@
     "materials": ["Vasos", "Vinagre", "Bicarbonato", "Sobres", "Varitas"],
     "introduction": {
       "story": "El Gran Mago ha sellado su despacho. Debéis preparar la poción de apertura antes del anochecer.",
-      "setupForParents": "Pon los ingredientes en botes con nombres mágicos como 'Lágrimas de Fénix'."
+      "setupForParents": "Pon los ingredientes en botes con nombres como 'Lágrimas de Fénix'."
     },
     "missions": [
-      {
-        "order": 1,
-        "title": "El Vuelo de las Llaves",
-        "story": "Identificad la llave correcta entre todas las que cuelgan analizando un acertijo en verso."
-      },
-      {
-        "order": 2,
-        "title": "El Caldero Burbujeante",
-        "story": "Mezclad los polvos blancos con el líquido transparente para revelar el número oculto en el fondo del vaso."
-      },
-      {
-        "order": 3,
-        "title": "Encantamiento de Silencio",
-        "story": "Debéis encontrar el siguiente sobre siguiendo las instrucciones de uno de los niños que no puede hablar, solo gesticular."
-      }
+      { "order": 1, "title": "El Vuelo de las Llaves", "story": "Identificad la llave correcta entre todas las que cuelgan analizando un acertijo." },
+      { "order": 2, "title": "El Caldero Burbujeante", "story": "Mezclad los polvos blancos para revelar el número oculto en el fondo del vaso." },
+      { "order": 3, "title": "Encantamiento de Silencio", "story": "Encontrad el sobre siguiendo las mímicas de un compañero que ha perdido la voz." },
+      { "order": 4, "title": "Duelo de Varitas", "story": "Superad el laberinto de espejos (hilos) sin tocar las cuerdas mágicas." }
     ]
   },
   {
     "id": "pack_kids_004",
     "title": "El Galeón del Pirata Patapalo",
+    "imageUrl": "/images/templates/pack_004.png",
     "estimatedDurationMinutes": 40,
     "ageRange": { "min": 4, "max": 8 },
     "participants": 3,
@@ -110,30 +79,19 @@
     "place": "indoor",
     "materials": ["Pañuelos", "Monedas de chocolate", "Cuerda", "Peluche de loro"],
     "introduction": {
-      "story": "¡Ahoy! Estáis encerrados en el camarote. El mapa del tesoro está en la cubierta superior.",
-      "setupForParents": "Usa una sábana azul en el suelo para simular el mar alrededor de la cama."
+      "story": "¡Ahoy! Estáis encerrados en el camarote. El mapa está en la cubierta superior.",
+      "setupForParents": "Usa una sábana azul en el suelo para simular el mar bravío."
     },
     "missions": [
-      {
-        "order": 1,
-        "title": "Nudos Marineros",
-        "story": "Desatad los 5 nudos de la cuerda para liberar la llave de plástico colgada en el centro."
-      },
-      {
-        "order": 2,
-        "title": "El Loro Chivato",
-        "story": "El loro tiene una pista en su pata. Debéis imitar el sonido de 3 animales marinos para que os la entregue."
-      },
-      {
-        "order": 3,
-        "title": "X marca el Lugar",
-        "story": "Buscad bajo los 'arrecifes' (cojines rojos) las monedas que forman la palabra SECRETO."
-      }
+      { "order": 1, "title": "Nudos Marineros", "story": "Desatad los 5 nudos de la cuerda para liberar la llave del camarote." },
+      { "order": 2, "title": "El Loro Chivato", "story": "Imitad el sonido de 3 animales marinos para que el loro os entregue la pista." },
+      { "order": 3, "title": "X marca el Lugar", "story": "Buscad bajo los arrecifes (cojines rojos) las monedas que forman el mapa." }
     ]
   },
   {
     "id": "pack_kids_005",
     "title": "Laboratorio Zombi: La Cura Final",
+    "imageUrl": "/images/templates/pack_005.png",
     "estimatedDurationMinutes": 50,
     "ageRange": { "min": 9, "max": 13 },
     "participants": 4,
@@ -143,25 +101,81 @@
     "place": "indoor",
     "materials": ["Jeringuillas de juguete", "Ketchup", "Candados", "Libretas"],
     "introduction": {
-      "story": "Un virus convierte a la gente en zombis vegetarianos. ¡Cread el antídoto de chocolate ya!",
-      "setupForParents": "Configura un candado de maleta en la despensa donde están los dulces."
+      "story": "Un virus convierte a la gente en zombis vegetarianos. ¡Cread el antídoto!",
+      "setupForParents": "Configura un candado de maleta en el armario de los dulces."
     },
     "missions": [
-      {
-        "order": 1,
-        "title": "Análisis de ADN",
-        "story": "Ordenad los botes de especias por color para encontrar la letra oculta en cada tapa."
-      },
-      {
-        "order": 2,
-        "title": "Suministro de Energía",
-        "story": "Completad el circuito de 'cables' (hilos de lana) que cruzan la cocina sin tocar las alarmas (cascabeles)."
-      },
-      {
-        "order": 3,
-        "title": "La Mezcla Maestra",
-        "story": "Calculad la dosis exacta sumando los años de todos los participantes y dividiéndolos por dos."
-      }
+      { "order": 1, "title": "Análisis de ADN", "story": "Ordenad los botes por color para encontrar la secuencia de la cura." },
+      { "order": 2, "title": "Láseres de Seguridad", "story": "Cruzad la cocina sin tocar los hilos de lana con cascabeles." },
+      { "order": 3, "title": "La Mezcla Maestra", "story": "Calculad la dosis exacta sumando las edades de la tripulación." },
+      { "order": 4, "title": "Extracción de Muestra", "story": "Rescatad el vial del fondo de un recipiente lleno de 'slime' pegajoso." }
+    ]
+  },
+  {
+    "id": "pack_kids_006",
+    "title": "El Reino de los Dragones Dormidos",
+    "imageUrl": "/images/templates/pack_006.png",
+    "estimatedDurationMinutes": 45,
+    "ageRange": { "min": 5, "max": 9 },
+    "participants": 4,
+    "difficulty": "medium",
+    "tone": "fantasy",
+    "adventureType": "adventure",
+    "place": "garden",
+    "materials": ["Huevos de plástico", "Cucharas", "Cinta de carrocero", "Escamas (papel pinocho)"],
+    "introduction": {
+      "story": "Los huevos de dragón han sido robados por trasgos. Recuperadlos antes de que eclosionen.",
+      "setupForParents": "Esconde los huevos entre las plantas del jardín."
+    },
+    "missions": [
+      { "order": 1, "title": "Paso de Gigante", "story": "Llevad los huevos en cucharas equilibrándolos sin despertar al dragón." },
+      { "order": 2, "title": "El Rastro de Escamas", "story": "Seguid el camino de papel pinocho sorteando las trampas de los trasgos." },
+      { "order": 3, "title": "El Nido Sagrado", "story": "Construid un nido resistente usando solo elementos naturales del jardín." }
+    ]
+  },
+  {
+    "id": "pack_kids_007",
+    "title": "Detectives: El Robo del Siglo",
+    "imageUrl": "/images/templates/pack_007.png",
+    "estimatedDurationMinutes": 55,
+    "ageRange": { "min": 8, "max": 12 },
+    "participants": 2,
+    "difficulty": "medium",
+    "tone": "mystery",
+    "adventureType": "mystery",
+    "place": "indoor",
+    "materials": ["Lupa", "Polvos talco", "Cinta adhesiva", "Sobres cerrados"],
+    "introduction": {
+      "story": "Alguien ha robado las galletas sagradas. Hay huellas sospechosas por toda la sala.",
+      "setupForParents": "Esparce un poco de harina para simular huellas cerca de la cocina."
+    },
+    "missions": [
+      { "order": 1, "title": "Huellas Dactilares", "story": "Buscad huellas en los vasos usando el talco y la cinta adhesiva." },
+      { "order": 2, "title": "Interrogatorio", "story": "Descifrad qué juguete miente analizando sus 'declaraciones' escritas." },
+      { "order": 3, "title": "La Caja Fuerte", "story": "Encontrad la combinación sumando los números ocultos en la decoración." },
+      { "order": 4, "title": "Reconstrucción", "story": "Armad el puzle de la nota de rescate que ha sido triturada." }
+    ]
+  },
+  {
+    "id": "pack_kids_008",
+    "title": "Olimpiadas Robot: El Cortocircuito",
+    "imageUrl": "/images/templates/pack_008.png",
+    "estimatedDurationMinutes": 35,
+    "ageRange": { "min": 6, "max": 10 },
+    "participants": 8,
+    "difficulty": "easy",
+    "tone": "funny",
+    "adventureType": "action",
+    "place": "garden",
+    "materials": ["Aros", "Pelotas", "Cajas de zapatos", "Papel de aluminio"],
+    "introduction": {
+      "story": "Los robots han perdido su aceite de motor. Superad las pruebas para recargar las baterías.",
+      "setupForParents": "Crea un circuito de obstáculos con los aros y cajas."
+    },
+    "missions": [
+      { "order": 1, "title": "Caminata Robótica", "story": "Carrera con cajas de zapatos en los pies imitando sonidos metálicos." },
+      { "order": 2, "title": "Recarga de Energía", "story": "Encestad las pelotas (pilas) en el cubo desde una distancia segura." },
+      { "order": 3, "title": "Escudo de Aluminio", "story": "Fabricad un casco protector para protegerse de la lluvia electromagnética." }
     ]
   }
 ]
