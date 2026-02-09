@@ -1,5 +1,10 @@
-// src/scripts/test-multimodal.ts
-// Ejecutar con: npx tsx src/scripts/test-multimodal.ts
+// scripts/test-multimodal.ts
+/**
+ * Script de prueba para verificar el funcionamiento del orquestador multimodal
+ * con diferentes combinaciones de proveedores de IA.
+ *
+ * Ejecutar con: pnpm test:ai
+ */
 
 import { generateAdventureMultimodal } from '@/application/generate-adventure-multimodal'
 import { OpenAIAdapter, GeminiAdapter, PollinationsImageAdapter } from '@/infrastructure/ai/adapters'

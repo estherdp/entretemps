@@ -80,37 +80,42 @@ Desde el punto de vista técnico, el proyecto demuestra cómo una **Clean Archit
 El código fuente sigue una estructura en capas que refleja directamente los principios de **Clean Architecture**:
 
 ```
-src/
-├── 🎨 app/                  # Next.js App Router (presentación y routing)
-│   ├── wizard/              # Flujo guiado de 6 pasos
-│   ├── pack/result/         # Visualización del pack generado
-│   ├── my-adventures/       # Biblioteca personal de aventuras
-│   ├── login/               # Autenticación OAuth
-│   └── api/                 # API Routes (generate, regenerate, reorder, delete)
+entretemps/
+├── 🧪 scripts/              # Scripts de prueba y herramientas de desarrollo
+│   ├── test-multimodal.ts   # Pruebas del orquestador multimodal con diferentes proveedores
+│   └── test-pollinations.ts # Verificación del adaptador de Pollinations AI
 │
-├── 💼 application/          # Casos de uso — lógica de negocio pura
-│   ├── generate-pack.ts
-│   ├── generate-adventure-multimodal.ts
-│   ├── regenerate-mission.ts
-│   └── save-adventure-pack.ts
-│
-├── 🧩 domain/               # Entidades e interfaces (ports)
-│   ├── services/            # Contratos de IA (IAdventureProvider, IImageGenerator…)
-│   ├── adventure-pack.ts
-│   └── wizard-data.ts
-│
-├── 🔌 infrastructure/       # Adaptadores externos (implementan los ports)
-│   ├── ai/adapters/         # GeminiAdapter, OpenAIAdapter, NanobananaAdapter…
-│   ├── images/              # PexelsImageAdapter
-│   ├── n8n/                 # N8NAdapter (workflow externo)
-│   └── supabase/            # Repositorios y cliente de base de datos
-│
-├── 🎨 ui/                   # Componentes React, hooks y providers
-│   ├── components/          # Button, Card, MissionCard, WizardShell…
-│   ├── hooks/               # useRegenerateMission, useSaveAdventurePack…
-│   └── wizard/              # Contexto y labels del wizard
-│
-└── 📚 lib/                  # Schemas Zod, utilidades transversales
+└── src/
+    ├── 🎨 app/              # Next.js App Router (presentación y routing)
+    │   ├── wizard/          # Flujo guiado de 6 pasos
+    │   ├── pack/result/     # Visualización del pack generado
+    │   ├── my-adventures/   # Biblioteca personal de aventuras
+    │   ├── login/           # Autenticación OAuth
+    │   └── api/             # API Routes (generate, regenerate, reorder, delete)
+    │
+    ├── 💼 application/      # Casos de uso — lógica de negocio pura
+    │   ├── generate-pack.ts
+    │   ├── generate-adventure-multimodal.ts
+    │   ├── regenerate-mission.ts
+    │   └── save-adventure-pack.ts
+    │
+    ├── 🧩 domain/           # Entidades e interfaces (ports)
+    │   ├── services/        # Contratos de IA (IAdventureProvider, IImageGenerator…)
+    │   ├── adventure-pack.ts
+    │   └── wizard-data.ts
+    │
+    ├── 🔌 infrastructure/   # Adaptadores externos (implementan los ports)
+    │   ├── ai/adapters/     # GeminiAdapter, OpenAIAdapter, NanobananaAdapter…
+    │   ├── images/          # PexelsImageAdapter
+    │   ├── n8n/             # N8NAdapter (workflow externo)
+    │   └── supabase/        # Repositorios y cliente de base de datos
+    │
+    ├── 🎨 ui/               # Componentes React, hooks y providers
+    │   ├── components/      # Button, Card, MissionCard, WizardShell…
+    │   ├── hooks/           # useRegenerateMission, useSaveAdventurePack…
+    │   └── wizard/          # Contexto y labels del wizard
+    │
+    └── 📚 lib/              # Schemas Zod, utilidades transversales
 ```
 
 <details>
@@ -233,6 +238,10 @@ pnpm build          # Build de producción
 pnpm test:run       # Ejecutar tests unitarios
 pnpm test:e2e       # Ejecutar tests E2E con Playwright
 pnpm lint           # Análisis estático
+
+# Scripts de prueba manual de adaptadores (desarrollo)
+pnpm test:ai        # Probar orquestador multimodal con diferentes proveedores
+pnpm test:images    # Verificar generación de imágenes con Pollinations AI
 ```
 
 ---

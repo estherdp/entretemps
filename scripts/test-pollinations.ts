@@ -1,8 +1,8 @@
-// src/scripts/test-pollinations.ts
+// scripts/test-pollinations.ts
 /**
  * Script de prueba para verificar el funcionamiento de PollinationsImageAdapter.
  *
- * Ejecutar con: pnpm tsx src/scripts/test-pollinations.ts
+ * Ejecutar con: pnpm test:images
  */
 
 import { PollinationsImageAdapter } from '@/infrastructure/ai/adapters'
