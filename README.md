@@ -423,7 +423,7 @@ Los datos alimentan un ciclo de **aprendizaje continuo** para que la IA ajuste l
 | Recurso | Enlace |
 |:--------|:-------|
 | 🌐 Aplicación en producción | [entretemps.vercel.app](#) *(placeholder — sustituir por URL de Vercel)* |
-| 📊 Presentación del TFM | [Ver slides](#) *(placeholder — sustituir por enlace a slides)* |
+| 📊 Presentación del TFM | [Ver slides](https://estherdols-my.sharepoint.com/:p:/g/personal/design_estherdols_studio/IQAO3IN9LDkNS54ULiryGDHrAT7OBo6_Bhnra4FB9uiMcmg?e=XBUzNR) *(placeholder — sustituir por enlace a slides)* |
 | 📖 Documentación de arquitectura de IA | [src/infrastructure/ai/README.md](src/infrastructure/ai/README.md) |
 | 🤖 Google AI Studio (Gemini) | [aistudio.google.com](https://aistudio.google.com) |
 | 🗄️ Supabase | [supabase.com](https://supabase.com) |
