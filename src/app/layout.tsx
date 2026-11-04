@@ -1,20 +1,36 @@
 import type { Metadata } from "next"
-import { Inter } from "next/font/google"
+import { Atkinson_Hyperlegible, Caveat, Young_Serif } from "next/font/google"
 import { RepositoryProvider } from "@/ui/providers/repository-provider"
 import { ConditionalNavbarWrapper } from "@/ui/components/conditional-navbar-wrapper"
 import "./globals.css"
 
-// Inter: Tipografía premium y profesional para SaaS
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
+// Títulos con aire de libro de cuentos
+const youngSerif = Young_Serif({
+  variable: "--font-young-serif",
+  subsets: ["latin", "latin-ext"],
+  weight: "400",
   display: "swap",
-  weight: ["300", "400", "500", "600", "700"],
+})
+
+// Texto de lectura: diseñada para máxima legibilidad (se lee en voz alta a los niños)
+const atkinson = Atkinson_Hyperlegible({
+  variable: "--font-atkinson",
+  subsets: ["latin", "latin-ext"],
+  weight: ["400", "700"],
+  display: "swap",
+})
+
+// Notas a mano en los márgenes del cuaderno
+const caveat = Caveat({
+  variable: "--font-caveat",
+  subsets: ["latin", "latin-ext"],
+  weight: ["500", "700"],
+  display: "swap",
 })
 
 export const metadata: Metadata = {
-  title: "Entretemps",
-  description: "Crea aventuras épicas para tus hijos en minutos. Sin pantallas, solo risas y momentos inolvidables.",
+  title: "Entretemps · Aventuras para jugar sin pantallas",
+  description: "Crea en minutos una aventura de juego físico para tus hijos: historia, retos, pistas para esconder y todo listo para imprimir.",
 }
 
 export default function RootLayout({
@@ -24,9 +40,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es">
-      <body
-        className={`${inter.variable} font-sans antialiased`}
-      >
+      <body className={`${youngSerif.variable} ${atkinson.variable} ${caveat.variable} font-sans antialiased`}>
         <RepositoryProvider>
           <ConditionalNavbarWrapper>
             {children}

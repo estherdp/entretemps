@@ -8,36 +8,20 @@ interface WizardStepCardProps {
 export function WizardStepCard({
   title,
   description,
-  badge = "Modo creativo",
-  children
+  badge = 'Modo creativo',
+  children,
 }: WizardStepCardProps) {
   return (
-    <div className="space-y-8">
-      {/* Step header */}
-      <div className="space-y-4">
-        {/* Badge */}
-        <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/5 text-primary text-xs font-semibold tracking-wide uppercase border border-primary/10">
-          <span>✨</span>
+    <div className="stagger space-y-8">
+      <div className="space-y-3">
+        <span className="inline-block -rotate-2 rounded-full border-2 border-ink bg-sun px-3 py-0.5 text-xs font-bold uppercase tracking-wider">
           {badge}
         </span>
-
-        {/* Title */}
-        <h2 className="text-3xl md:text-4xl font-bold leading-tight tracking-tight text-slate-900 dark:text-slate-50">
-          {title}
-        </h2>
-
-        {/* Description */}
-        {description && (
-          <p className="text-lg text-slate-600 dark:text-slate-400 leading-relaxed max-w-2xl">
-            {description}
-          </p>
-        )}
+        <h2 className="text-3xl leading-tight md:text-5xl">{title}</h2>
+        {description && <p className="max-w-2xl text-lg leading-relaxed text-ink-soft">{description}</p>}
       </div>
 
-      {/* Card content */}
-      <div className="bg-white dark:bg-card rounded-2xl p-8 shadow-sm border border-slate-200 dark:border-slate-800">
-        {children}
-      </div>
+      <div className="sticker p-5 sm:p-8">{children}</div>
     </div>
   )
 }

@@ -4,7 +4,6 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { WizardShell } from '@/ui/components/wizard-shell'
 import { WizardStepCard } from '@/ui/components/wizard-step-card'
-import { Card, CardContent } from '@/ui/components/card'
 import { SkeletonLoader } from '@/ui/components/skeleton-loader'
 
 import { useWizard } from '@/ui/wizard/wizard-provider'
@@ -57,6 +56,17 @@ export default function Step8Page() {
     }
   }
 
+  const summary: [string, string][] = [
+    ['Ocasión', wizardData.occasion ? OCCASION_LABELS[wizardData.occasion] : '—'],
+    ['Edades', wizardData.ages ? `${wizardData.ages.min} - ${wizardData.ages.max} años` : '—'],
+    ['Niños', wizardData.kidsCount ? `${wizardData.kidsCount} participantes` : '—'],
+    ['Tema', wizardData.interests || '—'],
+    ['Lugar', wizardData.place ? PLACE_LABELS[wizardData.place] : '—'],
+    ['Tipo de aventura', wizardData.adventureType ? ADVENTURE_TYPE_LABELS[wizardData.adventureType] : '—'],
+    ['Tono', wizardData.tone ? TONE_LABELS[wizardData.tone] : '—'],
+    ['Dificultad', wizardData.difficulty ? DIFFICULTY_LABELS[wizardData.difficulty] : '—'],
+  ]
+
   // Mostrar skeleton loader elegante durante la generación
   if (isLoading) {
     return <SkeletonLoader message="Creando tu aventura personalizada..." />
@@ -67,75 +77,35 @@ export default function Step8Page() {
       currentStep={8}
       totalSteps={8}
       prevHref="/wizard/step-7"
-      nextLabel="✨ Generar aventura"
+      nextLabel="¡Generar aventura!"
       onNext={handleGenerate}
     >
       <WizardStepCard
+        badge="Último paso"
         title="Resumen de tu aventura"
         description="Revisa los datos antes de generar tu Pack de Aventura."
       >
-        <div className="space-y-4">
-          <Card className="bg-muted/50">
-            <CardContent className="pt-4 space-y-3 text-sm">
-              <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
-                <span className="text-muted-foreground">Ocasión:</span>
-                <span className="font-medium">
-                  {wizardData.occasion ? OCCASION_LABELS[wizardData.occasion] : '—'}
-                </span>
+        <div className="space-y-5">
+          <dl className="grid gap-x-8 sm:grid-cols-2">
+            {summary.map(([label, value]) => (
+              <div key={label} className="flex items-baseline justify-between gap-4 border-b-2 border-dashed border-ink/20 py-3">
+                <dt className="font-hand text-xl text-ink-soft">{label}</dt>
+                <dd className="text-right font-bold">{value}</dd>
               </div>
-              <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
-                <span className="text-muted-foreground">Edades:</span>
-                <span className="font-medium">
-                  {wizardData.ages ? `${wizardData.ages.min} - ${wizardData.ages.max} años` : '—'}
-                </span>
-              </div>
-              <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
-                <span className="text-muted-foreground">Niños:</span>
-                <span className="font-medium">
-                  {wizardData.kidsCount ? `${wizardData.kidsCount} participantes` : '—'}
-                </span>
-              </div>
-              <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
-                <span className="text-muted-foreground">Tema:</span>
-                <span className="font-medium">{wizardData.interests || '—'}</span>
-              </div>
-              <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
-                <span className="text-muted-foreground">Lugar:</span>
-                <span className="font-medium">
-                  {wizardData.place ? PLACE_LABELS[wizardData.place] : '—'}
-                </span>
-              </div>
-              <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
-                <span className="text-muted-foreground">Tipo de aventura:</span>
-                <span className="font-medium">
-                  {wizardData.adventureType ? ADVENTURE_TYPE_LABELS[wizardData.adventureType] : '—'}
-                </span>
-              </div>
-              <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
-                <span className="text-muted-foreground">Tono de la historia:</span>
-                <span className="font-medium">
-                  {wizardData.tone ? TONE_LABELS[wizardData.tone] : '—'}
-                </span>
-              </div>
-              <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
-                <span className="text-muted-foreground">Dificultad:</span>
-                <span className="font-medium">
-                  {wizardData.difficulty ? DIFFICULTY_LABELS[wizardData.difficulty] : '—'}
-                </span>
-              </div>
-            </CardContent>
-          </Card>
+            ))}
+          </dl>
 
           {message && (
-            <div
-              className={`p-4 rounded-lg text-sm ${
+            <p
+              role="alert"
+              className={
                 message.type === 'success'
-                  ? 'bg-green-50 text-green-800 border border-green-200'
-                  : 'bg-red-50 text-red-800 border border-red-200'
-              }`}
+                  ? 'rounded-xl border-2 border-forest bg-forest/10 px-4 py-3 text-sm font-bold text-forest'
+                  : 'rounded-xl border-2 border-tomato bg-tomato/10 px-4 py-3 text-sm font-bold text-tomato'
+              }
             >
               {message.text}
-            </div>
+            </p>
           )}
         </div>
       </WizardStepCard>

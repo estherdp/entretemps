@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter, useParams } from 'next/navigation'
-import { Card, CardContent, CardHeader, CardTitle } from '@/ui/components/card'
+import { CopyPlus, Pencil, Printer, Save, Trash2 } from 'lucide-react'
 import { Button } from '@/ui/components/button'
+import { Label } from '@/ui/components/label'
 import { Textarea } from '@/ui/components/textarea'
 import { Input } from '@/ui/components/input'
 import {
@@ -25,11 +26,15 @@ import { useRepositories } from '@/ui/providers/repository-provider'
 import { updateMyPackText, PackTextChanges } from '@/application/update-my-pack-text'
 import { duplicateMyPack } from '@/application/duplicate-my-pack'
 import {
-  ADVENTURE_TYPE_LABELS,
-  TONE_LABELS,
-  DIFFICULTY_LABELS,
-  PLACE_LABELS,
-} from '@/ui/wizard/labels'
+  AdventureHero,
+  AdventurePage,
+  AdventureSection,
+  CenteredMessage,
+  ConclusionSection,
+  IntroductionSection,
+  MaterialsChecklist,
+  sortMissions,
+} from '@/ui/components/adventure-sections'
 import {
   DndContext,
   closestCenter,
@@ -67,8 +72,9 @@ export default function AdventureDetailPage() {
   const { deletePack, isDeleting, error: deleteError } = useDeletePack()
 
   // Editable text fields
+  // Última versión guardada: sirve para pintar y para "Cancelar" tras guardar
+  const [basePack, setBasePack] = useState<SavedAdventurePack | null>(null)
   const [title, setTitle] = useState('')
-  const [imageUrl, setImageUrl] = useState('')
   const [introStory, setIntroStory] = useState('')
   const [introSetupForParents, setIntroSetupForParents] = useState('')
   const [missionsStory, setMissionsStory] = useState<Record<number, string>>({})
@@ -104,22 +110,19 @@ export default function AdventureDetailPage() {
     }
   }, [needsAuth, router])
 
+  const resetFields = (source: SavedAdventurePack) => {
+    setTitle(source.pack.title)
+    setIntroStory(source.pack.introduction.story)
+    setIntroSetupForParents(source.pack.introduction.setupForParents)
+    setConclusionStory(source.pack.conclusion.story)
+    setMissionsStory(Object.fromEntries(source.pack.missions.map((m) => [m.order, m.story])))
+  }
+
   // Initialize editable fields when pack is loaded
   useEffect(() => {
     if (savedPack) {
-      setTitle(savedPack.pack.title)
-      setImageUrl(savedPack.pack.image?.url ?? '')
-      setIntroStory(savedPack.pack.introduction.story)
-      setIntroSetupForParents(savedPack.pack.introduction.setupForParents)
-      setConclusionStory(savedPack.pack.conclusion.story)
-
-      const missionsMap: Record<number, string> = {}
-      savedPack.pack.missions.forEach((mission) => {
-        missionsMap[mission.order] = mission.story
-      })
-      setMissionsStory(missionsMap)
-
-      // Initialize local missions
+      setBasePack(savedPack)
+      resetFields(savedPack)
       setLocalMissions(savedPack.pack.missions)
     }
   }, [savedPack])
@@ -133,7 +136,6 @@ export default function AdventureDetailPage() {
 
       const changes: PackTextChanges = {
         title: title,
-        imageUrl: imageUrl,
         introductionStory: introStory,
         introductionSetupForParents: introSetupForParents,
         conclusionStory: conclusionStory,
@@ -150,7 +152,7 @@ export default function AdventureDetailPage() {
         adventurePackRepository
       )
 
-      // Refrescamos el estado (opcional: podrías recargar del hook)
+      setBasePack(updatedPack)
       setIsEditing(false)
     } catch (err) {
       setSaveError(err instanceof Error ? err.message : 'Error al guardar los cambios')
@@ -181,41 +183,23 @@ export default function AdventureDetailPage() {
   }
 
   const handleDelete = async () => {
-    console.log('[handleDelete] Iniciando eliminación...')
     const success = await deletePack(id)
-    console.log('[handleDelete] Resultado de deletePack:', success)
 
     if (success) {
-      console.log('[handleDelete] Eliminación exitosa, mostrando mensaje...')
       setDeleteSuccess(true)
-      // Esperar 2 segundos para que se vean los logs
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      console.log('[handleDelete] Redirigiendo a /my-adventures')
+      // Breve pausa para que se vea la confirmación
+      await new Promise((resolve) => setTimeout(resolve, 1200))
       setShowDeleteDialog(false)
-      // Forzar recarga completa de la página para actualizar el listado
+      // Recarga completa para que el listado se actualice
       window.location.href = '/my-adventures'
-    } else {
-      console.error('[handleDelete] La eliminación falló')
     }
-    // Si hay error, se muestra en el dialog (deleteError del hook)
+    // Si hay error, se muestra en el diálogo (deleteError del hook)
   }
 
   const handleCancelEdit = () => {
-    if (!savedPack) return
+    if (!basePack) return
 
-    // Reset to original values
-    setTitle(savedPack.pack.title)
-    setImageUrl(savedPack.pack.image?.url ?? '')
-    setIntroStory(savedPack.pack.introduction.story)
-    setIntroSetupForParents(savedPack.pack.introduction.setupForParents)
-    setConclusionStory(savedPack.pack.conclusion.story)
-
-    const missionsMap: Record<number, string> = {}
-    savedPack.pack.missions.forEach((mission) => {
-      missionsMap[mission.order] = mission.story
-    })
-    setMissionsStory(missionsMap)
-
+    resetFields(basePack)
     setIsEditing(false)
     setSaveError(null)
   }
@@ -318,367 +302,197 @@ export default function AdventureDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-muted-foreground">Cargando aventura...</p>
-      </div>
+      <CenteredMessage>
+        <p className="font-hand text-2xl text-ink-soft">Abriendo tu aventura…</p>
+      </CenteredMessage>
     )
   }
 
-  if (error || !savedPack) {
+  if (error || !savedPack || !basePack) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-4 p-4">
-        <p className="text-red-600">{error || 'Aventura no encontrada'}</p>
-        <Button onClick={() => router.push('/my-adventures')}>
-          Volver a mis aventuras
-        </Button>
-      </div>
+      <CenteredMessage>
+        <p className="font-bold text-tomato">{error || 'Aventura no encontrada'}</p>
+        <Button onClick={() => router.push('/my-adventures')}>Volver a mis aventuras</Button>
+      </CenteredMessage>
     )
   }
 
-  const pack = savedPack.pack
+  const pack = basePack.pack
+  const busy = isDuplicating || isDeleting
+
+  const actions = isEditing ? null : (
+    <>
+      <Button onClick={() => setIsEditing(true)}>
+        <Pencil /> Editar aventura
+      </Button>
+      <Button onClick={() => window.print()} variant="outline">
+        <Printer /> Imprimir
+      </Button>
+      <Button onClick={handleDuplicate} disabled={busy} variant="outline">
+        <CopyPlus /> {isDuplicating ? 'Duplicando...' : 'Guardar como nueva'}
+      </Button>
+
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogTrigger asChild>
+          <Button variant="ghost" disabled={busy} className="text-tomato hover:bg-tomato/10">
+            <Trash2 /> Eliminar
+          </Button>
+        </DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>¿Eliminar esta aventura?</DialogTitle>
+            <DialogDescription>
+              Esta acción no se puede deshacer. Se eliminará permanentemente &quot;{title}&quot; de tu colección de
+              aventuras.
+            </DialogDescription>
+          </DialogHeader>
+          {deleteSuccess && (
+            <p className="rounded-xl border-2 border-forest bg-forest/10 p-3 text-sm font-bold text-forest">
+              ✓ Aventura eliminada. Redirigiendo...
+            </p>
+          )}
+          {deleteError && !deleteSuccess && (
+            <p className="rounded-xl border-2 border-tomato bg-tomato/10 p-3 text-sm font-bold text-tomato">{deleteError}</p>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowDeleteDialog(false)} disabled={isDeleting || deleteSuccess}>
+              Cancelar
+            </Button>
+            <Button variant="destructive" onClick={handleDelete} disabled={isDeleting || deleteSuccess}>
+              {isDeleting ? 'Eliminando...' : deleteSuccess ? 'Eliminada ✓' : 'Sí, eliminar'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
+  )
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
-      {/* Hero Image */}
-      <div className="relative w-full h-64 md:h-96 bg-gradient-to-br from-purple-500/20 to-blue-500/20 overflow-hidden">
-        {imageUrl ? (
-          <img
-            src={imageUrl}
-            alt={title}
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <div className="text-center space-y-2 p-6">
-              <h1 className="text-3xl md:text-5xl font-bold text-foreground">{title}</h1>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Main Content */}
-      <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
-        {/* Header */}
-        <div className="space-y-4">
-          {/* Title Section */}
-          {isEditing ? (
+    <AdventurePage>
+      <AdventureHero
+        pack={pack}
+        kicker={isEditing ? 'Editando tu aventura' : 'De tu colección'}
+        title={
+          isEditing ? (
             <div className="space-y-2">
-              <label className="text-sm font-medium text-muted-foreground">
-                Título de la aventura
-              </label>
+              <Label htmlFor="pack-title">Título de la aventura</Label>
               <Input
+                id="pack-title"
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="text-2xl font-bold h-auto py-3"
+                className="h-auto py-3 font-display text-2xl md:text-3xl"
                 placeholder="Título de la aventura..."
               />
             </div>
           ) : (
-            imageUrl && <h1 className="text-3xl md:text-4xl font-bold">{title}</h1>
-          )}
+            <h1 className="text-4xl leading-[1.05] md:text-6xl">{title}</h1>
+          )
+        }
+        actions={actions}
+      />
 
-          {/* Image URL Editor (only in edit mode) */}
-          {isEditing && (
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-muted-foreground">
-                URL de la imagen (opcional)
-              </label>
-              <Input
-                type="url"
-                value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
-                placeholder="https://ejemplo.com/imagen.jpg"
-              />
-              <p className="text-xs text-muted-foreground">
-                Deja vacío para mostrar solo el título
-              </p>
-            </div>
-          )}
-
-          {/* Edit Mode Toggle */}
-          {!isEditing && (
-            <div className="flex flex-col sm:flex-row gap-2">
-              <Button onClick={() => setIsEditing(true)} variant="outline" className="w-full sm:w-auto">
-                ✏️ Editar aventura
-              </Button>
-              <Button
-                onClick={handleDuplicate}
-                disabled={isDuplicating || isDeleting}
-                variant="outline"
-                className="w-full sm:w-auto"
-              >
-                {isDuplicating ? 'Duplicando...' : '📋 Guardar como nueva'}
-              </Button>
-              <Button
-                onClick={() => window.print()}
-                variant="outline"
-                className="w-full sm:w-auto"
-              >
-                🖨️ Imprimir
-              </Button>
-
-              {/* Delete Button with Confirmation Dialog */}
-              <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-                <DialogTrigger asChild>
-                  <Button
-                    variant="destructive"
-                    disabled={isDuplicating || isDeleting}
-                    className="w-full sm:w-auto"
-                  >
-                    🗑️ Eliminar
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>¿Eliminar esta aventura?</DialogTitle>
-                    <DialogDescription>
-                      Esta acción no se puede deshacer. Se eliminará permanentemente
-                      "{title}" de tu colección de aventuras.
-                    </DialogDescription>
-                  </DialogHeader>
-                  {deleteSuccess && (
-                    <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg p-3">
-                      <p className="text-sm text-green-800 dark:text-green-200">
-                        ✓ Aventura eliminada exitosamente. Redirigiendo...
-                      </p>
-                    </div>
-                  )}
-                  {deleteError && !deleteSuccess && (
-                    <div className="bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-lg p-3">
-                      <p className="text-sm text-red-800 dark:text-red-200">
-                        {deleteError}
-                      </p>
-                    </div>
-                  )}
-                  <DialogFooter>
-                    <Button
-                      variant="outline"
-                      onClick={() => setShowDeleteDialog(false)}
-                      disabled={isDeleting || deleteSuccess}
-                    >
-                      Cancelar
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      onClick={handleDelete}
-                      disabled={isDeleting || deleteSuccess}
-                    >
-                      {isDeleting ? 'Eliminando...' : deleteSuccess ? 'Eliminada ✓' : 'Sí, eliminar'}
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-            </div>
-          )}
-
-          {/* Key Info */}
-          <Card>
-            <CardContent className="pt-6">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="space-y-1">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wide">Edades</p>
-                  <p className="font-semibold">{pack.ageRange.min}-{pack.ageRange.max} años</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wide">Duración</p>
-                  <p className="font-semibold">{pack.estimatedDurationMinutes} min</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wide">Participantes</p>
-                  <p className="font-semibold">{pack.participants} niños</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wide">Dificultad</p>
-                  <p className="font-semibold">{DIFFICULTY_LABELS[pack.difficulty]}</p>
-                </div>
-              </div>
-              <div className="mt-4 pt-4 border-t grid grid-cols-2 md:grid-cols-3 gap-4">
-                <div className="space-y-1">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wide">Tipo</p>
-                  <p className="font-semibold">{ADVENTURE_TYPE_LABELS[pack.adventureType]}</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wide">Tono</p>
-                  <p className="font-semibold">{TONE_LABELS[pack.tone]}</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wide">Lugar</p>
-                  <p className="font-semibold">{PLACE_LABELS[pack.place]}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Error Display */}
-        {saveError && (
-          <div className="bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
-            <p className="text-sm text-red-800 dark:text-red-200">{saveError}</p>
-          </div>
-        )}
-
-        {/* Introduction */}
-        <Card>
-          <CardHeader>
-            <CardTitle>La Aventura Comienza</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="prose prose-sm max-w-none">
-              {isEditing ? (
-                <Textarea
-                  value={introStory}
-                  onChange={(e) => setIntroStory(e.target.value)}
-                  className="min-h-32"
-                  placeholder="Historia de introducción..."
-                />
-              ) : (
-                <p className="text-base leading-relaxed">{pack.introduction.story}</p>
-              )}
-            </div>
-            <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
-              <p className="text-sm font-medium text-amber-900 dark:text-amber-100 mb-2">
-                💡 Guía para padres
-              </p>
-              {isEditing ? (
-                <Textarea
-                  value={introSetupForParents}
-                  onChange={(e) => setIntroSetupForParents(e.target.value)}
-                  className="min-h-24 text-sm"
-                  placeholder="Guía de preparación para padres..."
-                />
-              ) : (
-                <p className="text-sm text-amber-800 dark:text-amber-200 leading-relaxed">
-                  {pack.introduction.setupForParents}
-                </p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Materials */}
-        {pack.materials.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Materiales Necesarios</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                {pack.materials.map((material, idx) => (
-                  <li key={idx} className="flex items-start gap-2">
-                    <span className="text-primary mt-0.5">✓</span>
-                    <span className="text-sm">{material}</span>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Missions with Drag & Drop */}
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold">Misiones</h2>
-            {isEditing && localMissions.length > 0 && (
-              <p className="text-sm text-muted-foreground">
-                Arrastra las misiones para reordenarlas
-              </p>
-            )}
-          </div>
-
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEnd}
-          >
-            <SortableContext
-              items={localMissions.map((m) => m.order)}
-              strategy={verticalListSortingStrategy}
-            >
-              <div className="space-y-4">
-                {localMissions
-                  .sort((a, b) => a.order - b.order)
-                  .map((mission) => (
-                    <MissionCard
-                      key={mission.order}
-                      mission={mission}
-                      isEditing={isEditing}
-                      isRegenerating={regeneratingMissionOrder === mission.order}
-                      missionStory={missionsStory[mission.order] || ''}
-                      onStoryChange={(story) =>
-                        setMissionsStory({
-                          ...missionsStory,
-                          [mission.order]: story,
-                        })
-                      }
-                      onRegenerate={() => handleRegenerateMission(mission.order)}
-                      isDragDisabled={!isEditing || regeneratingMissionOrder !== null}
-                    />
-                  ))}
-              </div>
-            </SortableContext>
-          </DndContext>
-        </div>
-
-        {/* Conclusion */}
-        <Card className="border-2 border-primary/20">
-          <CardHeader>
-            <CardTitle>Final de la Aventura</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="prose prose-sm max-w-none">
-              {isEditing ? (
-                <Textarea
-                  value={conclusionStory}
-                  onChange={(e) => setConclusionStory(e.target.value)}
-                  className="min-h-32"
-                  placeholder="Historia de conclusión..."
-                />
-              ) : (
-                <p className="text-base leading-relaxed">{pack.conclusion.story}</p>
-              )}
-            </div>
-            <div className="bg-purple-50 dark:bg-purple-950/20 border border-purple-200 dark:border-purple-800 rounded-lg p-4">
-              <p className="text-sm font-medium text-purple-900 dark:text-purple-100 mb-2">
-                🎉 Tip de celebración
-              </p>
-              <p className="text-sm text-purple-800 dark:text-purple-200 leading-relaxed">
-                {pack.conclusion.celebrationTip}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Actions - Save/Cancel when editing */}
-        {isEditing && (
-          <div className="flex flex-col sm:flex-row gap-4 pt-4">
-            <Button
-              onClick={handleCancelEdit}
-              variant="outline"
-              className="flex-1"
-              disabled={isSaving}
-            >
-              Cancelar
-            </Button>
-            <Button
-              onClick={handleSaveChanges}
-              className="flex-1"
-              disabled={isSaving}
-            >
-              {isSaving ? 'Guardando...' : '💾 Guardar cambios'}
-            </Button>
-          </div>
-        )}
-
-        {/* Footer Info */}
-        <p className="text-xs text-center text-muted-foreground pt-4">
-          Pack guardado el {new Date(savedPack.createdAt).toLocaleDateString('es-ES', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-          })}
+      {saveError && (
+        <p role="alert" className="no-print rounded-xl border-2 border-tomato bg-tomato/10 p-3 font-bold text-tomato">
+          {saveError}
         </p>
-      </div>
-    </div>
+      )}
+
+      <IntroductionSection
+        story={introStory}
+        note={introSetupForParents}
+        storySlot={
+          isEditing ? (
+            <Textarea
+              value={introStory}
+              onChange={(e) => setIntroStory(e.target.value)}
+              className="min-h-32 text-base"
+              placeholder="Historia de introducción..."
+            />
+          ) : undefined
+        }
+        noteSlot={
+          isEditing ? (
+            <Textarea
+              value={introSetupForParents}
+              onChange={(e) => setIntroSetupForParents(e.target.value)}
+              className="min-h-24 bg-card"
+              placeholder="Guía de preparación para padres..."
+            />
+          ) : undefined
+        }
+      />
+
+      <MaterialsChecklist materials={pack.materials} />
+
+      <AdventureSection
+        kicker={`${localMissions.length} paradas en el mapa`}
+        title="Misiones"
+        aside={
+          isEditing && localMissions.length > 0 ? (
+            <p className="font-hand text-xl text-ink-soft">Arrastra las misiones para reordenarlas</p>
+          ) : undefined
+        }
+      >
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+          <SortableContext items={localMissions.map((m) => m.order)} strategy={verticalListSortingStrategy}>
+            <div className="space-y-4">
+              {sortMissions(localMissions).map((mission) => (
+                <MissionCard
+                  key={mission.order}
+                  mission={mission}
+                  isEditing={isEditing}
+                  isRegenerating={regeneratingMissionOrder === mission.order}
+                  missionStory={missionsStory[mission.order] || ''}
+                  onStoryChange={(story) =>
+                    setMissionsStory({
+                      ...missionsStory,
+                      [mission.order]: story,
+                    })
+                  }
+                  onRegenerate={() => handleRegenerateMission(mission.order)}
+                  isDragDisabled={!isEditing || regeneratingMissionOrder !== null}
+                />
+              ))}
+            </div>
+          </SortableContext>
+        </DndContext>
+      </AdventureSection>
+
+      <ConclusionSection
+        story={conclusionStory}
+        note={pack.conclusion.celebrationTip}
+        storySlot={
+          isEditing ? (
+            <Textarea
+              value={conclusionStory}
+              onChange={(e) => setConclusionStory(e.target.value)}
+              className="min-h-32 text-base"
+              placeholder="Historia de conclusión..."
+            />
+          ) : undefined
+        }
+      />
+
+      {isEditing && (
+        <div className="no-print sticky bottom-4 z-30 flex flex-col gap-3 rounded-2xl border-2 border-ink bg-paper/95 p-3 shadow-sticker backdrop-blur sm:flex-row sm:justify-end">
+          <Button onClick={handleCancelEdit} variant="outline" disabled={isSaving}>
+            Cancelar
+          </Button>
+          <Button onClick={handleSaveChanges} disabled={isSaving}>
+            <Save /> {isSaving ? 'Guardando...' : 'Guardar cambios'}
+          </Button>
+        </div>
+      )}
+
+      <p className="text-center text-sm text-ink-soft">
+        Pack guardado el{' '}
+        {new Date(savedPack.createdAt).toLocaleDateString('es-ES', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        })}
+      </p>
+    </AdventurePage>
   )
 }

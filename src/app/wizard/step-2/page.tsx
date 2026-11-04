@@ -28,7 +28,7 @@ export default function Step2Page() {
         title="¿Qué edades tienen los niños?"
         description="Indica las edades para adaptar la dificultad de los retos."
       >
-        <div className="space-y-4">
+        <div className="grid gap-5 sm:grid-cols-3">
           <div className="space-y-2">
             <Label htmlFor="age-min">Edad mínima</Label>
             <Input

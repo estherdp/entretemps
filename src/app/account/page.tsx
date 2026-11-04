@@ -49,17 +49,17 @@ function ProfileForm({ user }: { user: User }) {
             {isSaving ? 'Guardando...' : 'Guardar'}
           </Button>
         </div>
-        {saved && <p className="text-sm text-green-700">Nombre guardado.</p>}
-        {error && <p className="text-sm text-red-600">{error}</p>}
+        {saved && <p className="text-sm font-bold text-forest">Nombre guardado.</p>}
+        {error && <p className="text-sm font-bold text-tomato">{error}</p>}
       </div>
       <dl className="grid gap-1 text-sm">
         <div className="flex gap-2">
-          <dt className="text-muted-foreground">Email:</dt>
-          <dd>{user.email}</dd>
+          <dt className="text-ink-soft">Email:</dt>
+          <dd className="font-bold">{user.email}</dd>
         </div>
         <div className="flex gap-2">
-          <dt className="text-muted-foreground">Acceso con:</dt>
-          <dd>{user.provider === 'google' ? 'Google' : 'Enlace por email'}</dd>
+          <dt className="text-ink-soft">Acceso con:</dt>
+          <dd className="font-bold">{user.provider === 'google' ? 'Google' : 'Enlace por email'}</dd>
         </div>
       </dl>
     </form>
@@ -72,20 +72,23 @@ function UsageMeter({ label, status }: { label: string; status: GenerationQuotaS
   return (
     <div className="space-y-1">
       <div className="flex justify-between text-sm">
-        <span>{label}</span>
-        <span className="text-muted-foreground">
+        <span className="font-bold">{label}</span>
+        <span className="font-bold text-ink-soft">
           {status.used} de {status.limit}
         </span>
       </div>
       <div
-        className="h-2 rounded-full bg-muted overflow-hidden"
+        className="h-4 overflow-hidden rounded-full border-2 border-ink bg-paper-deep"
         role="progressbar"
         aria-valuenow={status.used}
         aria-valuemin={0}
         aria-valuemax={status.limit}
         aria-label={label}
       >
-        <div className="h-full bg-primary transition-all" style={{ width: `${percent}%` }} />
+        <div
+          className={percent >= 100 ? 'h-full bg-tomato transition-all' : 'h-full bg-forest transition-all'}
+          style={{ width: `${percent}%` }}
+        />
       </div>
     </div>
   )
@@ -120,7 +123,7 @@ function DeleteAccountDialog({ open, onOpenChange }: { open: boolean; onOpenChan
             onChange={(e) => setConfirmation(e.target.value)}
             autoComplete="off"
           />
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && <p className="text-sm font-bold text-tomato">{error}</p>}
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isDeleting}>
@@ -146,8 +149,8 @@ export default function AccountPage() {
 
   if (isLoading || !user) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-muted-foreground">Cargando tu cuenta...</p>
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <p className="font-hand text-2xl text-ink-soft">Cargando tu cuenta...</p>
       </div>
     )
   }
@@ -158,8 +161,11 @@ export default function AccountPage() {
   }
 
   return (
-    <main className="max-w-2xl mx-auto px-4 py-12 space-y-6">
-      <h1 className="text-3xl font-bold tracking-tight">Mi cuenta</h1>
+    <main className="mx-auto max-w-2xl space-y-8 px-4 pb-24 pt-12">
+      <div>
+        <p className="font-hand text-2xl text-tomato">Tu rincón</p>
+        <h1 className="text-4xl md:text-5xl">Mi cuenta</h1>
+      </div>
 
       <Card>
         <CardHeader>
@@ -183,7 +189,7 @@ export default function AccountPage() {
               <UsageMeter label="Misiones regeneradas" status={usage.mission} />
             </>
           ) : (
-            <p className="text-sm text-muted-foreground">{usageError ?? 'Consultando...'}</p>
+            <p className="text-sm text-ink-soft">{usageError ?? 'Consultando...'}</p>
           )}
         </CardContent>
       </Card>
@@ -196,7 +202,7 @@ export default function AccountPage() {
           <Button variant="outline" onClick={handleSignOut}>
             <LogOut /> Cerrar sesión
           </Button>
-          <Button variant="ghost" className="text-red-600 hover:text-red-700" onClick={() => setIsDeleteOpen(true)}>
+          <Button variant="ghost" className="text-tomato hover:bg-tomato/10" onClick={() => setIsDeleteOpen(true)}>
             <Trash2 /> Borrar mi cuenta
           </Button>
         </CardContent>

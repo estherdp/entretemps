@@ -1,11 +1,10 @@
 'use client'
 
-import { useState } from 'react'
 import { WizardShell } from '@/ui/components/wizard-shell'
 import { WizardStepCard } from '@/ui/components/wizard-step-card'
 import { Label } from '@/ui/components/label'
 import { Textarea } from '@/ui/components/textarea'
-import { Button } from '@/ui/components/button'
+import { OptionChip } from '@/ui/components/option-tile'
 import { validateStep3 } from '@/application/validate-wizard-step'
 
 import { useWizard } from '@/ui/wizard/wizard-provider'
@@ -64,29 +63,18 @@ export default function Step3Page() {
               value={interests}
               onChange={(e) => setWizardData({ interests: e.target.value })}
               placeholder="Ej: Superman, dinosaurios, Harry Potter, fútbol, la Oveja Dolly…"
-              className="min-h-32 resize-none rounded-2xl border-border/60 shadow-premium focus:shadow-premium-lg focus:border-primary/60 transition-all"
+              className="min-h-32 resize-none text-base"
             />
-            <p className="text-xs text-muted-foreground">
+            <p className="text-sm text-ink-soft">
               Separa varios intereses con comas. Cuanto más específico, ¡mejor!
             </p>
           </div>
 
-          {/* Suggested chips - Modern bubbles */}
           <div className="space-y-3">
-            <p className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-              <span className="inline-block w-1.5 h-1.5 rounded-full bg-primary"></span>
-              Ideas para inspirarte
-            </p>
+            <p className="font-hand text-xl text-tomato">Ideas para inspirarte</p>
             <div className="flex flex-wrap gap-2">
               {SUGGESTED_CHIPS.map((chip) => (
-                <button
-                  key={chip}
-                  type="button"
-                  onClick={() => handleChipClick(chip)}
-                  className="px-4 py-2 text-sm font-medium rounded-full bg-gradient-to-br from-primary/10 to-primary/5 text-primary border border-primary/20 hover:border-primary/40 hover:shadow-premium hover:scale-105 active:scale-95 transition-all duration-200"
-                >
-                  {chip}
-                </button>
+                <OptionChip key={chip} label={chip} prefix="+" pressable={false} onSelect={() => handleChipClick(chip)} />
               ))}
             </div>
           </div>

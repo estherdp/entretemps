@@ -6,9 +6,30 @@ import { signInWithEmail, signInWithGoogle } from '@/infrastructure/supabase/aut
 import { Button } from '@/ui/components/button'
 import { Input } from '@/ui/components/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/ui/components/card'
+import { AdventureIllustration } from '@/ui/components/adventure-illustration'
 
 // Login con Google: requiere configurar OAuth en Google Cloud y en Supabase.
 const GOOGLE_LOGIN_ENABLED = process.env.NEXT_PUBLIC_ENABLE_GOOGLE_LOGIN === 'true'
+
+/** Marco de las pantallas de acceso: ilustración a un lado, formulario al otro. */
+function AuthFrame({ children }: { children: React.ReactNode }) {
+  return (
+    <main className="mx-auto grid min-h-[calc(100vh-4rem)] max-w-6xl items-center gap-12 px-4 py-12 lg:grid-cols-2">
+      <div className="hidden space-y-6 lg:block">
+        <p className="font-hand text-3xl text-tomato">¡Hola, familia exploradora!</p>
+        <h1 className="text-5xl leading-[1.05]">
+          Tu próxima aventura empieza con <span className="marker">un enlace mágico</span>
+        </h1>
+        <div className="washi sticker w-[85%] -rotate-2 overflow-hidden" aria-hidden="true">
+          <div className="aspect-[400/260]">
+            <AdventureIllustration type="fantasy" place="home" />
+          </div>
+        </div>
+      </div>
+      <div className="mx-auto w-full max-w-md">{children}</div>
+    </main>
+  )
+}
 
 function LoginForm() {
   const searchParams = useSearchParams()
@@ -67,24 +88,26 @@ function LoginForm() {
 
   if (sent) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <Card className="w-full max-w-md">
-          <CardHeader>
+      <AuthFrame>
+        <Card className="rotate-1">
+          <CardHeader className="items-center text-center">
+            <span className="stamp mb-2 h-20 w-20 bg-paper text-lg text-forest">¡Enviado!</span>
             <CardTitle>Revisa tu email</CardTitle>
             <CardDescription>
-              Te hemos enviado un enlace mágico a {email}. Haz clic en el enlace
+              Te hemos enviado un enlace mágico a <strong className="text-ink">{email}</strong>. Haz clic en el enlace
               para iniciar sesión.
             </CardDescription>
           </CardHeader>
         </Card>
-      </div>
+      </AuthFrame>
     )
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
+    <AuthFrame>
+      <Card>
         <CardHeader>
+          <p className="font-hand text-xl text-tomato">Sin contraseñas</p>
           <CardTitle>Iniciar sesión</CardTitle>
           <CardDescription>
             {GOOGLE_LOGIN_ENABLED
@@ -104,10 +127,10 @@ function LoginForm() {
                 </svg>
                 Continuar con Google
               </Button>
-              <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                <span className="h-px flex-1 bg-border" />
+              <div className="flex items-center gap-3 font-hand text-lg text-ink-soft">
+                <span className="h-0 flex-1 border-t-2 border-dashed border-ink/30" />
                 o con tu email
-                <span className="h-px flex-1 bg-border" />
+                <span className="h-0 flex-1 border-t-2 border-dashed border-ink/30" />
               </div>
             </>
           )}
@@ -123,27 +146,26 @@ function LoginForm() {
               />
             </div>
             {error && (
-              <p className="text-sm text-red-600">{error}</p>
+              <p role="alert" className="text-sm font-bold text-tomato">{error}</p>
             )}
             <Button type="submit" disabled={loading} className="w-full">
               {loading ? 'Enviando...' : 'Enviar enlace'}
             </Button>
           </form>
+          <p className="text-center text-xs text-ink-soft">
+            Solo guardamos tu email. Nunca pedimos datos de los niños.
+          </p>
         </CardContent>
       </Card>
-    </div>
+    </AuthFrame>
   )
 }
 
 export default function LoginPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle>Cargando...</CardTitle>
-          </CardHeader>
-        </Card>
+      <div className="flex min-h-[60vh] items-center justify-center p-4">
+        <p className="font-hand text-2xl text-ink-soft">Cargando...</p>
       </div>
     }>
       <LoginForm />

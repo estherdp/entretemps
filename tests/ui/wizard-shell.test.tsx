@@ -56,7 +56,7 @@ describe('WizardShell', () => {
     expect(screen.getAllByText('Generar aventura').length).toBeGreaterThanOrEqual(1)
   })
 
-  it('should have clean white background', () => {
+  it('should render the full-height wrapper', () => {
     const { container } = render(
       <WizardShell currentStep={1} totalSteps={5}>
         <p>Content</p>
@@ -64,7 +64,7 @@ describe('WizardShell', () => {
     )
 
     const wrapper = container.firstChild as HTMLElement
-    expect(wrapper.className).toContain('bg-white')
+    expect(wrapper.className).toContain('min-h-screen')
   })
 
   it('should render mobile sticky footer', () => {

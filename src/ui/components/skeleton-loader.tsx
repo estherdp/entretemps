@@ -1,11 +1,10 @@
 /**
- * Skeleton Loader Premium
- *
- * Componente de carga elegante que se muestra mientras se genera
- * la aventura con IA. Transmite profesionalidad y calma.
+ * Pantalla de espera mientras la IA genera la aventura.
+ * Una brújula que gira y un mapa que se va dibujando: transmite calma
+ * y deja claro qué se está preparando.
  */
 
-import { Sparkles } from 'lucide-react'
+const PREPARING = ['Escribiendo la historia', 'Inventando los retos', 'Escondiendo las pistas']
 
 interface SkeletonLoaderProps {
   message?: string
@@ -13,93 +12,74 @@ interface SkeletonLoaderProps {
 
 export function SkeletonLoader({ message = 'Preparando las pistas secretas...' }: SkeletonLoaderProps) {
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-b from-background to-muted/20">
-      <div className="max-w-2xl w-full space-y-8">
-        {/* Animated Icon */}
-        <div className="flex justify-center">
-          <div className="relative">
-            <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full animate-pulse" />
-            <div className="relative w-20 h-20 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center border border-primary/20 shadow-premium-lg">
-              <Sparkles className="w-10 h-10 text-primary animate-pulse" strokeWidth={1.5} />
-            </div>
-          </div>
-        </div>
-
-        {/* Message */}
-        <div className="text-center space-y-2">
-          <h2 className="text-2xl font-bold text-foreground">{message}</h2>
-          <p className="text-muted-foreground">
-            Reuniendo a los personajes de tu historia...
-          </p>
-        </div>
-
-        {/* Skeleton Cards */}
-        <div className="space-y-4">
-          {/* Title skeleton */}
-          <div className="bg-card rounded-2xl p-6 shadow-premium border border-border/60 space-y-4 animate-pulse">
-            <div className="h-8 bg-muted/60 rounded-lg w-3/4" />
-            <div className="space-y-2">
-              <div className="h-4 bg-muted/40 rounded w-full" />
-              <div className="h-4 bg-muted/40 rounded w-5/6" />
-            </div>
-          </div>
-
-          {/* Missions skeleton */}
-          {[1, 2, 3].map((i) => (
-            <div
-              key={i}
-              className="bg-card rounded-2xl p-6 shadow-premium border border-border/60 space-y-3 animate-pulse"
-              style={{ animationDelay: `${i * 150}ms` }}
+    <div className="flex min-h-[80vh] items-center justify-center p-4" role="status" aria-live="polite">
+      <div className="w-full max-w-xl space-y-10 text-center">
+        <svg viewBox="0 0 160 160" className="mx-auto h-36 w-36" aria-hidden="true">
+          <circle cx="80" cy="80" r="66" fill="var(--card)" stroke="var(--ink)" strokeWidth="4" />
+          <circle cx="80" cy="80" r="54" fill="none" stroke="var(--ink)" strokeWidth="1.5" strokeDasharray="3 7" />
+          {['N', 'E', 'S', 'O'].map((label, i) => (
+            <text
+              key={label}
+              x={80 + 42 * Math.sin((i * Math.PI) / 2)}
+              y={86 - 42 * Math.cos((i * Math.PI) / 2)}
+              textAnchor="middle"
+              fontSize="14"
+              fontWeight="700"
+              fill="var(--ink-soft)"
             >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-primary/10 rounded-full" />
-                <div className="h-5 bg-muted/50 rounded w-1/3" />
-              </div>
-              <div className="space-y-2 pl-13">
-                <div className="h-3 bg-muted/30 rounded w-full" />
-                <div className="h-3 bg-muted/30 rounded w-4/5" />
-              </div>
-            </div>
+              {label}
+            </text>
           ))}
+          <g className="origin-center animate-[spin_3s_cubic-bezier(.6,0,.4,1)_infinite]" style={{ transformBox: 'view-box' }}>
+            <path d="M80 30 L90 80 L80 130 L70 80Z" fill="var(--ink)" />
+            <path d="M80 30 L90 80 H70Z" fill="var(--tomato)" stroke="var(--ink)" strokeWidth="2" strokeLinejoin="round" />
+          </g>
+          <circle cx="80" cy="80" r="6" fill="var(--sun)" stroke="var(--ink)" strokeWidth="2.5" />
+        </svg>
+
+        <div className="space-y-2">
+          <h2 className="text-3xl md:text-4xl">{message}</h2>
+          <p className="font-hand text-2xl text-tomato">La magia lleva su tiempo… ¡ya casi!</p>
         </div>
 
-        {/* Progress indicator */}
-        <div className="space-y-2">
-          <div className="h-2 bg-muted/30 rounded-full overflow-hidden">
-            <div className="h-full bg-gradient-to-r from-primary/60 via-primary to-primary/60 animate-[shimmer_2s_ease-in-out_infinite] w-1/2" />
-          </div>
-          <p className="text-xs text-center text-muted-foreground">
-            La magia lleva su tiempo... ¡ya casi!
-          </p>
-        </div>
+        <ol className="sticker mx-auto max-w-sm space-y-3 p-5 text-left">
+          {PREPARING.map((step, i) => (
+            <li key={step} className="flex items-center gap-3">
+              <span
+                className="h-3 w-3 shrink-0 animate-pulse rounded-full border-2 border-ink bg-sun"
+                style={{ animationDelay: `${i * 400}ms` }}
+              />
+              <span className="font-bold">{step}…</span>
+            </li>
+          ))}
+        </ol>
+
+        <svg viewBox="0 0 400 40" className="mx-auto w-full max-w-md" aria-hidden="true">
+          <path
+            d="M10 30 C80 0 140 40 200 18 S330 0 390 22"
+            fill="none"
+            stroke="var(--tomato)"
+            strokeWidth="4"
+            strokeDasharray="12 10"
+            strokeLinecap="round"
+            className="animate-[dash_1.2s_linear_infinite]"
+          />
+        </svg>
       </div>
     </div>
   )
 }
 
-/**
- * Skeleton Card Component
- *
- * Componente reutilizable para mostrar placeholders de carga
- * en cualquier parte de la aplicación.
- */
+/** Placeholder de carga reutilizable. */
 export function SkeletonCard({ className = '' }: { className?: string }) {
   return (
-    <div
-      className={`bg-card rounded-2xl p-6 shadow-premium border border-border/60 space-y-4 animate-pulse ${className}`}
-    >
-      <div className="h-6 bg-muted/50 rounded w-2/3" />
+    <div className={`sticker animate-pulse space-y-4 p-6 ${className}`}>
+      <div className="h-6 w-2/3 rounded bg-paper-deep" />
       <div className="space-y-2">
-        <div className="h-4 bg-muted/30 rounded w-full" />
-        <div className="h-4 bg-muted/30 rounded w-5/6" />
-        <div className="h-4 bg-muted/30 rounded w-4/5" />
+        <div className="h-4 w-full rounded bg-paper-deep/70" />
+        <div className="h-4 w-5/6 rounded bg-paper-deep/70" />
+        <div className="h-4 w-4/5 rounded bg-paper-deep/70" />
       </div>
     </div>
   )
 }
-
-// Add shimmer animation to globals.css if not present:
-// @keyframes shimmer {
-//   0% { transform: translateX(-100%); }
-//   100% { transform: translateX(100%); }
-// }

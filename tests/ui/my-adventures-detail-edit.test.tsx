@@ -127,7 +127,8 @@ describe('AdventureDetailPage - Edit Mode', () => {
     expect(titleInput).toHaveValue('Test Adventure')
 
     // Verify image URL input appears
-    expect(screen.getByPlaceholderText('https://ejemplo.com/imagen.jpg')).toBeInTheDocument()
+    // Las portadas son ilustraciones: ya no se edita una URL de imagen
+    expect(screen.queryByPlaceholderText('https://ejemplo.com/imagen.jpg')).not.toBeInTheDocument()
 
     // Verify textarea contains original value
     const introTextarea = screen.getByPlaceholderText('Historia de introducción...')
@@ -204,7 +205,7 @@ describe('AdventureDetailPage - Edit Mode', () => {
     })
   })
 
-  it('should allow editing title and image URL', async () => {
+  it('should allow editing the title', async () => {
     const user = userEvent.setup()
     renderWithProviders(<AdventureDetailPage />)
 
@@ -227,9 +228,5 @@ describe('AdventureDetailPage - Edit Mode', () => {
     await user.type(titleInput, 'New Title')
     expect(titleInput).toHaveValue('New Title')
 
-    // Verify image URL is editable
-    const imageInput = screen.getByPlaceholderText('https://ejemplo.com/imagen.jpg')
-    await user.type(imageInput, 'https://new-image.com/test.jpg')
-    expect(imageInput).toHaveValue('https://new-image.com/test.jpg')
   })
 })

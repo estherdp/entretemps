@@ -1,6 +1,7 @@
 import Link from 'next/link'
-import { Progress } from '@/ui/components/progress'
+import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { Button } from '@/ui/components/button'
+import { cn } from '@/lib/utils'
 
 interface WizardShellProps {
   currentStep: number
@@ -14,6 +15,93 @@ interface WizardShellProps {
   validationMessage?: string
 }
 
+/** Progreso como una ruta del mapa: cada paso es una parada. */
+function RouteProgress({ currentStep, totalSteps }: { currentStep: number; totalSteps: number }) {
+  const progressValue = Math.round((currentStep / totalSteps) * 100)
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-baseline justify-between">
+        <span className="font-hand text-2xl text-tomato">Paso {currentStep} de {totalSteps}</span>
+        <span className="text-sm font-bold text-ink-soft">{progressValue}%</span>
+      </div>
+      <div
+        role="progressbar"
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={progressValue}
+        aria-label="Progreso del asistente"
+        className="relative flex items-center justify-between"
+      >
+        <div className="route absolute inset-x-2 top-1/2 -translate-y-1/2" aria-hidden="true" />
+        {Array.from({ length: totalSteps }, (_, index) => {
+          const step = index + 1
+          const isDone = step < currentStep
+          const isCurrent = step === currentStep
+          return (
+            <span
+              key={step}
+              aria-hidden="true"
+              className={cn(
+                'relative grid place-items-center rounded-full border-2 border-ink text-xs font-bold transition-all',
+                isCurrent ? 'h-9 w-9 bg-tomato text-paper shadow-sticker-sm' : 'h-6 w-6',
+                isDone && 'bg-forest text-paper',
+                !isDone && !isCurrent && 'bg-card text-ink-soft'
+              )}
+            >
+              {isDone ? '✓' : step}
+            </span>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+function ValidationNote({ message }: { message?: string }) {
+  if (!message) return null
+  return (
+    <p className="rounded-xl border-2 border-dashed border-sun bg-sun/15 px-4 py-3 text-sm font-bold text-ink">
+      {message}
+    </p>
+  )
+}
+
+function NavButtons({
+  prevHref,
+  nextHref,
+  nextLabel,
+  nextDisabled,
+  onNext,
+  stretch,
+}: Pick<WizardShellProps, 'prevHref' | 'nextHref' | 'nextLabel' | 'nextDisabled' | 'onNext'> & { stretch?: boolean }) {
+  const size = stretch ? 'lg' : 'default'
+  return (
+    <div className="flex gap-3">
+      {prevHref ? (
+        <Button variant="outline" size={size} asChild className={cn(stretch && 'flex-1')}>
+          <Link href={prevHref}>
+            <ArrowLeft /> Atrás
+          </Link>
+        </Button>
+      ) : null}
+      <div className={cn('flex justify-end', stretch ? 'flex-1' : 'flex-1')}>
+        {nextHref ? (
+          <Button asChild size={size} disabled={nextDisabled} className={cn(stretch && 'w-full', nextDisabled && 'pointer-events-none opacity-50')}>
+            <Link href={nextDisabled ? '#' : nextHref} aria-disabled={nextDisabled}>
+              {nextLabel} <ArrowRight />
+            </Link>
+          </Button>
+        ) : (
+          <Button size={size} disabled={nextDisabled} onClick={onNext} className={cn(stretch && 'w-full')}>
+            {nextLabel}
+          </Button>
+        )}
+      </div>
+    </div>
+  )
+}
+
 export function WizardShell({
   currentStep,
   totalSteps,
@@ -25,102 +113,28 @@ export function WizardShell({
   onNext,
   validationMessage,
 }: WizardShellProps) {
-  const progressValue = (currentStep / totalSteps) * 100
+  const navProps = { prevHref, nextHref, nextLabel, nextDisabled, onNext }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-background">
-      {/* Single column layout */}
-      <div className="max-w-4xl mx-auto px-4 pt-24 pb-8">
+    <div className="min-h-screen">
+      <div className="mx-auto max-w-3xl px-4 pb-8 pt-10 md:pt-14">
         <div className="space-y-10">
-          {/* Progress */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-slate-600 dark:text-slate-400 font-medium">
-                Paso {currentStep} de {totalSteps}
-              </span>
-              <span className="text-primary font-semibold">
-                {Math.round(progressValue)}%
-              </span>
-            </div>
-            <Progress value={progressValue} className="h-2 bg-slate-100 dark:bg-slate-800 [&>div]:bg-primary" />
-          </div>
+          <RouteProgress currentStep={currentStep} totalSteps={totalSteps} />
 
-          {/* Form content */}
-          <div className="space-y-6 pb-32 lg:pb-8">
-            {children}
-          </div>
+          <div className="space-y-6 pb-40 lg:pb-4">{children}</div>
 
-          {/* Desktop navigation buttons (hidden on mobile) */}
-          <div className="hidden lg:block space-y-4">
-            {validationMessage && (
-              <div className="text-sm text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-900/20 px-5 py-3.5 rounded-xl border border-amber-200 dark:border-amber-800">
-                {validationMessage}
-              </div>
-            )}
-            <div className="flex gap-4">
-              {prevHref ? (
-                <Button variant="outline" asChild className="h-12 px-6 rounded-xl border-slate-300 dark:border-slate-700">
-                  <Link href={prevHref}>Atrás</Link>
-                </Button>
-              ) : null}
-              <div className="flex-1 flex justify-end">
-                {nextHref ? (
-                  <Button
-                    asChild
-                    disabled={nextDisabled}
-                    className="h-12 px-8 rounded-xl font-semibold"
-                  >
-                    <Link href={nextDisabled ? '#' : nextHref}>{nextLabel}</Link>
-                  </Button>
-                ) : (
-                  <Button
-                    disabled={nextDisabled}
-                    onClick={onNext}
-                    className="h-12 px-8 rounded-xl font-semibold"
-                  >
-                    {nextLabel}
-                  </Button>
-                )}
-              </div>
-            </div>
+          <div className="hidden space-y-4 lg:block">
+            <ValidationNote message={validationMessage} />
+            <NavButtons {...navProps} />
           </div>
         </div>
       </div>
 
-      {/* Mobile sticky footer (hidden on desktop) */}
-      <div className="fixed bottom-0 left-0 right-0 lg:hidden bg-white/95 dark:bg-slate-950/95 backdrop-blur-xl border-t border-slate-200 dark:border-slate-800 shadow-[0_-4px_20px_-4px_rgba(0,0,0,0.08)]">
-        <div className="px-6 py-4 pb-8 space-y-4">
-          {validationMessage && (
-            <div className="text-sm text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-900/20 px-5 py-3.5 rounded-xl border border-amber-200 dark:border-amber-800">
-              {validationMessage}
-            </div>
-          )}
-          <div className="flex gap-3">
-            {prevHref ? (
-              <Button variant="outline" asChild className="flex-1 h-14 rounded-xl border-slate-300 dark:border-slate-700 font-semibold">
-                <Link href={prevHref}>Atrás</Link>
-              </Button>
-            ) : null}
-            <div className={prevHref ? 'flex-1' : 'w-full'}>
-              {nextHref ? (
-                <Button
-                  asChild
-                  className="w-full h-14 rounded-xl font-semibold"
-                  disabled={nextDisabled}
-                >
-                  <Link href={nextDisabled ? '#' : nextHref}>{nextLabel}</Link>
-                </Button>
-              ) : (
-                <Button
-                  className="w-full h-14 rounded-xl font-semibold"
-                  disabled={nextDisabled}
-                  onClick={onNext}
-                >
-                  {nextLabel}
-                </Button>
-              )}
-            </div>
-          </div>
+      {/* Pie fijo en móvil */}
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t-2 border-ink bg-paper/95 backdrop-blur-md lg:hidden">
+        <div className="space-y-3 px-4 pb-6 pt-4">
+          <ValidationNote message={validationMessage} />
+          <NavButtons {...navProps} stretch />
         </div>
       </div>
     </div>

@@ -51,7 +51,6 @@ describe('WizardStepCard', () => {
     )
 
     expect(screen.getByText('Modo creativo')).toBeInTheDocument()
-    expect(screen.getByText('✨')).toBeInTheDocument()
   })
 
   it('should render custom badge when provided', () => {

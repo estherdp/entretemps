@@ -25,14 +25,6 @@ vi.mock('@/ui/components/adventure-card', () => ({
   AdventureCard: ({ title }: { title: string }) => <div data-testid="adventure-card">{title}</div>,
 }))
 
-// Mock lucide-react icons
-vi.mock('lucide-react', () => ({
-  Star: () => <div>Star Icon</div>,
-  Heart: () => <div>Heart Icon</div>,
-  Compass: () => <div>Compass Icon</div>,
-  Wand2: () => <div>Wand2 Icon</div>,
-}))
-
 const mockTemplates = [
   {
     id: 'template-1',
@@ -105,10 +97,10 @@ describe('Home Page - Conditional Rendering', () => {
       render(<Home />)
 
       expect(screen.getByText('Todo lo que necesitas para una aventura épica')).toBeInTheDocument()
-      expect(screen.getByText('Aventuras únicas en minutos')).toBeInTheDocument()
-      expect(screen.getByText('Hecha para tu familia')).toBeInTheDocument()
-      expect(screen.getByText('Explora cualquier espacio')).toBeInTheDocument()
-      expect(screen.getByText('Tú tienes el control')).toBeInTheDocument()
+      expect(screen.getByText('Una historia para leer en voz alta')).toBeInTheDocument()
+      expect(screen.getByText('Retos con solución')).toBeInTheDocument()
+      expect(screen.getByText('Tarjetas para esconder')).toBeInTheDocument()
+      expect(screen.getByText('Para pequeños y mayores')).toBeInTheDocument()
     })
 
     it('should show "Para padres, por padres" section', () => {
@@ -131,10 +123,10 @@ describe('Home Page - Conditional Rendering', () => {
       expect(newAdventureButtons.length).toBe(0)
     })
 
-    it('should NOT show "Mis Aventuras" section', () => {
+    it('should NOT show "Mis aventuras" section', () => {
       render(<Home />)
 
-      expect(screen.queryByText('Mis Aventuras')).not.toBeInTheDocument()
+      expect(screen.queryByText('Mis aventuras')).not.toBeInTheDocument()
       expect(screen.queryByText('Tus creaciones guardadas')).not.toBeInTheDocument()
     })
 
@@ -142,7 +134,7 @@ describe('Home Page - Conditional Rendering', () => {
       render(<Home />)
 
       expect(screen.queryByText('Plantillas')).not.toBeInTheDocument()
-      expect(screen.queryByText('Aventuras listas para jugar')).not.toBeInTheDocument()
+      expect(screen.queryByText(/Aventuras listas para jugar/)).not.toBeInTheDocument()
     })
   })
 
@@ -170,14 +162,14 @@ describe('Home Page - Conditional Rendering', () => {
       expect(screen.getByText(/¡Nueva aventura!/i)).toBeInTheDocument()
     })
 
-    it('should show "Mis Aventuras" section', () => {
+    it('should show "Mis aventuras" section', () => {
       render(<Home />)
 
-      expect(screen.getByText('Mis Aventuras')).toBeInTheDocument()
+      expect(screen.getByText('Mis aventuras')).toBeInTheDocument()
       expect(screen.getByText('Tus creaciones guardadas')).toBeInTheDocument()
     })
 
-    it('should render user adventures in "Mis Aventuras" section', () => {
+    it('should render user adventures in "Mis aventuras" section', () => {
       render(<Home />)
 
       expect(screen.getByText('My Adventure 1')).toBeInTheDocument()
@@ -187,7 +179,7 @@ describe('Home Page - Conditional Rendering', () => {
       render(<Home />)
 
       expect(screen.getByText('Plantillas')).toBeInTheDocument()
-      expect(screen.getByText('Aventuras listas para jugar')).toBeInTheDocument()
+      expect(screen.getByText(/Aventuras listas para jugar/)).toBeInTheDocument()
     })
 
     it('should render templates', () => {
@@ -201,7 +193,7 @@ describe('Home Page - Conditional Rendering', () => {
       render(<Home />)
 
       expect(screen.queryByText('Todo lo que necesitas para una aventura épica')).not.toBeInTheDocument()
-      expect(screen.queryByText('Aventuras únicas en minutos')).not.toBeInTheDocument()
+      expect(screen.queryByText('Retos con solución')).not.toBeInTheDocument()
     })
 
     it('should NOT show landing page CTA', () => {
@@ -264,7 +256,7 @@ describe('Home Page - Conditional Rendering', () => {
 
       render(<Home />)
 
-      expect(screen.getByText('Buscando tus aventuras...')).toBeInTheDocument()
+      expect(screen.getByText('Buscando tus aventuras…')).toBeInTheDocument()
     })
   })
 

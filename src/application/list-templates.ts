@@ -1,5 +1,5 @@
 import templates from '@/data/templates/examples.json'
-import { GeneratedAdventurePack } from '@/domain/generated-adventure-pack'
+import type { AdventureType, Place } from '@/domain/wizard-data'
 
 /**
  * Tipo para las plantillas en el JSON.
@@ -33,6 +33,8 @@ export interface TemplateListItem {
   title: string
   estimatedDurationMinutes: number
   ageRange: { min: number; max: number }
+  adventureType: AdventureType
+  place: Place
   image?: { url: string }
 }
 
@@ -42,6 +44,8 @@ export function listTemplates(): TemplateListItem[] {
     title: template.title,
     estimatedDurationMinutes: template.estimatedDurationMinutes,
     ageRange: template.ageRange,
+    adventureType: template.adventureType as AdventureType,
+    place: template.place as Place,
     image: template.imageUrl ? { url: template.imageUrl } : undefined,
   }))
 }

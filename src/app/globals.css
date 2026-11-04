@@ -3,24 +3,20 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/*
+ * Entretemps · "Cuaderno de expedición"
+ * Papel cálido, tinta oscura, sello rojo tomate y rutas de mapa discontinuas.
+ * Tipografías: Young Serif (títulos), Atkinson Hyperlegible (lectura) y Caveat (notas a mano).
+ */
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-atkinson), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-young-serif), Georgia, serif;
+  --font-hand: var(--font-caveat), "Comic Sans MS", cursive;
   --font-mono: ui-monospace, monospace;
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
+
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
@@ -37,6 +33,22 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+
+  /* Paleta de expedición */
+  --color-paper: var(--paper);
+  --color-paper-deep: var(--paper-deep);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-tomato: var(--tomato);
+  --color-forest: var(--forest);
+  --color-sun: var(--sun);
+  --color-sky: var(--sky);
+  --color-plum: var(--plum);
+
+  --shadow-sticker-sm: 2px 2px 0 0 var(--ink);
+  --shadow-sticker: 4px 4px 0 0 var(--ink);
+  --shadow-sticker-lg: 7px 7px 0 0 var(--ink);
+
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -44,135 +56,286 @@
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
+
+  --animate-rise: rise 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-wiggle: wiggle 0.5s ease-in-out;
+  --animate-draw: draw 2.4s ease-out both;
 }
 
 :root {
-  /* Premium Design System - Estilo SaaS */
-  --radius: 1rem; /* Esquinas más redondeadas por defecto */
+  --radius: 0.75rem;
 
-  /* Fondo slate-50 suave */
-  --background: oklch(0.984 0.002 247);
-  --foreground: oklch(0.22 0.015 264);
+  --paper: #f5eedf;
+  --paper-deep: #ebe0c8;
+  --ink: #1e2b2f;
+  --ink-soft: #55625f;
+  --tomato: #d6492a;
+  --forest: #2e6a4f;
+  --sun: #edb43c;
+  --sky: #4f86b0;
+  --plum: #7a4a7f;
 
-  /* Tarjetas con fondo blanco puro y sombras suaves */
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.22 0.015 264);
-
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.22 0.015 264);
-
-  /* Violeta suave y elegante como primario */
-  --primary: oklch(0.65 0.18 285);
-  --primary-foreground: oklch(0.99 0 0);
-
-  --secondary: oklch(0.97 0.005 264);
-  --secondary-foreground: oklch(0.22 0.015 264);
-
-  /* Fondos muted más sutiles */
-  --muted: oklch(0.965 0.003 264);
-  --muted-foreground: oklch(0.52 0.015 264);
-
-  --accent: oklch(0.7 0.18 28);
-  --accent-foreground: oklch(0.99 0 0);
-
-  --destructive: oklch(0.577 0.245 27.325);
-
-  /* Bordes más sutiles */
-  --border: oklch(0.925 0.005 264);
-  --input: oklch(0.925 0.005 264);
-  --ring: oklch(0.65 0.18 285);
-  --chart-1: oklch(0.628 0.21 292);
-  --chart-2: oklch(0.7 0.18 28);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.628 0.21 292);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
-}
-
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.72 0.2 292);
-  --primary-foreground: oklch(0.145 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.75 0.18 28);
-  --accent-foreground: oklch(0.145 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.72 0.2 292);
-  --chart-1: oklch(0.72 0.2 292);
-  --chart-2: oklch(0.75 0.18 28);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.72 0.2 292);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --card: #fffbf2;
+  --card-foreground: var(--ink);
+  --popover: #fffbf2;
+  --popover-foreground: var(--ink);
+  --primary: var(--tomato);
+  --primary-foreground: #fff8ec;
+  --secondary: var(--paper-deep);
+  --secondary-foreground: var(--ink);
+  --muted: #ece3d0;
+  --muted-foreground: var(--ink-soft);
+  --accent: var(--sun);
+  --accent-foreground: var(--ink);
+  --destructive: #b3261e;
+  --border: rgb(30 43 47 / 0.16);
+  --input: rgb(30 43 47 / 0.28);
+  --ring: var(--tomato);
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
-    @apply bg-background text-foreground;
-    font-feature-settings: "cv11", "ss01";
-    font-optical-sizing: auto;
+    @apply text-foreground;
+    background-color: var(--paper);
+    /* Grano de papel + retícula de puntos de cuaderno */
+    background-image:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.12 0 0 0 0 0.17 0 0 0 0 0.18 0 0 0 0.07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+      radial-gradient(rgb(30 43 47 / 0.09) 1px, transparent 1.2px);
+    background-size: 160px 160px, 22px 22px;
+    font-size: 1.0625rem;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+
+  ::selection {
+    background: var(--sun);
+    color: var(--ink);
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--tomato);
+    outline-offset: 3px;
   }
 }
 
-/* Sombras Premium */
+@layer components {
+  /* Papel con borde de tinta y sombra dura, como una pegatina */
+  .sticker {
+    background: var(--card);
+    border: 2px solid var(--ink);
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-sticker);
+  }
+
+  /* Cinta adhesiva decorativa sobre una tarjeta */
+  .washi {
+    position: relative;
+  }
+  .washi::before {
+    content: "";
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    width: 92px;
+    height: 24px;
+    transform: translateX(-50%) rotate(-3deg);
+    background: color-mix(in srgb, var(--sun) 70%, transparent);
+    background-image: repeating-linear-gradient(
+      90deg,
+      rgb(255 255 255 / 0.25) 0 6px,
+      transparent 6px 12px
+    );
+    border-radius: 2px;
+    box-shadow: 0 1px 0 rgb(30 43 47 / 0.15);
+    pointer-events: none;
+  }
+
+  /* Ruta de mapa discontinua */
+  .route {
+    border-top: 3px dashed color-mix(in srgb, var(--tomato) 70%, transparent);
+  }
+
+  /* Tarjeta de pista troquelada: muescas laterales */
+  .ticket {
+    position: relative;
+    background: var(--card);
+    border: 2px dashed var(--ink);
+    border-radius: 14px;
+    -webkit-mask:
+      radial-gradient(circle 10px at 0 50%, transparent 98%, #000) left / 51% 100% no-repeat,
+      radial-gradient(circle 10px at 100% 50%, transparent 98%, #000) right / 51% 100% no-repeat;
+    mask:
+      radial-gradient(circle 10px at 0 50%, transparent 98%, #000) left / 51% 100% no-repeat,
+      radial-gradient(circle 10px at 100% 50%, transparent 98%, #000) right / 51% 100% no-repeat;
+  }
+
+  /* Sello circular */
+  .stamp {
+    display: inline-grid;
+    place-items: center;
+    border: 2.5px solid currentColor;
+    border-radius: 9999px;
+    outline: 1.5px solid currentColor;
+    outline-offset: 3px;
+    font-family: var(--font-hand);
+    line-height: 1;
+    text-align: center;
+    transform: rotate(-12deg);
+  }
+
+  /* Subrayado a mano en títulos */
+  .marker {
+    background-image: linear-gradient(
+      transparent 62%,
+      color-mix(in srgb, var(--sun) 75%, transparent) 62%,
+      color-mix(in srgb, var(--sun) 75%, transparent) 90%,
+      transparent 90%
+    );
+    padding: 0 0.12em;
+    box-decoration-break: clone;
+  }
+}
+
 @layer utilities {
-  .shadow-premium {
-    box-shadow:
-      0 1px 2px 0 rgb(0 0 0 / 0.03),
-      0 1px 3px 0 rgb(0 0 0 / 0.08);
+  .press {
+    transition:
+      transform 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+  .press:hover {
+    transform: translate(-1px, -1px);
+  }
+  .press:active {
+    transform: translate(3px, 3px);
+    box-shadow: 0 0 0 0 var(--ink);
   }
 
-  .shadow-premium-lg {
-    box-shadow:
-      0 4px 6px -1px rgb(0 0 0 / 0.05),
-      0 2px 4px -2px rgb(0 0 0 / 0.05),
-      0 12px 24px -4px rgb(0 0 0 / 0.08);
+  .stagger > * {
+    animation: rise 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+  .stagger > *:nth-child(2) { animation-delay: 80ms; }
+  .stagger > *:nth-child(3) { animation-delay: 160ms; }
+  .stagger > *:nth-child(4) { animation-delay: 240ms; }
+  .stagger > *:nth-child(5) { animation-delay: 320ms; }
+  .stagger > *:nth-child(6) { animation-delay: 400ms; }
+  .stagger > *:nth-child(n + 7) { animation-delay: 460ms; }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(1.5deg);
+  }
+}
+
+@keyframes wiggle {
+  0%,
+  100% { transform: rotate(0deg); }
+  25% { transform: rotate(-4deg); }
+  75% { transform: rotate(4deg); }
+}
+
+@keyframes draw {
+  from { stroke-dashoffset: 1000; }
+  to { stroke-dashoffset: 0; }
+}
+
+/* Ruta discontinua que "avanza" (dasharray 12 10 → periodo 22) */
+@keyframes dash {
+  to { stroke-dashoffset: -22; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ---------- Impresión: el pack se convierte en un cuadernillo ---------- */
+.print-only {
+  display: none;
+}
+
+@media print {
+  @page {
+    margin: 14mm;
   }
 
-  .hover-lift {
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  body {
+    background: #fff !important;
+    font-size: 11pt;
   }
 
-  .hover-lift:hover {
-    transform: translateY(-2px);
-    box-shadow:
-      0 12px 24px -4px rgb(0 0 0 / 0.08),
-      0 8px 16px -4px rgb(0 0 0 / 0.06);
+  nav,
+  .no-print {
+    display: none !important;
   }
 
-  @keyframes shimmer {
-    0% {
-      transform: translateX(-100%);
-    }
-    100% {
-      transform: translateX(100%);
-    }
+  .print-only {
+    display: block;
+  }
+
+  .sticker,
+  .ticket {
+    box-shadow: none !important;
+  }
+
+  .print-break-before {
+    break-before: page;
+  }
+
+  .print-avoid-break {
+    break-inside: avoid;
+  }
+
+  details > *:not(summary) {
+    display: block;
+  }
+
+  .stagger > *,
+  [class*='animate-'] {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+
+  .ticket {
+    break-inside: avoid;
   }
 }
