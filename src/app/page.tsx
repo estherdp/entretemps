@@ -1,11 +1,12 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { ArrowRight, BookOpen, Puzzle, Scissors, Sprout } from 'lucide-react'
+import { ArrowDown, ArrowRight, BookOpen, Puzzle, Scissors, Sprout } from 'lucide-react'
 import { Button } from '@/ui/components/button'
 import { AdventureCard } from '@/ui/components/adventure-card'
 import { AdventureIllustration } from '@/ui/components/adventure-illustration'
 import { useHomeData } from '@/ui/hooks/use-home-data'
+import type { TemplateListItem } from '@/application/list-templates'
 import { useAuth } from '@/ui/hooks/use-auth'
 import { getUserGreetingName } from '@/domain/user'
 
@@ -71,7 +72,7 @@ function HeroCollage() {
         <div className="aspect-[400/260]">
           <AdventureIllustration type="mystery" place="garden" />
         </div>
-        <p className="truncate border-t-2 border-ink px-4 py-2.5 font-display text-base sm:text-lg">El misterio del huevo de dinosaurio</p>
+        <p className="border-t-2 border-ink py-2.5 pl-4 pr-[46%] font-display text-base leading-snug sm:text-lg">El misterio de las galletas</p>
       </div>
 
       <div className="ticket absolute bottom-0 right-0 w-[54%] rotate-[4deg] p-4 shadow-sticker animate-[float_8s_ease-in-out_1s_infinite]">
@@ -89,7 +90,7 @@ function HeroCollage() {
   )
 }
 
-function Landing({ onStart }: { onStart: () => void }) {
+function Landing({ onStart, templates }: { onStart: () => void; templates: TemplateListItem[] }) {
   return (
     <>
       <section className="relative overflow-hidden px-4 pb-20 pt-14 md:pb-28 md:pt-20">
@@ -112,6 +113,11 @@ function Landing({ onStart }: { onStart: () => void }) {
               </Button>
             </div>
             <p className="text-sm font-bold text-ink-soft">Gratis · Para niños de 3 a 12 años · Sin guardar datos de los niños</p>
+            {templates.length > 0 && (
+              <a href="#probar" className="inline-flex items-center gap-1.5 font-hand text-2xl text-forest underline decoration-dashed underline-offset-4 hover:text-tomato">
+                o prueba una aventura de ejemplo, sin registrarte <ArrowDown className="h-5 w-5" />
+              </a>
+            )}
           </div>
           <HeroCollage />
         </div>
@@ -135,6 +141,32 @@ function Landing({ onStart }: { onStart: () => void }) {
           </ol>
         </div>
       </section>
+
+      {templates.length > 0 && (
+        <section id="probar" className="scroll-mt-20 px-4 pt-24">
+          <div className="mx-auto max-w-7xl">
+            <p className="font-hand text-2xl text-tomato">Pruébalo ya, sin registrarte</p>
+            <h2 className="max-w-3xl text-4xl md:text-5xl">Aventuras listas para imprimir esta misma tarde</h2>
+            <p className="mt-4 max-w-2xl text-lg text-ink-soft">
+              Abre cualquiera para ver el pack completo: historia, retos con solución y tarjetas para esconder.
+            </p>
+            <div className="stagger mt-12 grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-3">
+              {templates.map((template) => (
+                <AdventureCard
+                  key={template.id}
+                  id={template.id}
+                  title={template.title}
+                  ageRange={template.ageRange}
+                  estimatedDurationMinutes={template.estimatedDurationMinutes}
+                  adventureType={template.adventureType}
+                  place={template.place}
+                  href={`/templates/${template.id}`}
+                />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       <section className="px-4 py-24">
         <div className="mx-auto max-w-7xl">
@@ -204,7 +236,7 @@ export default function Home() {
   return (
     <main className="min-h-screen">
       {!hasUser ? (
-        <Landing onStart={() => router.push('/login')} />
+        <Landing onStart={() => router.push('/login')} templates={templates} />
       ) : (
         <div className="mx-auto max-w-7xl space-y-20 px-4 pb-24 pt-12">
           <section className="stagger grid items-center gap-8 md:grid-cols-[1fr_auto]">

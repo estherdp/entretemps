@@ -40,7 +40,7 @@ export function AdventureCard({
         </div>
 
         <div className="flex min-h-[112px] flex-col justify-between gap-3 p-4">
-          <h3 className="line-clamp-2 text-lg leading-snug group-hover:text-primary transition-colors">
+          <h3 className="text-lg leading-snug group-hover:text-primary transition-colors">
             {title}
           </h3>
           <div className="flex items-center gap-4 text-sm font-bold text-ink-soft">

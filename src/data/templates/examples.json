@@ -1,181 +1,694 @@
 [
   {
-    "id": "pack_demo_001",
-    "title": "La Selva Perdida y el Tesoro Encendido",
-    "imageUrl": "/images/templates/pack_001.png",
-    "estimatedDurationMinutes": 45,
-    "ageRange": { "min": 5, "max": 10 },
-    "participants": 4,
-    "difficulty": "medium",
-    "tone": "enigmatic",
-    "adventureType": "adventure",
-    "place": "garden",
-    "materials": ["Cojines", "Linternas", "Cajas de cartón", "Papel brillante", "Cinta adhesiva", "Pequeños premios"],
-    "introduction": {
-      "story": "La Selva Perdida ha elegido este jardín como escenario. El Tesoro Encendido espera a los valientes.",
-      "setupForParents": "Prepara el jardín y esconde la caja final en un lugar elevado o tras un arbusto."
-    },
-    "missions": [
-      { "order": 1, "title": "El Río de Cojines", "story": "Debéis cruzar el río de lava saltando solo sobre los cojines sin tocar el césped." },
-      { "order": 2, "title": "El Tótem de Cartón", "story": "Construid un tótem de 1 metro de altura usando solo cajas. Si se cae, los monos os descubrirán." },
-      { "order": 3, "title": "La Cueva de las Luciérnagas", "story": "Usad las linternas para encontrar los 5 símbolos brillantes ocultos en la oscuridad." }
-    ]
-  },
-  {
-    "id": "pack_kids_002",
-    "title": "Misión Espacial: Oxígeno Crítico",
-    "imageUrl": "/images/templates/pack_002.png",
+    "id": "misterio-galletas",
+    "title": "El misterio de las galletas desaparecidas",
     "estimatedDurationMinutes": 30,
-    "ageRange": { "min": 6, "max": 12 },
-    "participants": 5,
-    "difficulty": "hard",
-    "tone": "exciting",
-    "adventureType": "action",
-    "place": "indoor",
-    "materials": ["Botellas de plástico", "Papel de aluminio", "Globos azules", "Cronómetro"],
-    "introduction": {
-      "story": "¡Atención tripulación! El sistema de aire falla. Tenéis 30 minutos para recalibrar la nave.",
-      "setupForParents": "Esconde los 'tanques de oxígeno' (globos) y prepara una clave numérica en la calculadora."
-    },
-    "missions": [
-      { "order": 1, "title": "Código de Emergencia", "story": "Descifrad la clave numérica mirando bajo las sillas con visión de rayos X." },
-      { "order": 2, "title": "Gravedad Zero", "story": "Transportad los globos de oxígeno al reactor usando solo la cabeza." },
-      { "order": 3, "title": "Reparación del Casco", "story": "Unid las botellas con cinta para crear un conducto de ventilación estanco." }
-    ]
-  },
-  {
-    "id": "pack_kids_003",
-    "title": "La Escuela de Magia: El Examen Final",
-    "imageUrl": "/images/templates/pack_003.png",
-    "estimatedDurationMinutes": 60,
-    "ageRange": { "min": 7, "max": 11 },
-    "participants": 6,
-    "difficulty": "medium",
-    "tone": "enigmatic",
-    "adventureType": "fantasy",
-    "place": "indoor",
-    "materials": ["Vasos", "Vinagre", "Bicarbonato", "Sobres", "Varitas"],
-    "introduction": {
-      "story": "El Gran Mago ha sellado su despacho. Debéis preparar la poción de apertura antes del anochecer.",
-      "setupForParents": "Pon los ingredientes en botes con nombres como 'Lágrimas de Fénix'."
-    },
-    "missions": [
-      { "order": 1, "title": "El Vuelo de las Llaves", "story": "Identificad la llave correcta entre todas las que cuelgan analizando un acertijo." },
-      { "order": 2, "title": "El Caldero Burbujeante", "story": "Mezclad los polvos blancos para revelar el número oculto en el fondo del vaso." },
-      { "order": 3, "title": "Encantamiento de Silencio", "story": "Encontrad el sobre siguiendo las mímicas de un compañero que ha perdido la voz." },
-      { "order": 4, "title": "Duelo de Varitas", "story": "Superad el laberinto de espejos (hilos) sin tocar las cuerdas mágicas." }
-    ]
-  },
-  {
-    "id": "pack_kids_004",
-    "title": "El Galeón del Pirata Patapalo",
-    "imageUrl": "/images/templates/pack_004.png",
-    "estimatedDurationMinutes": 40,
     "ageRange": { "min": 4, "max": 8 },
     "participants": 3,
     "difficulty": "easy",
     "tone": "funny",
-    "adventureType": "adventure",
-    "place": "indoor",
-    "materials": ["Pañuelos", "Monedas de chocolate", "Cuerda", "Peluche de loro"],
-    "introduction": {
-      "story": "¡Ahoy! Estáis encerrados en el camarote. El mapa está en la cubierta superior.",
-      "setupForParents": "Usa una sábana azul en el suelo para simular el mar bravío."
-    },
-    "missions": [
-      { "order": 1, "title": "Nudos Marineros", "story": "Desatad los 5 nudos de la cuerda para liberar la llave del camarote." },
-      { "order": 2, "title": "El Loro Chivato", "story": "Imitad el sonido de 3 animales marinos para que el loro os entregue la pista." },
-      { "order": 3, "title": "X marca el Lugar", "story": "Buscad bajo los arrecifes (cojines rojos) las monedas que forman el mapa." }
-    ]
-  },
-  {
-    "id": "pack_kids_005",
-    "title": "Laboratorio Zombi: La Cura Final",
-    "imageUrl": "/images/templates/pack_005.png",
-    "estimatedDurationMinutes": 50,
-    "ageRange": { "min": 9, "max": 13 },
-    "participants": 4,
-    "difficulty": "hard",
-    "tone": "enigmatic",
     "adventureType": "mystery",
-    "place": "indoor",
-    "materials": ["Jeringuillas de juguete", "Ketchup", "Candados", "Libretas"],
+    "place": "home",
+    "materials": [
+      "Un bote de galletas vacío",
+      "Migas de pan o papel amarillo troceado",
+      "Rotulador marrón y papel",
+      "Una caja con galletas o la merienda",
+      "Un peluche (mejor si es naranja)"
+    ],
     "introduction": {
-      "story": "Un virus convierte a la gente en zombis vegetarianos. ¡Cread el antídoto!",
-      "setupForParents": "Configura un candado de maleta en el armario de los dulces."
+      "story": "¡Alerta en la cocina! Esta mañana había doce galletas en el bote y ahora solo quedan migas... y un rastro muy sospechoso. El Inspector Bigotes necesita ayudantes con buen olfato. ¿Seréis capaces de descubrir quién se ha llevado las galletas antes de la merienda?",
+      "setupForParents": "Antes de empezar: guarda las galletas en una caja dentro del armario de los abrigos junto a un peluche, esconde las tarjetas de pista en los lugares indicados y deja un rastro de migas desde el bote vacío hasta el felpudo de la entrada. Tú eres el Inspector Bigotes: lee las historias con voz de detective."
     },
     "missions": [
-      { "order": 1, "title": "Análisis de ADN", "story": "Ordenad los botes por color para encontrar la secuencia de la cura." },
-      { "order": 2, "title": "Láseres de Seguridad", "story": "Cruzad la cocina sin tocar los hilos de lana con cascabeles." },
-      { "order": 3, "title": "La Mezcla Maestra", "story": "Calculad la dosis exacta sumando las edades de la tripulación." },
-      { "order": 4, "title": "Extracción de Muestra", "story": "Rescatad el vial del fondo de un recipiente lleno de 'slime' pegajoso." }
-    ]
+      {
+        "order": 1,
+        "title": "El rastro de migas",
+        "story": "Mirad bien el suelo de la cocina: ¡hay migas! Los buenos detectives siguen el rastro sin pisarlo, a gatas y con mucho cuidado. ¿Adónde lleva?",
+        "parentGuide": "Haz el rastro con migas de pan o trocitos de papel amarillo desde el bote hasta el felpudo de la entrada. Anímales a ir a gatas, con lupa imaginaria incluida.",
+        "successCondition": "Encuentran la primera tarjeta bajo el felpudo.",
+        "challenge": {
+          "type": "search",
+          "description": "Seguir el rastro de migas desde el bote vacío hasta el lugar donde termina.",
+          "solution": "El rastro acaba en el felpudo de la entrada: la tarjeta está debajo."
+        },
+        "hints": ["Las migas van hacia la puerta.", "Mirad debajo de lo que pisamos al entrar en casa."],
+        "clueCards": [
+          {
+            "text": "El ladrón tenía frío en los pies... Busca donde duermen los zapatos.",
+            "hidingSpot": "Debajo del felpudo de la entrada, al final del rastro"
+          }
+        ],
+        "materials": ["Un bote de galletas vacío", "Migas de pan o papel amarillo troceado"],
+        "ageAdaptations": {
+          "younger": "Haz un rastro corto, con migas grandes y bien visibles.",
+          "older": "Deja huecos en el rastro y añade un desvío falso que no lleva a ninguna parte."
+        },
+        "estimatedMinutes": 8
+      },
+      {
+        "order": 2,
+        "title": "El acertijo del zapatero",
+        "story": "¡En el zapatero hay una huella de chocolate! Y dentro de un zapato, el ladrón ha dejado un acertijo. Si lo resolvéis, sabréis dónde ha escondido su siguiente pista.",
+        "parentGuide": "Dibuja una huella marrón en un papel y déjala junto al zapatero. Mete la tarjeta del acertijo dentro de un zapato. Pega la siguiente tarjeta detrás del reloj de la casa (o a su lado si no se puede).",
+        "successCondition": "Dicen «¡el reloj!» y van a buscar la tarjeta.",
+        "challenge": {
+          "type": "riddle",
+          "description": "Resolver el acertijo: «Tengo agujas y no sé coser, tengo números y no sé leer. ¿Qué soy?»",
+          "solution": "El reloj."
+        },
+        "hints": ["Hace tic-tac.", "Lo miramos para saber si ya es hora de merendar."],
+        "clueCards": [
+          {
+            "text": "Tengo agujas y no sé coser, tengo números y no sé leer. Busca detrás de mí.",
+            "hidingSpot": "Dentro de un zapato del zapatero"
+          }
+        ],
+        "materials": ["Rotulador marrón y papel"],
+        "ageAdaptations": {
+          "younger": "Imita el tic-tac del reloj como pista extra.",
+          "older": "Que lean el acertijo en voz alta y expliquen por qué la respuesta encaja."
+        },
+        "estimatedMinutes": 8
+      },
+      {
+        "order": 3,
+        "title": "Las letras revueltas",
+        "story": "Detrás del reloj hay un mensaje... ¡y un pelo naranja! El ladrón ha escondido las galletas en un sitio calentito, pero ha revuelto las letras para despistaros. Ordenadlas y descubriréis su escondite.",
+        "parentGuide": "Pon la caja de galletas y el peluche dentro del armario de los abrigos. Si aún no leen, ayúdales con la primera letra o cambia las letras por un dibujo de un abrigo.",
+        "successCondition": "Abren el armario y encuentran las galletas y al culpable.",
+        "challenge": {
+          "type": "puzzle",
+          "description": "Ordenar las letras R · A · I · M · O · R · A para formar el nombre del escondite.",
+          "solution": "ARMARIO: las galletas están en el armario de los abrigos."
+        },
+        "hints": ["Empieza por A.", "Es un mueble donde guardamos la ropa."],
+        "clueCards": [
+          {
+            "text": "¡Casi me pilláis! Ordenad estas letras y encontraréis mi tesoro: R · A · I · M · O · R · A",
+            "hidingSpot": "Pegada detrás del reloj (o justo a su lado)"
+          }
+        ],
+        "materials": ["Una caja con galletas o la merienda", "Un peluche (mejor si es naranja)"],
+        "ageAdaptations": {
+          "younger": "Dibuja un abrigo en la tarjeta en lugar de las letras.",
+          "older": "Añade dos letras de más que sobren para despistar."
+        },
+        "estimatedMinutes": 10
+      }
+    ],
+    "conclusion": {
+      "story": "Dentro del armario, junto a la caja de galletas, está el culpable: ¡un peluche con el bigote lleno de migas! Resulta que solo quería compartirlas con unos detectives tan listos como vosotros. Caso cerrado.",
+      "celebrationTip": "Merendad las galletas juntos y dad a cada detective una placa de papel de «Detective con olfato»."
+    }
   },
   {
-    "id": "pack_kids_006",
-    "title": "El Reino de los Dragones Dormidos",
-    "imageUrl": "/images/templates/pack_006.png",
+    "id": "expedicion-mapa",
+    "title": "La expedición del mapa roto",
     "estimatedDurationMinutes": 45,
+    "ageRange": { "min": 6, "max": 10 },
+    "participants": 4,
+    "difficulty": "medium",
+    "tone": "exciting",
+    "adventureType": "adventure",
+    "place": "garden",
+    "materials": [
+      "Un mapa del jardín dibujado a mano y cortado en 3 trozos",
+      "Cojines, cartones o aros para el puente",
+      "Una regadera",
+      "Una caja de zapatos como cofre",
+      "Una pequeña sorpresa para el cofre"
+    ],
+    "introduction": {
+      "story": "Exploradores, atención: el capitán Brújula enterró hace cien años un cofre en este jardín. Su mapa se rompió en tres trozos y el viento los repartió por todas partes. Solo un equipo valiente y unido podrá juntarlos y encontrar la X.",
+      "setupForParents": "Dibuja un mapa sencillo del jardín con una X donde esconderás el cofre y córtalo en 3 trozos. Esconde cada trozo junto a su tarjeta de pista. Prepara el puente con cojines o cartones y guarda una sorpresa en el cofre."
+    },
+    "missions": [
+      {
+        "order": 1,
+        "title": "El árbol del capitán",
+        "story": "El capitán Brújula dejó un acertijo grabado en la tapa de su viejo diario. Dicen que el primer trozo del mapa descansa a los pies de la respuesta.",
+        "parentGuide": "Entrega la primera tarjeta en mano al empezar. Esconde el primer trozo del mapa y la tarjeta de la misión 2 al pie del árbol (o la planta) más grande del jardín.",
+        "successCondition": "Encuentran el primer trozo del mapa al pie del árbol.",
+        "challenge": {
+          "type": "riddle",
+          "description": "Resolver: «Tengo hojas y no soy libro, tengo copa y no soy taza. ¿Qué soy?»",
+          "solution": "Un árbol."
+        },
+        "hints": ["Vive en el jardín y no se mueve.", "Los pájaros hacen nidos en él."],
+        "clueCards": [
+          {
+            "text": "Tengo hojas y no soy libro, tengo copa y no soy taza. A mis pies espera el primer trozo.",
+            "hidingSpot": "Entrégala en mano al empezar la aventura"
+          }
+        ],
+        "materials": ["Un mapa del jardín dibujado a mano y cortado en 3 trozos"],
+        "ageAdaptations": {
+          "younger": "Señala hacia los árboles si se atascan.",
+          "older": "Pídeles que inventen otro acertijo con la misma estructura."
+        },
+        "estimatedMinutes": 8
+      },
+      {
+        "order": 2,
+        "title": "El puente de los cocodrilos",
+        "story": "Entre vosotros y el segundo trozo hay un río lleno de cocodrilos hambrientos. Solo se puede cruzar saltando de piedra en piedra. ¡Si alguien toca el agua, todo el equipo vuelve a empezar!",
+        "parentGuide": "Coloca cojines, cartones o aros formando un camino. Bajo el último esconde el segundo trozo del mapa y la tarjeta de la misión 3. Supervisa que el suelo no resbale.",
+        "successCondition": "Todo el equipo cruza sin tocar el césped.",
+        "challenge": {
+          "type": "physical",
+          "description": "Cruzar el jardín pisando solo las «piedras» (cojines, cartones o aros) sin tocar el suelo.",
+          "solution": "Lo consiguen ayudándose: pueden darse la mano o mover una piedra entre todos."
+        },
+        "hints": ["Ir de uno en uno es más fácil.", "Podéis daros la mano para no perder el equilibrio."],
+        "clueCards": [
+          {
+            "text": "¡Bravo! El siguiente trozo lo guarda alguien que se llena de agua pero nunca tiene sed.",
+            "hidingSpot": "Debajo de la última piedra del puente"
+          }
+        ],
+        "materials": ["Cojines, cartones o aros para el puente"],
+        "ageAdaptations": {
+          "younger": "Pon las piedras más juntas.",
+          "older": "Dales una piedra menos de las necesarias: tendrán que moverla para avanzar."
+        },
+        "estimatedMinutes": 12
+      },
+      {
+        "order": 3,
+        "title": "El mensaje al revés",
+        "story": "¡La regadera! Atado a ella hay un mensaje muy raro. Los piratas escribían al revés para despistar a sus enemigos. ¿Sabréis leerlo?",
+        "parentGuide": "Ata la tarjeta a la regadera. Esconde el tercer trozo del mapa debajo de una maceta.",
+        "successCondition": "Descifran «BAJO LA MACETA» y encuentran el último trozo.",
+        "challenge": {
+          "type": "cipher",
+          "description": "Leer el mensaje escrito al revés: ATECAM AL OJAB",
+          "solution": "BAJO LA MACETA."
+        },
+        "hints": ["Empezad a leer por la última letra.", "La primera palabra es «BAJO»."],
+        "clueCards": [
+          {
+            "text": "Ojo, exploradores: los piratas escriben al revés. ATECAM AL OJAB",
+            "hidingSpot": "Atada a la regadera"
+          }
+        ],
+        "materials": ["Una regadera"],
+        "ageAdaptations": {
+          "younger": "Lee tú las letras de una en una empezando por el final.",
+          "older": "Que escriban un mensaje al revés para el resto de la familia."
+        },
+        "estimatedMinutes": 10
+      },
+      {
+        "order": 4,
+        "title": "La X del tesoro",
+        "story": "¡Tenéis los tres trozos! Juntadlos como un puzle y el mapa os dirá dónde está el cofre. Pero cuidado: el capitán dejó un último candado que solo se abre con un grito de equipo.",
+        "parentGuide": "Esconde el cofre donde marcaste la X. Pega en la tapa la última tarjeta. Deja que interpreten el mapa sin ayuda al principio.",
+        "successCondition": "Encuentran el cofre y lo abren con el grito de equipo.",
+        "challenge": {
+          "type": "puzzle",
+          "description": "Unir los tres trozos del mapa, orientarlo con el jardín real y encontrar la X.",
+          "solution": "La X marca el escondite del cofre."
+        },
+        "hints": ["Buscad en el mapa algo que podáis ver ahora mismo, como el árbol.", "Girad el mapa hasta que coincida con el jardín."],
+        "clueCards": [
+          {
+            "text": "Cofre del capitán Brújula. Solo se abre si toda la tripulación grita a la vez: «¡Exploradores unidos!»",
+            "hidingSpot": "Pegada en la tapa del cofre"
+          }
+        ],
+        "materials": ["Una caja de zapatos como cofre", "Una pequeña sorpresa para el cofre"],
+        "ageAdaptations": {
+          "younger": "Dibuja en el mapa objetos muy reconocibles (el columpio, la mesa).",
+          "older": "Añade en el mapa una instrucción de pasos: «5 pasos desde el árbol hacia la casa»."
+        },
+        "estimatedMinutes": 10
+      }
+    ],
+    "conclusion": {
+      "story": "El cofre se abre con un crujido... ¡El tesoro del capitán Brújula! Y dentro, una nota: «El verdadero tesoro es una tripulación que no se rinde». Hoy habéis demostrado ser la mejor expedición del jardín.",
+      "celebrationTip": "Repartid el tesoro y haced una foto de grupo con el mapa completo para colgarla en la nevera."
+    }
+  },
+  {
+    "id": "academia-magos",
+    "title": "La academia de magos aprendices",
+    "estimatedDurationMinutes": 40,
     "ageRange": { "min": 5, "max": 9 },
     "participants": 4,
     "difficulty": "medium",
-    "tone": "fantasy",
-    "adventureType": "adventure",
-    "place": "garden",
-    "materials": ["Huevos de plástico", "Cucharas", "Cinta de carrocero", "Escamas (papel pinocho)"],
+    "tone": "enigmatic",
+    "adventureType": "fantasy",
+    "place": "home",
+    "materials": [
+      "Un vaso o cuenco para la poción",
+      "Una linterna",
+      "Un diploma de mago hecho a mano por cada niño",
+      "Palitos o lápices como varitas"
+    ],
     "introduction": {
-      "story": "Los huevos de dragón han sido robados por trasgos. Recuperadlos antes de que eclosionen.",
-      "setupForParents": "Esconde los huevos entre las plantas del jardín."
+      "story": "Bienvenidos a la Academia de Magos Aprendices. Soy la profesora Lechuza y hoy es un día muy especial: el examen para conseguir vuestro diploma de magia. Tendréis que preparar una poción, descifrar un hechizo y vencer al duende travieso. ¿Preparados, aprendices?",
+      "setupForParents": "Esconde las tarjetas de pista en los lugares indicados y los diplomas en un sitio oscuro (debajo de la cama o dentro de un armario). Dale a cada niño un palito como varita. Tú eres la profesora Lechuza."
     },
     "missions": [
-      { "order": 1, "title": "Paso de Gigante", "story": "Llevad los huevos en cucharas equilibrándolos sin despertar al dragón." },
-      { "order": 2, "title": "El Rastro de Escamas", "story": "Seguid el camino de papel pinocho sorteando las trampas de los trasgos." },
-      { "order": 3, "title": "El Nido Sagrado", "story": "Construid un nido resistente usando solo elementos naturales del jardín." }
-    ]
+      {
+        "order": 1,
+        "title": "La poción de los tres ingredientes",
+        "story": "Todo mago necesita una poción para empezar el examen. La receta pide tres ingredientes muy especiales que están escondidos por la casa. ¡Rápido, que la poción se enfría!",
+        "parentGuide": "Lee la receta en voz alta. Vale cualquier objeto que cumpla la descripción; lo importante es que lo justifiquen. Remueve la «poción» con una varita y entrega la siguiente tarjeta.",
+        "successCondition": "Traen los tres ingredientes y explican por qué cada uno cumple la receta.",
+        "challenge": {
+          "type": "search",
+          "description": "Encontrar en casa: algo verde, algo que haga ruido y algo más suave que una nube.",
+          "solution": "Cualquier objeto que cumpla cada condición (una hoja, un sonajero o llaves, un peluche o algodón)."
+        },
+        "hints": ["Lo verde puede estar en la cocina.", "Lo suave puede estar en vuestra cama."],
+        "clueCards": [
+          {
+            "text": "La poción está lista. Ahora el hechizo: está escrito sin vocales, y espera en la estantería de los libros.",
+            "hidingSpot": "La entrega la profesora Lechuza al terminar la poción"
+          }
+        ],
+        "materials": ["Un vaso o cuenco para la poción"],
+        "ageAdaptations": {
+          "younger": "Pide solo dos ingredientes y acompáñales.",
+          "older": "Añade un cuarto ingrediente: «algo que empiece por la letra M»."
+        },
+        "estimatedMinutes": 10
+      },
+      {
+        "order": 2,
+        "title": "El hechizo de las estrellas",
+        "story": "En la estantería hay un pergamino con un hechizo muy antiguo. Un duende borró todas las vocales y las cambió por estrellas. Si lo descifráis, sabréis dónde está la siguiente prueba.",
+        "parentGuide": "Deja la tarjeta entre los libros. Explica que cada estrella es una vocal que falta. Esconde la tarjeta de la misión 3 bajo el cojín del sofá.",
+        "successCondition": "Descifran «BAJO EL COJÍN» y encuentran la tarjeta.",
+        "challenge": {
+          "type": "cipher",
+          "description": "Descifrar el hechizo cambiando cada estrella por una vocal: B★J★ ★L C★J★N",
+          "solution": "BAJO EL COJÍN."
+        },
+        "hints": ["La primera palabra es «BAJO».", "Lo usamos para apoyar la cabeza en el sofá."],
+        "clueCards": [
+          {
+            "text": "Hechizo antiguo: B★J★ ★L C★J★N",
+            "hidingSpot": "Entre los libros de la estantería"
+          }
+        ],
+        "materials": [],
+        "ageAdaptations": {
+          "younger": "Dibuja un cojín al lado del hechizo.",
+          "older": "Que escriban su nombre con estrellas en lugar de vocales para que los demás lo adivinen."
+        },
+        "estimatedMinutes": 8
+      },
+      {
+        "order": 3,
+        "title": "El duende de las palabras prohibidas",
+        "story": "¡Oh, no! El duende travieso ha lanzado un hechizo: durante tres minutos, nadie puede decir «sí» ni «no». Si alguien se equivoca, el duende se ríe y hay que volver a empezar.",
+        "parentGuide": "Hazles preguntas rápidas y tramposas («¿Te gusta el chocolate?», «¿Eres un dragón?»). Cronometra 3 minutos. Al terminar, entrega la tarjeta de la misión 4.",
+        "successCondition": "Aguantan tres minutos sin decir «sí» ni «no».",
+        "challenge": {
+          "type": "physical",
+          "description": "Responder a las preguntas de la profesora durante tres minutos sin decir «sí» ni «no».",
+          "solution": "Responden con otras palabras: «claro», «para nada», «a lo mejor»..."
+        },
+        "hints": ["Podéis decir «claro que sí»... ¡no, eso tampoco!", "Probad con «por supuesto» o «para nada»."],
+        "clueCards": [
+          {
+            "text": "¡Habéis vencido al duende! Último acertijo: cuanto más grande soy, menos se ve. Buscad dentro de mí.",
+            "hidingSpot": "Debajo del cojín del sofá"
+          }
+        ],
+        "materials": [],
+        "ageAdaptations": {
+          "younger": "Reduce el tiempo a un minuto y prohíbe solo la palabra «no».",
+          "older": "Prohíbe también «vale»."
+        },
+        "estimatedMinutes": 8
+      },
+      {
+        "order": 4,
+        "title": "El examen final",
+        "story": "Último acertijo del examen: «Cuanto más grande soy, menos se ve». Quien lo resuelva sabrá dónde están escondidos los diplomas de magia. ¡Varitas en alto!",
+        "parentGuide": "Los diplomas deben estar en un sitio oscuro (debajo de la cama, dentro de un armario). Dales una linterna cuando acierten.",
+        "successCondition": "Resuelven el acertijo y encuentran los diplomas con la linterna.",
+        "challenge": {
+          "type": "riddle",
+          "description": "Resolver: «Cuanto más grande soy, menos se ve. ¿Qué soy?»",
+          "solution": "La oscuridad: los diplomas están en el sitio más oscuro de la casa."
+        },
+        "hints": ["Aparece cuando apagamos la luz.", "Para encontrarlo vais a necesitar una linterna."],
+        "clueCards": [
+          {
+            "text": "Diploma de magia: este aprendiz ha superado el examen de la Academia.",
+            "hidingSpot": "En el sitio más oscuro de la casa, junto a los diplomas"
+          }
+        ],
+        "materials": ["Una linterna", "Un diploma de mago hecho a mano por cada niño"],
+        "ageAdaptations": {
+          "younger": "Apaga la luz de la habitación como pista.",
+          "older": "Pídeles que inventen un hechizo propio antes de recoger el diploma."
+        },
+        "estimatedMinutes": 10
+      }
+    ],
+    "conclusion": {
+      "story": "La profesora Lechuza abre sus alas y anuncia: «¡Examen superado!». Desde hoy sois magos de verdad. Recordad que el hechizo más poderoso es el que se hace en equipo.",
+      "celebrationTip": "Haced una ceremonia de entrega de diplomas y que cada mago diga su hechizo favorito."
+    }
   },
   {
-    "id": "pack_kids_007",
-    "title": "Detectives: El Robo del Siglo",
-    "imageUrl": "/images/templates/pack_007.png",
-    "estimatedDurationMinutes": 55,
-    "ageRange": { "min": 8, "max": 12 },
-    "participants": 2,
-    "difficulty": "medium",
-    "tone": "mystery",
-    "adventureType": "mystery",
-    "place": "indoor",
-    "materials": ["Lupa", "Polvos talco", "Cinta adhesiva", "Sobres cerrados"],
-    "introduction": {
-      "story": "Alguien ha robado las galletas sagradas. Hay huellas sospechosas por toda la sala.",
-      "setupForParents": "Esparce un poco de harina para simular huellas cerca de la cocina."
-    },
-    "missions": [
-      { "order": 1, "title": "Huellas Dactilares", "story": "Buscad huellas en los vasos usando el talco y la cinta adhesiva." },
-      { "order": 2, "title": "Interrogatorio", "story": "Descifrad qué juguete miente analizando sus 'declaraciones' escritas." },
-      { "order": 3, "title": "La Caja Fuerte", "story": "Encontrad la combinación sumando los números ocultos en la decoración." },
-      { "order": 4, "title": "Reconstrucción", "story": "Armad el puzle de la nota de rescate que ha sido triturada." }
-    ]
-  },
-  {
-    "id": "pack_kids_008",
-    "title": "Olimpiadas Robot: El Cortocircuito",
-    "imageUrl": "/images/templates/pack_008.png",
+    "id": "superheroes-parque",
+    "title": "Superhéroes al rescate del parque",
     "estimatedDurationMinutes": 35,
-    "ageRange": { "min": 6, "max": 10 },
-    "participants": 8,
+    "ageRange": { "min": 4, "max": 8 },
+    "participants": 5,
+    "difficulty": "easy",
+    "tone": "exciting",
+    "adventureType": "action",
+    "place": "park",
+    "materials": [
+      "Una bolsa para recoger tesoros",
+      "Capas improvisadas (toallas o pañuelos)",
+      "Medallas de papel para cada héroe"
+    ],
+    "introduction": {
+      "story": "¡Atención, héroes! El villano Desorden ha llenado el parque de caos y ha escondido la Medalla del Valor. Solo un equipo de superhéroes entrenados puede devolver la calma al parque. ¡Capas puestas y a por él!",
+      "setupForParents": "Lleva las tarjetas en el bolsillo y entrégalas al terminar cada misión (en un parque es más fácil que esconderlas antes). Elige un banco como cuartel general. Lleva capas improvisadas y las medallas de papel."
+    },
+    "missions": [
+      {
+        "order": 1,
+        "title": "Entrenamiento de héroes",
+        "story": "Ningún héroe sale a la calle sin entrenar. Completad el circuito del cuartel general: saltos de rana, carrera hasta el árbol y equilibrio de funambulista.",
+        "parentGuide": "Marca el circuito: 5 saltos de rana, carrera de ida y vuelta hasta un árbol cercano y caminar sobre una línea (un bordillo bajo o una línea en el suelo). Vigila que la zona sea segura.",
+        "successCondition": "Todos completan el circuito.",
+        "challenge": {
+          "type": "physical",
+          "description": "Hacer 5 saltos de rana, correr hasta el árbol y volver, y caminar sobre una línea sin salirse.",
+          "solution": "Completar las tres pruebas, aunque sea despacio."
+        },
+        "hints": ["En el equilibrio, abrid los brazos como un avión.", "Mirad al final de la línea, no a los pies."],
+        "clueCards": [
+          {
+            "text": "¡Entrenamiento superado! El villano Desorden ha dejado el parque hecho un lío. Recuperad 5 hojas diferentes antes de que se las lleve el viento.",
+            "hidingSpot": "En tu bolsillo: entrégala al terminar el circuito"
+          }
+        ],
+        "materials": ["Capas improvisadas (toallas o pañuelos)"],
+        "ageAdaptations": {
+          "younger": "Quita la prueba de equilibrio o hazla de la mano.",
+          "older": "Cronometra el circuito y que intenten batir su propio récord."
+        },
+        "estimatedMinutes": 10
+      },
+      {
+        "order": 2,
+        "title": "Las hojas perdidas",
+        "story": "El villano Desorden ha revuelto todas las hojas del parque. Los héroes con vista de águila deben encontrar cinco hojas distintas: de forma, de color o de tamaño.",
+        "parentGuide": "Solo hojas caídas del suelo, nada de arrancar. Al terminar, que las ordenen de la más pequeña a la más grande.",
+        "successCondition": "Reúnen 5 hojas diferentes y las ordenan por tamaño.",
+        "challenge": {
+          "type": "search",
+          "description": "Encontrar en el suelo 5 hojas diferentes y ordenarlas de la más pequeña a la más grande.",
+          "solution": "Cualquier combinación de 5 hojas distintas bien ordenada."
+        },
+        "hints": ["Mirad debajo de árboles distintos.", "Buscad una hoja muy alargada y otra muy redonda."],
+        "clueCards": [
+          {
+            "text": "¡Parque ordenado! Último paso: cada héroe necesita un nombre y una pose secreta para derrotar a Desorden.",
+            "hidingSpot": "En tu bolsillo: entrégala al ordenar las hojas"
+          }
+        ],
+        "materials": ["Una bolsa para recoger tesoros"],
+        "ageAdaptations": {
+          "younger": "Basta con 3 hojas de colores distintos.",
+          "older": "Que adivinen de qué árbol viene cada hoja."
+        },
+        "estimatedMinutes": 10
+      },
+      {
+        "order": 3,
+        "title": "La pose del héroe",
+        "story": "El villano Desorden solo se rinde ante héroes de verdad. Inventad vuestro nombre de superhéroe y una pose secreta. Cuando todos estéis listos, gritad vuestros nombres a la vez... ¡y el villano huirá!",
+        "parentGuide": "Deja que inventen sin prisas. Cuando griten, haz tú de villano que huye derrotado. Después entrega las medallas.",
+        "successCondition": "Cada niño presenta su nombre y su pose de superhéroe.",
+        "challenge": {
+          "type": "creative",
+          "description": "Inventar un nombre de superhéroe y una pose secreta, y presentarlos al grupo.",
+          "solution": "Cualquier nombre y pose valen: lo importante es presentarlo con energía."
+        },
+        "hints": ["Pensad en vuestro animal favorito.", "Juntad un superpoder con un color: Rayo Naranja, Capitana Tortuga..."],
+        "clueCards": [
+          {
+            "text": "Medalla del Valor: por proteger el parque del villano Desorden.",
+            "hidingSpot": "Junto a las medallas, en el cuartel general"
+          }
+        ],
+        "materials": ["Medallas de papel para cada héroe"],
+        "ageAdaptations": {
+          "younger": "Ofréceles dos o tres nombres para elegir.",
+          "older": "Que expliquen también cuál es su superpoder y su punto débil."
+        },
+        "estimatedMinutes": 10
+      }
+    ],
+    "conclusion": {
+      "story": "El villano Desorden sale corriendo y el parque vuelve a estar en calma. Los pájaros cantan, las hojas están ordenadas y todo el mundo sabe quién lo ha conseguido: ¡vosotros, los héroes del parque!",
+      "celebrationTip": "Entregad las medallas en el banco del cuartel general y haced una foto con las poses de superhéroe."
+    }
+  },
+  {
+    "id": "circo-calcetines",
+    "title": "El circo de los calcetines locos",
+    "estimatedDurationMinutes": 25,
+    "ageRange": { "min": 3, "max": 6 },
+    "participants": 3,
     "difficulty": "easy",
     "tone": "funny",
-    "adventureType": "action",
-    "place": "garden",
-    "materials": ["Aros", "Pelotas", "Cajas de zapatos", "Papel de aluminio"],
+    "adventureType": "humor",
+    "place": "home",
+    "materials": [
+      "6 pares de calcetines de colores (separados)",
+      "Rotuladores o pegatinas para hacer ojos",
+      "Un cesto o caja",
+      "Una entrada de circo de papel por niño"
+    ],
     "introduction": {
-      "story": "Los robots han perdido su aceite de motor. Superad las pruebas para recargar las baterías.",
-      "setupForParents": "Crea un circuito de obstáculos con los aros y cajas."
+      "story": "¡Pasen y vean! Esta noche actúa el Circo de los Calcetines Locos... pero hay un problema: ¡los calcetines se han escapado y están escondidos por toda la casa! Sin calcetines no hay función. ¿Nos ayudáis a encontrarlos?",
+      "setupForParents": "Separa 6 pares de calcetines y esconde un calcetín de cada par por el salón (a la vista o casi). Guarda las parejas en el cesto. Tú eres el presentador del circo: usa voz de pista."
     },
     "missions": [
-      { "order": 1, "title": "Caminata Robótica", "story": "Carrera con cajas de zapatos en los pies imitando sonidos metálicos." },
-      { "order": 2, "title": "Recarga de Energía", "story": "Encestad las pelotas (pilas) en el cubo desde una distancia segura." },
-      { "order": 3, "title": "Escudo de Aluminio", "story": "Fabricad un casco protector para protegerse de la lluvia electromagnética." }
-    ]
+      {
+        "order": 1,
+        "title": "¿Dónde están los calcetines?",
+        "story": "Los calcetines se han escondido muertos de risa. Buscadlos por todo el salón y, cuando los tengáis, encontrad a su pareja en el cesto. ¡Cada calcetín quiere estar con su hermano!",
+        "parentGuide": "Escóndelos en sitios fáciles: asomando de un cojín, encima de una silla, detrás de una cortina. Celebra cada calcetín encontrado con un redoble de tambor.",
+        "successCondition": "Encuentran los 6 calcetines y los emparejan.",
+        "challenge": {
+          "type": "search",
+          "description": "Encontrar 6 calcetines escondidos y emparejarlos con su pareja del cesto.",
+          "solution": "Seis parejas completas."
+        },
+        "hints": ["Uno está muy cerca de la ventana.", "Mirad entre los cojines del sofá."],
+        "clueCards": [
+          {
+            "text": "¡Bien! Los calcetines ya están juntos. Ahora necesitan ojos para salir a escena.",
+            "hidingSpot": "En el fondo del cesto, debajo de las parejas"
+          }
+        ],
+        "materials": ["6 pares de calcetines de colores (separados)", "Un cesto o caja"],
+        "ageAdaptations": {
+          "younger": "Esconde solo 3 calcetines y muy a la vista.",
+          "older": "Que digan el color de cada calcetín antes de emparejarlo."
+        },
+        "estimatedMinutes": 8
+      },
+      {
+        "order": 2,
+        "title": "Las marionetas parlanchinas",
+        "story": "Un calcetín sin ojos no puede actuar. ¡Convertid un calcetín en marioneta y dadle una voz muy graciosa! ¿Será un calcetín cantante, gruñón o que no para de estornudar?",
+        "parentGuide": "Usa pegatinas o dibuja ojos con rotulador sobre papel y pégalos. Haz tú la primera voz para animarles.",
+        "successCondition": "Cada niño tiene su marioneta y le ha puesto voz.",
+        "challenge": {
+          "type": "creative",
+          "description": "Convertir un calcetín en marioneta con ojos y presentarla con una voz divertida.",
+          "solution": "Cualquier marioneta y voz son válidas."
+        },
+        "hints": ["Probad a hablar como un ratón.", "¿Y si vuestro calcetín tiene hipo?"],
+        "clueCards": [
+          {
+            "text": "¡Qué marionetas tan graciosas! Para el número final, convertid los calcetines en pelotas.",
+            "hidingSpot": "La entrega el presentador al terminar las marionetas"
+          }
+        ],
+        "materials": ["Rotuladores o pegatinas para hacer ojos"],
+        "ageAdaptations": {
+          "younger": "Pon tú los ojos y deja que elijan la voz.",
+          "older": "Que inventen un pequeño diálogo entre dos marionetas."
+        },
+        "estimatedMinutes": 8
+      },
+      {
+        "order": 3,
+        "title": "El gran número final",
+        "story": "¡Redoble de tambores! Para el número final, los artistas lanzarán pelotas de calcetín al cesto desde la línea del circo. ¡Tres aciertos y la función será un éxito!",
+        "parentGuide": "Enrolla los calcetines sobrantes en bolas. Marca una línea en el suelo a una distancia adecuada. Aplaude cada lanzamiento, entre o no.",
+        "successCondition": "Entre todos consiguen meter 3 pelotas en el cesto.",
+        "challenge": {
+          "type": "physical",
+          "description": "Lanzar pelotas de calcetín al cesto desde una línea hasta conseguir 3 aciertos entre todos.",
+          "solution": "Tres pelotas dentro del cesto."
+        },
+        "hints": ["Lanzad suave, hacia arriba.", "Acercad un paso la línea si cuesta mucho."],
+        "clueCards": [
+          {
+            "text": "Entrada de honor al Circo de los Calcetines Locos. ¡Artista estrella!",
+            "hidingSpot": "Una por niño, junto al cesto"
+          }
+        ],
+        "materials": ["Una entrada de circo de papel por niño"],
+        "ageAdaptations": {
+          "younger": "Pon el cesto muy cerca.",
+          "older": "Que lancen de espaldas o con la mano contraria."
+        },
+        "estimatedMinutes": 8
+      }
+    ],
+    "conclusion": {
+      "story": "¡La función ha sido un exitazo! Los calcetines saludan desde el escenario y el público no para de aplaudir. Gracias a vosotros, el Circo de los Calcetines Locos podrá actuar muchas noches más.",
+      "celebrationTip": "Haced una reverencia final con las marionetas y entregad las entradas de honor a cada artista."
+    }
+  },
+  {
+    "id": "detectives-museo",
+    "title": "Detectives del museo: el diamante azul",
+    "estimatedDurationMinutes": 50,
+    "ageRange": { "min": 8, "max": 12 },
+    "participants": 6,
+    "difficulty": "medium",
+    "tone": "enigmatic",
+    "adventureType": "mystery",
+    "place": "indoor",
+    "materials": [
+      "Una canica o piedra azul (el diamante)",
+      "Un botón, una huella de papel y una nota arrugada",
+      "Ovillo de lana",
+      "Dos o tres sillas",
+      "Lápiz y papel"
+    ],
+    "introduction": {
+      "story": "Anoche, en el museo, desapareció el famoso Diamante Azul. Las cámaras no grabaron nada y solo hay tres sospechosos: la Condesa, el Jardinero y el Guardia. La policía está desconcertada y ha llamado a la mejor agencia de detectives de la ciudad: la vuestra.",
+      "setupForParents": "Prepara la «escena del crimen» con tres pruebas (un botón, una huella de papel y una nota arrugada). Esconde el diamante bajo una mesa y crea un laberinto de lana entre sillas delante. Imprime las tarjetas y déjalas en los lugares indicados."
+    },
+    "missions": [
+      {
+        "order": 1,
+        "title": "La escena del crimen",
+        "story": "Detectives, la vitrina está vacía. Antes de tocar nada, examinad la sala con lupa: el ladrón siempre deja algo atrás. Encontrad las tres pruebas y apuntad dónde estaba cada una.",
+        "parentGuide": "Coloca el botón, la huella y la nota en sitios discretos de la sala. La nota arrugada es la tarjeta de la misión 2.",
+        "successCondition": "Encuentran las tres pruebas y anotan dónde estaban.",
+        "challenge": {
+          "type": "search",
+          "description": "Encontrar las tres pruebas de la escena del crimen y apuntar dónde estaba cada una.",
+          "solution": "Un botón, una huella de papel y una nota arrugada con las declaraciones de los sospechosos."
+        },
+        "hints": ["Una prueba está a la altura del suelo.", "La nota está arrugada, como si alguien la tirase con prisa."],
+        "clueCards": [
+          {
+            "text": "Declaraciones. CONDESA: «El ladrón es el Guardia». JARDINERO: «Yo no soy el ladrón». GUARDIA: «La Condesa miente». Solo uno de los tres dice la verdad.",
+            "hidingSpot": "Arrugada, en un rincón de la sala (es una de las tres pruebas)"
+          }
+        ],
+        "materials": ["Un botón, una huella de papel y una nota arrugada", "Lápiz y papel"],
+        "ageAdaptations": {
+          "younger": "Deja las pruebas más a la vista.",
+          "older": "Que dibujen un plano de la sala marcando cada prueba."
+        },
+        "estimatedMinutes": 10
+      },
+      {
+        "order": 2,
+        "title": "El interrogatorio",
+        "story": "La nota arrugada recoge lo que dijo cada sospechoso. Pero ojo: solo uno de ellos dice la verdad. Razonad como auténticos detectives y descubrid quién se llevó el diamante.",
+        "parentGuide": "Deja que discutan en grupo. Si se atascan, propón probar sospechoso por sospechoso: «Si el ladrón fuera la Condesa, ¿cuántos dirían la verdad?». Al acertar, entrega la tarjeta de la misión 3.",
+        "successCondition": "Deducen que el ladrón es el Jardinero y explican por qué.",
+        "challenge": {
+          "type": "puzzle",
+          "description": "Con las declaraciones de la nota, y sabiendo que solo uno dice la verdad, descubrir quién es el ladrón.",
+          "solution": "El Jardinero. Si fuera él, la Condesa y el Jardinero mentirían y solo el Guardia diría la verdad. Con cualquier otro culpable habría dos verdades."
+        },
+        "hints": [
+          "Probad uno a uno: imaginad que el ladrón es la Condesa y contad cuántos dicen la verdad.",
+          "Solo hay un culpable con el que exactamente uno dice la verdad."
+        ],
+        "clueCards": [
+          {
+            "text": "Mensaje cifrado del Jardinero: CBKP MB NFTB. Cada letra es la siguiente del abecedario: para leerlo, usa la anterior.",
+            "hidingSpot": "La entrega quien dirige el juego al resolver el interrogatorio"
+          }
+        ],
+        "materials": ["Lápiz y papel"],
+        "ageAdaptations": {
+          "younger": "Haz una tabla con los tres sospechosos y marcad juntos verdad o mentira.",
+          "older": "Que redacten el informe del caso explicando su razonamiento."
+        },
+        "estimatedMinutes": 15
+      },
+      {
+        "order": 3,
+        "title": "El mensaje del jardinero",
+        "story": "En el bolsillo del Jardinero hay un papel con letras sin sentido. Seguro que es la pista del escondite. Descifradlo antes de que se lo lleve un cómplice.",
+        "parentGuide": "Deja papel y lápiz. Si cuesta, escribe el abecedario en una tira para que puedan contar hacia atrás.",
+        "successCondition": "Descifran «BAJO LA MESA».",
+        "challenge": {
+          "type": "cipher",
+          "description": "Descifrar CBKP MB NFTB cambiando cada letra por la anterior del abecedario.",
+          "solution": "BAJO LA MESA."
+        },
+        "hints": ["La C se convierte en B.", "La primera palabra es «BAJO»."],
+        "clueCards": [
+          {
+            "text": "CBKP MB NFTB",
+            "hidingSpot": "Dentro de un sobre en el bolsillo del «Jardinero» (o en una chaqueta colgada)"
+          }
+        ],
+        "materials": ["Lápiz y papel"],
+        "ageAdaptations": {
+          "younger": "Escribe el abecedario con flechas para que solo tengan que mirar la letra de al lado.",
+          "older": "Que cifren un mensaje para el resto del grupo con otro desplazamiento."
+        },
+        "estimatedMinutes": 10
+      },
+      {
+        "order": 4,
+        "title": "El laberinto de láseres",
+        "story": "El diamante está bajo la mesa, ¡pero el ladrón dejó activados los láseres de seguridad! Cruzad el laberinto sin tocar ningún hilo o sonará la alarma.",
+        "parentGuide": "Ata lana entre sillas a distintas alturas delante de la mesa. Si alguien toca un hilo, haz el sonido de la alarma y que vuelva a empezar. Supervisa que no tropiecen.",
+        "successCondition": "Un detective atraviesa el laberinto y recupera el diamante sin tocar la lana.",
+        "challenge": {
+          "type": "physical",
+          "description": "Atravesar el laberinto de lana sin tocar ningún hilo para llegar bajo la mesa.",
+          "solution": "Pasar agachándose y por encima de los hilos con calma; el equipo puede guiar con instrucciones."
+        },
+        "hints": ["Despacio se llega antes.", "Que un compañero os guíe con la voz."],
+        "clueCards": [
+          {
+            "text": "Diamante Azul recuperado. La agencia de detectives cierra el caso con éxito.",
+            "hidingSpot": "Junto al diamante, bajo la mesa"
+          }
+        ],
+        "materials": ["Una canica o piedra azul (el diamante)", "Ovillo de lana", "Dos o tres sillas"],
+        "ageAdaptations": {
+          "younger": "Pon pocos hilos y bajos.",
+          "older": "Que crucen con los ojos tapados guiados solo por la voz de un compañero."
+        },
+        "estimatedMinutes": 15
+      }
+    ],
+    "conclusion": {
+      "story": "El Diamante Azul brilla de nuevo en su vitrina. El Jardinero confiesa: quería verlo de cerca y se le complicó el plan. El director del museo os da las gracias: sin vuestra lógica y vuestro valor, el caso seguiría abierto.",
+      "celebrationTip": "Entregad a cada detective un carné de la agencia y dejad que cuenten el caso, paso a paso, a alguien de la familia."
+    }
   }
 ]

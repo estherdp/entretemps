@@ -1,33 +1,7 @@
-import templates from '@/data/templates/examples.json'
-import type { AdventureType, Place } from '@/domain/wizard-data'
+import type { ITemplateRepository } from '@/domain/repositories'
+import type { AdventureType, Difficulty, Place } from '@/domain/wizard-data'
 
-/**
- * Tipo para las plantillas en el JSON.
- * Incluye campos adicionales que no están en GeneratedAdventurePack.
- */
-interface TemplateJSON {
-  id: string
-  title: string
-  imageUrl?: string
-  estimatedDurationMinutes: number
-  ageRange: { min: number; max: number }
-  participants: number
-  difficulty: string
-  tone: string
-  adventureType: string
-  place: string
-  materials: string[]
-  introduction: {
-    story: string
-    setupForParents: string
-  }
-  missions: Array<{
-    order: number
-    title: string
-    story: string
-  }>
-}
-
+/** Datos mínimos de una plantilla para pintarla en un listado. */
 export interface TemplateListItem {
   id: string
   title: string
@@ -35,17 +9,17 @@ export interface TemplateListItem {
   ageRange: { min: number; max: number }
   adventureType: AdventureType
   place: Place
-  image?: { url: string }
+  difficulty: Difficulty
 }
 
-export function listTemplates(): TemplateListItem[] {
-  return (templates as TemplateJSON[]).map((template) => ({
+export function listTemplates(repository: ITemplateRepository): TemplateListItem[] {
+  return repository.list().map((template) => ({
     id: template.id,
     title: template.title,
     estimatedDurationMinutes: template.estimatedDurationMinutes,
     ageRange: template.ageRange,
-    adventureType: template.adventureType as AdventureType,
-    place: template.place as Place,
-    image: template.imageUrl ? { url: template.imageUrl } : undefined,
+    adventureType: template.adventureType,
+    place: template.place,
+    difficulty: template.difficulty,
   }))
 }

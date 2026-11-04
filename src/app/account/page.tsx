@@ -54,11 +54,11 @@ function ProfileForm({ user }: { user: User }) {
       </div>
       <dl className="grid gap-1 text-sm">
         <div className="flex gap-2">
-          <dt className="text-ink-soft">Email:</dt>
-          <dd className="font-bold">{user.email}</dd>
+          <dt className="shrink-0 text-ink-soft">Email:</dt>
+          <dd className="min-w-0 break-all font-bold">{user.email}</dd>
         </div>
         <div className="flex gap-2">
-          <dt className="text-ink-soft">Acceso con:</dt>
+          <dt className="shrink-0 text-ink-soft">Acceso con:</dt>
           <dd className="font-bold">{user.provider === 'google' ? 'Google' : 'Enlace por email'}</dd>
         </div>
       </dl>

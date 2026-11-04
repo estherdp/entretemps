@@ -117,7 +117,7 @@ describe('PackResultPage', () => {
     // Valores numéricos divididos en elementos separados (número + etiqueta en <span>)
     expect(screen.getByText('Edades')).toBeInTheDocument()
     expect(screen.getByText('Duración')).toBeInTheDocument()
-    expect(screen.getByText('Participantes')).toBeInTheDocument()
+    expect(screen.getByText('Jugadores')).toBeInTheDocument()
     expect(screen.getByText('Fácil')).toBeInTheDocument()
   })
 

@@ -271,7 +271,7 @@ describe('MissionCard', () => {
       expect(badge).toBeInTheDocument()
     })
 
-    it('should display mission title with truncation classes', () => {
+    it('should display the full mission title without clamping it', () => {
       const { container } = render(
         <DndContext>
           <MissionCard {...defaultProps} />
@@ -281,8 +281,8 @@ describe('MissionCard', () => {
       const title = screen.getByText('Test Mission')
       expect(title).toBeInTheDocument()
 
-      // Check for truncation classes
-      expect(title.className).toContain('line-clamp-2')
+      // El título se lee entero: puede ocupar varias líneas, nunca se recorta
+      expect(title.className).not.toMatch(/line-clamp|truncate/)
     })
   })
 })

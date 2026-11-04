@@ -2,10 +2,12 @@
 
 import { useEffect, useMemo } from 'react'
 import { useRouter, useParams } from 'next/navigation'
-import { Printer, Save } from 'lucide-react'
+import { LogIn, Printer, Save } from 'lucide-react'
 import { Button } from '@/ui/components/button'
 import { getTemplateById } from '@/application/get-template-by-id'
 import { useSaveTemplateAsMyPack } from '@/ui/hooks/use-save-template'
+import { useRepositories } from '@/ui/providers/repository-provider'
+import { useAuth } from '@/ui/hooks/use-auth'
 import type { GeneratedAdventurePack } from '@/domain/generated-adventure-pack'
 import {
   AdventureHero,
@@ -22,8 +24,13 @@ import {
 export default function TemplateDetailPage() {
   const router = useRouter()
   const params = useParams()
+  const { templateRepository } = useRepositories()
+  const { user } = useAuth()
   // Las plantillas son datos estáticos: se resuelven al renderizar
-  const pack: GeneratedAdventurePack | null = useMemo(() => getTemplateById(params.id as string), [params.id])
+  const pack: GeneratedAdventurePack | null = useMemo(
+    () => getTemplateById(params.id as string, templateRepository),
+    [params.id, templateRepository]
+  )
   
   const { saveTemplate, isSaving, error: saveError } = useSaveTemplateAsMyPack()
 
@@ -36,14 +43,12 @@ export default function TemplateDetailPage() {
     if (!pack) return
 
     const savedPack = await saveTemplate(pack)
-    
     if (savedPack) {
       router.push(`/my-adventures/${savedPack.id}`)
-    } else if (!saveError) {
-      // Si no hay pack ni error explícito, probablemente necesita auth
-      router.push('/login')
     }
   }
+
+  const loginHref = `/login?next=${encodeURIComponent(`/templates/${params.id as string}`)}`
 
   if (!pack) {
     return (
@@ -58,13 +63,19 @@ export default function TemplateDetailPage() {
     <AdventurePage>
       <AdventureHero
         pack={pack}
-        kicker="Plantilla lista para jugar"
+        kicker={user ? 'Plantilla lista para jugar' : 'Prueba gratis · sin registro'}
         title={<h1 className="text-4xl leading-[1.05] md:text-6xl">{pack.title}</h1>}
         actions={
           <>
-            <Button onClick={handleSaveAsMyPack} disabled={isSaving}>
-              <Save /> {isSaving ? 'Guardando...' : 'Guardar en mis aventuras'}
-            </Button>
+            {user ? (
+              <Button onClick={handleSaveAsMyPack} disabled={isSaving}>
+                <Save /> {isSaving ? 'Guardando...' : 'Guardar en mis aventuras'}
+              </Button>
+            ) : (
+              <Button onClick={() => router.push(loginHref)}>
+                <LogIn /> Entra para guardarla
+              </Button>
+            )}
             <Button onClick={() => window.print()} variant="outline">
               <Printer /> Imprimir pack
             </Button>

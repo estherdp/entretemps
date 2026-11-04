@@ -17,3 +17,13 @@ export const DISPLAY_NAME_MAX_LENGTH = 40
 export function getUserGreetingName(user: User): string {
   return user.displayName?.trim() || user.email.split('@')[0]
 }
+
+/**
+ * Primera palabra del nombre de saludo, para espacios pequeños (la barra
+ * de navegación). Así se muestra una palabra entera en vez de un nombre
+ * largo recortado con puntos suspensivos.
+ */
+export function getUserShortName(user: User): string {
+  const greeting = getUserGreetingName(user)
+  return greeting.split(/[\s._-]+/).find(Boolean) ?? greeting
+}

@@ -5,7 +5,7 @@
 // la lógica de cada página vive en la propia página.
 
 import type { ReactNode } from 'react'
-import { Check, Clock, Gauge, Users } from 'lucide-react'
+import { Check, Clock, Gauge, Smile, Users } from 'lucide-react'
 import type { GeneratedAdventurePack, GeneratedAdventurePackMission } from '@/domain/generated-adventure-pack'
 import { AdventureIllustration } from '@/ui/components/adventure-illustration'
 import { MissionPlayDetails } from '@/ui/components/mission-play-details'
@@ -31,7 +31,7 @@ export function AdventureHero({ pack, kicker, title, actions }: AdventureHeroPro
   const stats = [
     { icon: Users, label: 'Edades', value: `${pack.ageRange.min}-${pack.ageRange.max}`, unit: 'años' },
     { icon: Clock, label: 'Duración', value: `${pack.estimatedDurationMinutes}`, unit: 'min' },
-    { icon: Users, label: 'Participantes', value: `${pack.participants}`, unit: 'niños' },
+    { icon: Smile, label: 'Jugadores', value: `${pack.participants}`, unit: 'niños' },
     { icon: Gauge, label: 'Dificultad', value: DIFFICULTY_LABELS[pack.difficulty], unit: '' },
   ]
 
@@ -53,12 +53,12 @@ export function AdventureHero({ pack, kicker, title, actions }: AdventureHeroPro
             </span>
           ))}
         </div>
-        <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <dl className="grid grid-cols-[repeat(auto-fit,minmax(9rem,1fr))] gap-3">
           {stats.map(({ icon: Icon, label, value, unit }) => (
-            <div key={label} className="rounded-xl border-2 border-ink bg-card px-3 py-2.5">
-              <dt className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-ink-soft">
-                <Icon className="h-3.5 w-3.5" aria-hidden="true" />
-                {label}
+            <div key={label} className="min-w-0 rounded-xl border-2 border-ink bg-card px-3 py-2.5">
+              <dt className="flex min-w-0 items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-ink-soft">
+                <Icon className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                <span>{label}</span>
               </dt>
               <dd className="mt-0.5 font-display text-xl">
                 {value}

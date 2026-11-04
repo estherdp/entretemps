@@ -6,7 +6,7 @@ import { useState } from 'react'
 import { Menu, X, User, Plus } from 'lucide-react'
 import { Button } from './button'
 import { useAuth } from '@/ui/hooks/use-auth'
-import { getUserGreetingName } from '@/domain/user'
+import { getUserGreetingName, getUserShortName } from '@/domain/user'
 import { cn } from '@/lib/utils'
 
 function CompassLogo() {
@@ -82,7 +82,7 @@ export function Navbar() {
                     <span className="grid h-7 w-7 place-items-center rounded-full bg-ink text-paper">
                       <User className="h-4 w-4" />
                     </span>
-                    <span className="max-w-[140px] truncate">{getUserGreetingName(user)}</span>
+                    <span>{getUserShortName(user)}</span>
                   </Link>
                 </>
               ) : (

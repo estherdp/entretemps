@@ -6,7 +6,7 @@
 import { listTemplates, type TemplateListItem } from './list-templates'
 import { listMyAdventurePacks } from './list-my-adventure-packs'
 import type { IAuthService } from '@/domain/services'
-import type { IAdventurePackRepository } from '@/domain/repositories'
+import type { IAdventurePackRepository, ITemplateRepository } from '@/domain/repositories'
 import type { SavedAdventurePack } from '@/domain/saved-adventure-pack'
 
 export interface HomeData {
@@ -18,10 +18,11 @@ export interface HomeData {
 export async function loadHomeData(
   authService: IAuthService,
   repository: IAdventurePackRepository,
+  templateRepository: ITemplateRepository,
   maxAdventures = 6
 ): Promise<HomeData> {
   // Cargar plantillas (siempre disponibles)
-  const templates = listTemplates()
+  const templates = listTemplates(templateRepository)
 
   // Cargar aventuras del usuario si está autenticado
   let myAdventures: SavedAdventurePack[] = []

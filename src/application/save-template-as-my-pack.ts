@@ -7,9 +7,10 @@ export async function saveTemplateAsMyPack(
   pack: GeneratedAdventurePack,
   repository: IAdventurePackRepository
 ): Promise<SavedAdventurePack> {
+  // La copia es una aventura nueva del usuario: id propio y fecha de hoy
   return repository.save({
     userId,
     title: pack.title,
-    pack,
+    pack: { ...pack, id: crypto.randomUUID(), createdAt: new Date().toISOString() },
   })
 }

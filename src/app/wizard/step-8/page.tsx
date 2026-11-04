@@ -89,8 +89,8 @@ export default function Step8Page() {
           <dl className="grid gap-x-8 sm:grid-cols-2">
             {summary.map(([label, value]) => (
               <div key={label} className="flex items-baseline justify-between gap-4 border-b-2 border-dashed border-ink/20 py-3">
-                <dt className="font-hand text-xl text-ink-soft">{label}</dt>
-                <dd className="text-right font-bold">{value}</dd>
+                <dt className="shrink-0 font-hand text-xl text-ink-soft">{label}</dt>
+                <dd className="min-w-0 break-words text-right font-bold">{value}</dd>
               </div>
             ))}
           </dl>

@@ -88,7 +88,7 @@ export function MissionCard({
 
         <MissionStamp order={mission.order} className="h-12 w-12 text-2xl" />
 
-        <h3 className="line-clamp-2 min-w-0 flex-1 text-xl leading-tight md:text-2xl">{mission.title}</h3>
+        <h3 className="min-w-0 flex-1 text-balance text-xl leading-tight md:text-2xl">{mission.title}</h3>
 
         <Button
           onClick={() => setIsExpanded(!isExpanded)}

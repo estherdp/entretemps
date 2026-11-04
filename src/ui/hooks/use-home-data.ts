@@ -10,7 +10,7 @@ import { useRepositories } from '@/ui/providers/repository-provider'
 import { useAuth } from './use-auth'
 
 export function useHomeData(maxAdventures = 6) {
-  const { authService, adventurePackRepository } = useRepositories()
+  const { authService, adventurePackRepository, templateRepository } = useRepositories()
   const { user } = useAuth() // Listen to auth changes
   const [data, setData] = useState<HomeData>({
     templates: [],
@@ -26,6 +26,7 @@ export function useHomeData(maxAdventures = 6) {
         const homeData = await loadHomeData(
           authService,
           adventurePackRepository,
+          templateRepository,
           maxAdventures
         )
         setData(homeData)
@@ -38,7 +39,7 @@ export function useHomeData(maxAdventures = 6) {
 
     load()
     // Reload when user changes (login/logout)
-  }, [authService, adventurePackRepository, maxAdventures, user])
+  }, [authService, adventurePackRepository, templateRepository, maxAdventures, user])
 
   return { data, isLoading }
 }
