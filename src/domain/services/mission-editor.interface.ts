@@ -15,6 +15,7 @@ export interface AdventureContext {
   tone: 'funny' | 'enigmatic' | 'exciting' | 'calm'
   place: 'home' | 'garden' | 'park' | 'indoor' | 'outdoor'
   difficulty: 'easy' | 'medium' | 'hard'
+  narrator?: { name: string; description: string }
   existingMissions?: Array<{
     order: number
     title: string

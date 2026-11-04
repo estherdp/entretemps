@@ -2,7 +2,11 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { GeminiAdapter } from '@/infrastructure/ai/adapters/gemini.adapter'
+import { AIProviderQuotaError } from '@/domain/errors'
 import type { WizardData } from '@/domain/wizard-data'
+import type { AdventureContext } from '@/domain/services'
+import type { GeneratedAdventurePackMission } from '@/domain/generated-adventure-pack'
+import { createAIAdventureOutput, createAIMissionOutput } from '../fixtures/ai-adventure-output'
 
 // Mock del SDK de Google Gemini
 const mockGenerateContent = vi.fn()
@@ -28,531 +32,162 @@ const mockWizardData: WizardData = {
   difficulty: 'medium',
 }
 
-const validAdventurePackJSON = {
-  id: '123e4567-e89b-12d3-a456-426614174000',
-  title: 'Aventura de Prueba',
-  image: {
-    url: 'https://images.unsplash.com/photo-1234567890?w=800',
-    prompt: 'Una aventura mágica',
-  },
-  estimatedDurationMinutes: 60,
+const constraints = { phases: 2, puzzlesPerPhase: 2, screenFree: true }
+
+const mockContext: AdventureContext = {
+  title: 'El Secreto de la Selva Esmeralda',
   ageRange: { min: 6, max: 10 },
-  participants: 4,
-  difficulty: 'medium',
-  tone: 'exciting',
   adventureType: 'adventure',
-  place: 'home',
-  materials: ['Papel', 'Pinturas', 'Tijeras'],
-  introduction: {
-    story: 'Una historia introductoria',
-    setupForParents: 'Instrucciones para padres',
-  },
-  missions: [
-    {
-      order: 1,
-      title: 'Misión 1',
-      story: 'Historia de la misión',
-      parentGuide: 'Guía para padres',
-      successCondition: 'Condición de éxito',
-    },
-    {
-      order: 2,
-      title: 'Misión 2',
-      story: 'Historia de la misión 2',
-      parentGuide: 'Guía para padres 2',
-      successCondition: 'Condición de éxito 2',
-    },
-  ],
-  conclusion: {
-    story: 'Conclusión de la aventura',
-    celebrationTip: 'Tip de celebración',
-  },
-  createdAt: new Date().toISOString(),
+  tone: 'exciting',
+  place: 'garden',
+  difficulty: 'medium',
+  narrator: { name: 'Tucán Tomás', description: 'Un tucán sabio' },
+  existingMissions: [{ order: 1, title: 'El Guardián', story: 'El guardián vigila la entrada' }],
 }
 
-describe('GeminiAdapter - Unit Tests with SDK Mocks', () => {
+const currentMission: GeneratedAdventurePackMission = {
+  order: 2,
+  title: 'La Cascada',
+  story: 'Una cascada mágica',
+  parentGuide: 'Prepara agua',
+  successCondition: 'Cruzan la cascada',
+}
+
+function lastRequest() {
+  return mockGenerateContent.mock.calls[mockGenerateContent.mock.calls.length - 1][0]
+}
+
+describe('GeminiAdapter', () => {
   let adapter: GeminiAdapter
 
   beforeEach(() => {
-    vi.clearAllMocks()
     mockGenerateContent.mockReset()
-    // Crear adapter con API key de prueba
     adapter = new GeminiAdapter('test-api-key', 'gemini-2.5-flash-lite')
   })
 
   describe('Constructor', () => {
     it('should throw error if GEMINI_API_KEY is not provided', () => {
-      expect(() => {
-        new GeminiAdapter(undefined, 'gemini-2.5-flash-lite')
-      }).toThrow('GEMINI_API_KEY no configurada')
-    })
-
-    it('should accept API key as parameter', () => {
-      expect(() => {
-        new GeminiAdapter('test-key')
-      }).not.toThrow()
-    })
-
-    it('should use custom temperature and maxTokens when provided', () => {
-      const customAdapter = new GeminiAdapter('test-key', 'gemini-2.5-flash-lite', 0.5, 2000)
-      expect(customAdapter).toBeDefined()
-    })
-
-    it('should use default temperature and maxTokens when not provided', () => {
-      const defaultAdapter = new GeminiAdapter('test-key')
-      expect(defaultAdapter).toBeDefined()
+      const original = process.env.GEMINI_API_KEY
+      delete process.env.GEMINI_API_KEY
+      expect(() => new GeminiAdapter()).toThrow('GEMINI_API_KEY no configurada')
+      process.env.GEMINI_API_KEY = original
     })
   })
 
-  describe('generateAdventure - Success Cases', () => {
-    it('should parse and validate valid JSON response', async () => {
-      // Mockear respuesta válida
-      mockGenerateContent.mockResolvedValue({
-        text: JSON.stringify(validAdventurePackJSON),
-      })
+  describe('generateAdventure', () => {
+    it('should return a pack with generated id, createdAt and playable missions', async () => {
+      mockGenerateContent.mockResolvedValue({ text: JSON.stringify(createAIAdventureOutput(2)) })
 
-      const result = await adapter.generateAdventure(mockWizardData, 'es', {
-        phases: 2,
-        puzzlesPerPhase: 2,
-        screenFree: true,
-      })
+      const pack = await adapter.generateAdventure(mockWizardData, 'es', constraints)
 
-      expect(result).toBeDefined()
-      expect(result.id).toBe(validAdventurePackJSON.id)
-      expect(result.title).toBe(validAdventurePackJSON.title)
-      expect(result.missions).toHaveLength(2)
-      expect(mockGenerateContent).toHaveBeenCalledTimes(1)
+      expect(pack.id).toMatch(/^[0-9a-f-]{36}$/)
+      expect(pack.createdAt).toBeTruthy()
+      expect(pack.image).toBeUndefined()
+      expect(pack.narrator?.name).toBe('Tucán Tomás')
+      expect(pack.missions).toHaveLength(2)
+      expect(pack.missions[0].challenge?.solution).toBe('Solución 1')
+      expect(pack.missions[0].clueCards?.[0].hidingSpot).toBe('Debajo del cojín')
     })
 
-    it('should clean markdown fences from response', async () => {
-      const jsonWithMarkdown = `\`\`\`json
-${JSON.stringify(validAdventurePackJSON)}
-\`\`\``
+    it('should request structured JSON output with the adventure schema', async () => {
+      mockGenerateContent.mockResolvedValue({ text: JSON.stringify(createAIAdventureOutput(2)) })
 
-      mockGenerateContent.mockResolvedValue({
-        text: jsonWithMarkdown,
-      })
+      await adapter.generateAdventure(mockWizardData, 'es', constraints)
 
-      const result = await adapter.generateAdventure(mockWizardData, 'es', {
-        phases: 2,
-        puzzlesPerPhase: 2,
-        screenFree: true,
-      })
-
-      expect(result).toBeDefined()
-      expect(result.id).toBe(validAdventurePackJSON.id)
+      const { config, model } = lastRequest()
+      expect(model).toBe('gemini-2.5-flash-lite')
+      expect(config.responseMimeType).toBe('application/json')
+      expect(config.responseJsonSchema).toMatchObject({ type: 'object' })
+      expect(config.responseJsonSchema.$schema).toBeUndefined()
+      expect(config.responseJsonSchema.required).toContain('missions')
     })
 
-    it('should extract JSON between first { and last }', async () => {
-      const textWithExtraContent = `Aquí está tu aventura:
-${JSON.stringify(validAdventurePackJSON)}
-Espero que te guste!`
+    it('should include wizard data and constraints in the prompt', async () => {
+      mockGenerateContent.mockResolvedValue({ text: JSON.stringify(createAIAdventureOutput(2)) })
 
-      mockGenerateContent.mockResolvedValue({
-        text: textWithExtraContent,
-      })
+      await adapter.generateAdventure(mockWizardData, 'es', constraints)
 
-      const result = await adapter.generateAdventure(mockWizardData, 'es', {
-        phases: 2,
-        puzzlesPerPhase: 2,
-        screenFree: true,
-      })
-
-      expect(result).toBeDefined()
-      expect(result.title).toBe(validAdventurePackJSON.title)
+      const { contents } = lastRequest()
+      expect(contents).toContain('naturaleza, aventuras')
+      expect(contents).toContain('6-10 años')
+      expect(contents).toContain('Exactamente 2 misiones')
+      expect(contents).toContain('español')
     })
 
-    it('should add createdAt if missing', async () => {
-      const packWithoutCreatedAt = { ...validAdventurePackJSON }
-      delete (packWithoutCreatedAt as Partial<typeof validAdventurePackJSON>).createdAt
+    it('should throw when the response misses playable fields', async () => {
+      const output = createAIAdventureOutput(1) as unknown as Record<string, unknown>
+      const missions = output.missions as Array<Record<string, unknown>>
+      delete missions[0].challenge
+      mockGenerateContent.mockResolvedValue({ text: JSON.stringify(output) })
 
-      mockGenerateContent.mockResolvedValue({
-        text: JSON.stringify(packWithoutCreatedAt),
-      })
-
-      const result = await adapter.generateAdventure(mockWizardData, 'es', {
-        phases: 2,
-        puzzlesPerPhase: 2,
-        screenFree: true,
-      })
-
-      expect(result.createdAt).toBeDefined()
-      expect(typeof result.createdAt).toBe('string')
-    })
-  })
-
-  describe('generateAdventure - Error Cases', () => {
-    it('should throw error if response has no text', async () => {
-      mockGenerateContent.mockResolvedValue({
-        text: undefined,
-      })
-
-      await expect(
-        adapter.generateAdventure(mockWizardData, 'es', {
-          phases: 2,
-          puzzlesPerPhase: 2,
-          screenFree: true,
-        })
-      ).rejects.toThrow('La respuesta de Gemini no contiene texto')
+      await expect(adapter.generateAdventure(mockWizardData, 'es', constraints)).rejects.toThrow(
+        'Validación falló'
+      )
     })
 
-    it('should throw error if response is not valid JSON', async () => {
-      mockGenerateContent.mockResolvedValue({
-        text: 'This is not JSON at all',
-      })
+    it('should throw when the response is truncated JSON', async () => {
+      mockGenerateContent.mockResolvedValue({ text: '{"title": "Aventura' })
 
-      await expect(
-        adapter.generateAdventure(mockWizardData, 'es', {
-          phases: 2,
-          puzzlesPerPhase: 2,
-          screenFree: true,
-        })
-      ).rejects.toThrow('No se encontró un JSON válido')
+      await expect(adapter.generateAdventure(mockWizardData, 'es', constraints)).rejects.toThrow(
+        '¿respuesta truncada?'
+      )
     })
 
-    it('should throw error if JSON is malformed', async () => {
-      mockGenerateContent.mockResolvedValue({
-        text: '{ "id": "123", "title": "Test", invalid json }',
-      })
+    it('should throw when the response is empty', async () => {
+      mockGenerateContent.mockResolvedValue({ text: undefined })
 
-      await expect(
-        adapter.generateAdventure(mockWizardData, 'es', {
-          phases: 2,
-          puzzlesPerPhase: 2,
-          screenFree: true,
-        })
-      ).rejects.toThrow('Error al parsear JSON')
+      await expect(adapter.generateAdventure(mockWizardData, 'es', constraints)).rejects.toThrow(
+        'no contiene texto'
+      )
     })
 
-    it('should throw error if Zod validation fails', async () => {
-      const invalidPack = {
-        id: 'not-a-uuid',
-        title: 'Test',
-        // Faltan campos requeridos
-      }
+    it('should translate HTTP 429 into AIProviderQuotaError', async () => {
+      mockGenerateContent.mockRejectedValue(Object.assign(new Error('Too many requests'), { status: 429 }))
 
-      mockGenerateContent.mockResolvedValue({
-        text: JSON.stringify(invalidPack),
-      })
-
-      await expect(
-        adapter.generateAdventure(mockWizardData, 'es', {
-          phases: 2,
-          puzzlesPerPhase: 2,
-          screenFree: true,
-        })
-      ).rejects.toThrow('Validación falló')
+      await expect(adapter.generateAdventure(mockWizardData, 'es', constraints)).rejects.toBeInstanceOf(
+        AIProviderQuotaError
+      )
     })
 
-    it('should throw error if SDK throws error', async () => {
-      mockGenerateContent.mockRejectedValue(new Error('API quota exceeded'))
+    it('should wrap other SDK errors', async () => {
+      mockGenerateContent.mockRejectedValue(new Error('Network down'))
 
-      await expect(
-        adapter.generateAdventure(mockWizardData, 'es', {
-          phases: 2,
-          puzzlesPerPhase: 2,
-          screenFree: true,
-        })
-      ).rejects.toThrow('Error al generar aventura con Gemini: API quota exceeded')
-    })
-  })
-
-  describe('Prompt Building', () => {
-    it('should include wizard data in the request', async () => {
-      mockGenerateContent.mockResolvedValue({
-        text: JSON.stringify(validAdventurePackJSON),
-      })
-
-      await adapter.generateAdventure(mockWizardData, 'es', {
-        phases: 3,
-        puzzlesPerPhase: 2,
-        screenFree: true,
-      })
-
-      const callArgs = mockGenerateContent.mock.calls[0][0]
-      expect(callArgs.model).toBe('gemini-2.5-flash-lite')
-      expect(callArgs.contents).toContain('birthday')
-      expect(callArgs.contents).toContain('6-10 años')
-      expect(callArgs.contents).toContain('naturaleza, aventuras')
-      expect(callArgs.contents).toContain('español')
-    })
-
-    it('should respect constraints in prompt', async () => {
-      mockGenerateContent.mockResolvedValue({
-        text: JSON.stringify(validAdventurePackJSON),
-      })
-
-      await adapter.generateAdventure(mockWizardData, 'es', {
-        phases: 5,
-        puzzlesPerPhase: 3,
-        screenFree: false,
-      })
-
-      const callArgs = mockGenerateContent.mock.calls[0][0]
-      expect(callArgs.contents).toContain('5')
-      expect(callArgs.contents).toContain('EXACTAMENTE 5 misiones')
-    })
-
-    it('should apply cost control parameters (temperature and maxTokens)', async () => {
-      mockGenerateContent.mockResolvedValue({
-        text: JSON.stringify(validAdventurePackJSON),
-      })
-
-      await adapter.generateAdventure(mockWizardData, 'es', {
-        phases: 3,
-        puzzlesPerPhase: 2,
-        screenFree: true,
-      })
-
-      const callArgs = mockGenerateContent.mock.calls[0][0]
-      expect(callArgs.config).toBeDefined()
-      expect(callArgs.config.temperature).toBe(0.7)
-      // El adapter usa defaults o lee de process.env
-      // En tests, el default es 2500 según la configuración actual
-      expect(callArgs.config.maxOutputTokens).toBe(2500)
-      expect(callArgs.config.responseMimeType).toBe('application/json')
-    })
-
-    it('should use custom temperature and maxTokens when provided', async () => {
-      const customAdapter = new GeminiAdapter('test-key', 'gemini-2.5-flash-lite', 0.3, 2000)
-
-      mockGenerateContent.mockResolvedValue({
-        text: JSON.stringify(validAdventurePackJSON),
-      })
-
-      await customAdapter.generateAdventure(mockWizardData, 'es', {
-        phases: 3,
-        puzzlesPerPhase: 2,
-        screenFree: true,
-      })
-
-      const callArgs = mockGenerateContent.mock.calls[0][0]
-      expect(callArgs.config.temperature).toBe(0.3)
-      expect(callArgs.config.maxOutputTokens).toBe(2000)
+      await expect(adapter.generateAdventure(mockWizardData, 'es', constraints)).rejects.toThrow(
+        'Error al llamar a Gemini: Network down'
+      )
     })
   })
 
   describe('regenerateSingleMission', () => {
-    const mockContext = {
-      title: 'La Aventura del Tesoro',
-      ageRange: { min: 6, max: 10 },
-      adventureType: 'adventure' as const,
-      tone: 'exciting' as const,
-      place: 'home' as const,
-      difficulty: 'medium' as const,
-      existingMissions: [
-        {
-          order: 1,
-          title: 'Encuentra el mapa',
-          story: 'Historia de la misión 1',
-        },
-        {
-          order: 3,
-          title: 'Descubre el tesoro',
-          story: 'Historia de la misión 3',
-        },
-      ],
-    }
+    it('should return the regenerated mission keeping the original order', async () => {
+      mockGenerateContent.mockResolvedValue({ text: JSON.stringify(createAIMissionOutput(7)) })
 
-    const mockCurrentMission = {
-      order: 2,
-      title: 'Descifra las pistas',
-      story: 'Historia de la misión 2',
-      parentGuide: 'Guía para padres',
-      successCondition: 'Resolver el acertijo',
-    }
+      const mission = await adapter.regenerateSingleMission(mockContext, currentMission, undefined, 'es')
 
-    const validMissionJSON = {
-      order: 2,
-      title: 'Descifra las pistas mejoradas',
-      story: 'Nueva historia de la misión 2',
-      parentGuide: 'Nueva guía para padres',
-      successCondition: 'Resolver el nuevo acertijo',
-    }
-
-    it('should regenerate a mission successfully', async () => {
-      mockGenerateContent.mockResolvedValue({
-        text: JSON.stringify(validMissionJSON),
-      })
-
-      const result = await adapter.regenerateSingleMission(
-        mockContext,
-        mockCurrentMission,
-        undefined,
-        'es'
-      )
-
-      expect(result).toEqual(validMissionJSON)
-      expect(mockGenerateContent).toHaveBeenCalledTimes(1)
-
-      const callArgs = mockGenerateContent.mock.calls[0][0]
-      expect(callArgs.config.responseMimeType).toBe('application/json')
-      expect(callArgs.config.maxOutputTokens).toBe(1500) // Menos tokens para una sola misión
+      expect(mission.order).toBe(2)
+      expect(mission.challenge).toBeDefined()
+      expect(lastRequest().config.responseJsonSchema.required).toContain('challenge')
     })
 
-    it('should include context in the prompt', async () => {
-      mockGenerateContent.mockResolvedValue({
-        text: JSON.stringify(validMissionJSON),
-      })
+    it('should include context, other missions and feedback in the prompt', async () => {
+      mockGenerateContent.mockResolvedValue({ text: JSON.stringify(createAIMissionOutput(2)) })
 
-      await adapter.regenerateSingleMission(
-        mockContext,
-        mockCurrentMission,
-        undefined,
-        'es'
-      )
+      await adapter.regenerateSingleMission(mockContext, currentMission, 'Que sea más corta', 'en')
 
-      const callArgs = mockGenerateContent.mock.calls[0][0]
-      const prompt = callArgs.contents
-
-      expect(prompt).toContain('La Aventura del Tesoro')
-      expect(prompt).toContain('6-10 años')
-      expect(prompt).toContain('adventure')
-      expect(prompt).toContain('exciting')
-      expect(prompt).toContain('home')
-      expect(prompt).toContain('medium')
+      const { contents } = lastRequest()
+      expect(contents).toContain('El Secreto de la Selva Esmeralda')
+      expect(contents).toContain('Tucán Tomás')
+      expect(contents).toContain('El Guardián')
+      expect(contents).toContain('Que sea más corta')
+      expect(contents).toContain('inglés')
     })
 
-    it('should include existing missions in the prompt for coherence', async () => {
-      mockGenerateContent.mockResolvedValue({
-        text: JSON.stringify(validMissionJSON),
-      })
-
-      await adapter.regenerateSingleMission(
-        mockContext,
-        mockCurrentMission,
-        undefined,
-        'es'
-      )
-
-      const callArgs = mockGenerateContent.mock.calls[0][0]
-      const prompt = callArgs.contents
-
-      expect(prompt).toContain('Encuentra el mapa')
-      expect(prompt).toContain('Descubre el tesoro')
-      expect(prompt).toContain('MISIONES EXISTENTES')
-    })
-
-    it('should include feedback in the prompt when provided', async () => {
-      mockGenerateContent.mockResolvedValue({
-        text: JSON.stringify(validMissionJSON),
-      })
-
-      const feedback = 'Hazla más divertida con elementos de humor'
-
-      await adapter.regenerateSingleMission(
-        mockContext,
-        mockCurrentMission,
-        feedback,
-        'es'
-      )
-
-      const callArgs = mockGenerateContent.mock.calls[0][0]
-      const prompt = callArgs.contents
-
-      expect(prompt).toContain(feedback)
-      expect(prompt).toContain('FEEDBACK DEL USUARIO')
-    })
-
-    it('should handle JSON wrapped in markdown code blocks', async () => {
-      mockGenerateContent.mockResolvedValue({
-        text: '```json\n' + JSON.stringify(validMissionJSON) + '\n```',
-      })
-
-      const result = await adapter.regenerateSingleMission(
-        mockContext,
-        mockCurrentMission,
-        undefined,
-        'es'
-      )
-
-      expect(result).toEqual(validMissionJSON)
-    })
-
-    it('should throw error if response is not valid JSON', async () => {
-      mockGenerateContent.mockResolvedValue({
-        text: 'This is not JSON',
-      })
+    it('should translate quota errors when regenerating', async () => {
+      mockGenerateContent.mockRejectedValue(new Error('429 RESOURCE_EXHAUSTED'))
 
       await expect(
-        adapter.regenerateSingleMission(mockContext, mockCurrentMission, undefined, 'es')
-      ).rejects.toThrow('No se encontró un JSON válido')
-    })
-
-    it('should throw error if mission validation fails', async () => {
-      const invalidMission = {
-        order: 2,
-        title: 'Test',
-        // Faltan campos requeridos
-      }
-
-      mockGenerateContent.mockResolvedValue({
-        text: JSON.stringify(invalidMission),
-      })
-
-      await expect(
-        adapter.regenerateSingleMission(mockContext, mockCurrentMission, undefined, 'es')
-      ).rejects.toThrow('Validación de misión falló')
-    })
-
-    it('should correct the order if it does not match expected', async () => {
-      const missionWithWrongOrder = {
-        ...validMissionJSON,
-        order: 5, // Orden incorrecto
-      }
-
-      mockGenerateContent.mockResolvedValue({
-        text: JSON.stringify(missionWithWrongOrder),
-      })
-
-      const result = await adapter.regenerateSingleMission(
-        mockContext,
-        mockCurrentMission,
-        undefined,
-        'es'
-      )
-
-      expect(result.order).toBe(2) // Debe corregir al orden esperado
-    })
-
-    it('should throw error if SDK throws error', async () => {
-      mockGenerateContent.mockRejectedValue(new Error('Network error'))
-
-      await expect(
-        adapter.regenerateSingleMission(mockContext, mockCurrentMission, undefined, 'es')
-      ).rejects.toThrow('Error al regenerar misión con Gemini: Network error')
-    })
-
-    it('should use Spanish language instruction for es locale', async () => {
-      mockGenerateContent.mockResolvedValue({
-        text: JSON.stringify(validMissionJSON),
-      })
-
-      await adapter.regenerateSingleMission(
-        mockContext,
-        mockCurrentMission,
-        undefined,
-        'es'
-      )
-
-      const callArgs = mockGenerateContent.mock.calls[0][0]
-      expect(callArgs.contents).toContain('español')
-    })
-
-    it('should use English language instruction for en locale', async () => {
-      mockGenerateContent.mockResolvedValue({
-        text: JSON.stringify(validMissionJSON),
-      })
-
-      await adapter.regenerateSingleMission(
-        mockContext,
-        mockCurrentMission,
-        undefined,
-        'en'
-      )
-
-      const callArgs = mockGenerateContent.mock.calls[0][0]
-      expect(callArgs.contents).toContain('inglés')
+        adapter.regenerateSingleMission(mockContext, currentMission, undefined, 'es')
+      ).rejects.toBeInstanceOf(AIProviderQuotaError)
     })
   })
 })

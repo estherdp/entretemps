@@ -11,6 +11,9 @@ import { regenerateMission } from '@/application/regenerate-mission'
 import { GeminiAdapter } from '@/infrastructure/ai/adapters/gemini.adapter'
 import { AdventurePackRepository } from '@/infrastructure/supabase/adventure-pack-repository'
 import { getCurrentUserServer, createSupabaseServerClient } from '@/infrastructure/supabase/auth-server'
+import { GenerationUsageRepository } from '@/infrastructure/supabase/generation-usage-repository'
+import { assertGenerationQuota, parseQuotaLimit } from '@/application/generation-quota'
+import { AIProviderQuotaError, UserQuotaExceededError } from '@/domain/errors'
 
 /**
  * POST /api/pack/[id]/regenerate-mission
@@ -33,6 +36,7 @@ import { getCurrentUserServer, createSupabaseServerClient } from '@/infrastructu
  * - 401: No autenticado
  * - 403: No tiene permisos para editar este pack
  * - 404: Pack o misión no encontrada
+ * - 429: Cuota del usuario agotada o límite del proveedor de IA alcanzado
  * - 500: Error interno del servidor
  */
 export async function POST(
@@ -67,6 +71,14 @@ export async function POST(
     const missionEditor = new GeminiAdapter()
     const supabaseServer = await createSupabaseServerClient()
     const repository = new AdventurePackRepository(supabaseServer)
+    const usageRepo = new GenerationUsageRepository(supabaseServer)
+
+    await assertGenerationQuota(
+      user.id,
+      'mission',
+      parseQuotaLimit(process.env.DAILY_MISSION_LIMIT, 20),
+      usageRepo
+    )
 
     // 5. Ejecutar caso de uso
     const regeneratedMission = await regenerateMission(
@@ -79,12 +91,25 @@ export async function POST(
       'es' // TODO: Obtener locale del usuario o request
     )
 
+    await usageRepo.record(user.id, 'mission')
+
     // 6. Retornar éxito
     return NextResponse.json({
       ok: true,
       mission: regeneratedMission,
     })
   } catch (error) {
+    if (error instanceof UserQuotaExceededError) {
+      return NextResponse.json({ ok: false, error: error.message }, { status: 429 })
+    }
+
+    if (error instanceof AIProviderQuotaError) {
+      return NextResponse.json(
+        { ok: false, error: 'La IA ha alcanzado su límite de uso por hoy. Prueba más tarde.' },
+        { status: 429 }
+      )
+    }
+
     console.error('[regenerate-mission] Error:', error)
 
     const errorMessage = error instanceof Error ? error.message : 'Error desconocido'

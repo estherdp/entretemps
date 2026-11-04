@@ -31,7 +31,7 @@ async function testOpenAI() {
   if (result.ok && result.pack) {
     console.log('✅ Aventura generada:', result.pack.title)
     console.log('📊 Misiones:', result.pack.missions.length)
-    console.log('🖼️ Imagen:', result.pack.image.url)
+    console.log('🖼️ Imagen:', result.pack.image?.url)
     if (result.warnings) {
       console.log('⚠️ Warnings:', result.warnings)
     }
@@ -48,7 +48,7 @@ async function testGemini() {
   if (result.ok && result.pack) {
     console.log('✅ Aventura generada:', result.pack.title)
     console.log('📊 Misiones:', result.pack.missions.length)
-    console.log('🖼️ Imagen:', result.pack.image.url)
+    console.log('🖼️ Imagen:', result.pack.image?.url)
   } else {
     console.error('❌ Error:', result.error)
   }
@@ -69,8 +69,8 @@ async function testMultimodal() {
     console.log('✅ Aventura generada:', result.pack.title)
     console.log('📝 Texto generado por:', 'OpenAI')
     console.log('🖼️ Imagen generada por:', 'Nanobanana')
-    console.log('🔗 URL de imagen:', result.pack.image.url)
-    console.log('💬 Prompt de imagen:', result.pack.image.prompt)
+    console.log('🔗 URL de imagen:', result.pack.image?.url)
+    console.log('💬 Prompt de imagen:', result.pack.image?.prompt)
 
     if (result.warnings) {
       console.log('⚠️ Warnings:', result.warnings)
@@ -121,20 +121,20 @@ async function testPexels() {
 
   if (result.ok && result.pack) {
     console.log('✅ Aventura generada:', result.pack.title)
-    console.log('🖼️ Imagen URL:', result.pack.image.url)
-    console.log('📝 Imagen prompt:', result.pack.image.prompt)
+    console.log('🖼️ Imagen URL:', result.pack.image?.url)
+    console.log('📝 Imagen prompt:', result.pack.image?.prompt)
 
     if (result.warnings) {
       console.log('⚠️ Warnings:', result.warnings)
     }
 
     // Verificar origen de la imagen
-    if (result.pack.image.url.includes('pexels.com')) {
+    if (result.pack.image?.url.includes('pexels.com')) {
       console.log('✅ Imagen de Pexels detectada')
-    } else if (result.pack.image.url.includes('placehold.co')) {
+    } else if (result.pack.image?.url.includes('placehold.co')) {
       console.log('⚠️ Usando placeholder (Pexels no encontró imagen o falló)')
     } else {
-      console.log('❓ Imagen de origen desconocido:', result.pack.image.url)
+      console.log('❓ Imagen de origen desconocido:', result.pack.image?.url)
     }
   } else {
     console.error('❌ Error:', result.error)
@@ -158,7 +158,7 @@ async function testPexelsWithFallback() {
 
   if (result.ok && result.pack) {
     console.log('✅ Aventura generada:', result.pack.title)
-    console.log('🖼️ Imagen URL:', result.pack.image.url)
+    console.log('🖼️ Imagen URL:', result.pack.image?.url)
 
     if (result.warnings) {
       console.log('⚠️ Warnings:', result.warnings)

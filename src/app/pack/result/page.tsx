@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/ui/components/card'
 import { Button } from '@/ui/components/button'
 import { Copy, Check, Sparkles, Clock, Users, Target, Package } from 'lucide-react'
 import type { GeneratedAdventurePack } from '@/domain/generated-adventure-pack'
+import { MissionPlayDetails, missionPlayDetailsToText } from '@/ui/components/mission-play-details'
 import {
   ADVENTURE_TYPE_LABELS,
   TONE_LABELS,
@@ -77,6 +78,8 @@ ${m.story}
 ${m.parentGuide}
 
 ✅ Misión completada cuando: ${m.successCondition}
+
+${missionPlayDetailsToText(m)}
 `).join('\n')}
 
 🎉 FINAL DE LA AVENTURA
@@ -119,9 +122,9 @@ Creado con Entretemps el ${new Date(pack.createdAt).toLocaleDateString('es-ES')}
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
       {/* Hero Image */}
       <div className="relative w-full h-64 md:h-96 bg-gradient-to-br from-purple-500/20 to-blue-500/20 overflow-hidden">
-        {pack.image.url ? (
+        {pack.image?.url ? (
           <Image
-            src={pack.image.url}
+            src={pack.image?.url}
             alt={pack.title}
             fill
             className="object-cover"
@@ -141,7 +144,7 @@ Creado con Entretemps el ${new Date(pack.createdAt).toLocaleDateString('es-ES')}
       <div className="max-w-5xl mx-auto px-4 py-12 space-y-10">
         {/* Header con icono mágico */}
         <div className="space-y-6">
-          {pack.image.url && (
+          {pack.image?.url && (
             <div className="flex items-start gap-4">
               <div className="p-3 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10 border border-primary/20 shadow-premium">
                 <Sparkles className="w-8 h-8 text-primary" strokeWidth={1.5} />
@@ -312,6 +315,8 @@ Creado con Entretemps el ${new Date(pack.createdAt).toLocaleDateString('es-ES')}
                       </span>
                     </p>
                   </div>
+
+                  <MissionPlayDetails mission={mission} />
                 </CardContent>
               </Card>
             ))}

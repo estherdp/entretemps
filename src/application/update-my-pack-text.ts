@@ -33,10 +33,9 @@ export async function updateMyPackText(
   }
 
   if (changes.imageUrl !== undefined) {
-    updatedPack.image = {
-      ...updatedPack.image,
-      url: changes.imageUrl,
-    }
+    updatedPack.image = changes.imageUrl
+      ? { prompt: updatedPack.image?.prompt ?? '', url: changes.imageUrl }
+      : undefined
   }
 
   if (changes.introductionStory !== undefined) {

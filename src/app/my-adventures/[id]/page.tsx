@@ -108,7 +108,7 @@ export default function AdventureDetailPage() {
   useEffect(() => {
     if (savedPack) {
       setTitle(savedPack.pack.title)
-      setImageUrl(savedPack.pack.image.url)
+      setImageUrl(savedPack.pack.image?.url ?? '')
       setIntroStory(savedPack.pack.introduction.story)
       setIntroSetupForParents(savedPack.pack.introduction.setupForParents)
       setConclusionStory(savedPack.pack.conclusion.story)
@@ -205,7 +205,7 @@ export default function AdventureDetailPage() {
 
     // Reset to original values
     setTitle(savedPack.pack.title)
-    setImageUrl(savedPack.pack.image.url)
+    setImageUrl(savedPack.pack.image?.url ?? '')
     setIntroStory(savedPack.pack.introduction.story)
     setIntroSetupForParents(savedPack.pack.introduction.setupForParents)
     setConclusionStory(savedPack.pack.conclusion.story)

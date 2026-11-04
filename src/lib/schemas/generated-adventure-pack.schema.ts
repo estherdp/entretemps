@@ -7,20 +7,51 @@ const generatedAdventurePackImageSchema = z.object({
   prompt: z.string(),
 })
 
-const generatedAdventurePackIntroductionSchema = z.object({
+export const generatedAdventurePackIntroductionSchema = z.object({
   story: z.string(),
   setupForParents: z.string(),
 })
 
-const generatedAdventurePackMissionSchema = z.object({
+export const generatedAdventurePackNarratorSchema = z.object({
+  name: z.string(),
+  description: z.string(),
+})
+
+export const missionChallengeSchema = z.object({
+  type: z.enum(['riddle', 'puzzle', 'search', 'physical', 'creative', 'cipher']),
+  description: z.string(),
+  solution: z.string(),
+})
+
+export const missionClueCardSchema = z.object({
+  text: z.string(),
+  hidingSpot: z.string(),
+})
+
+export const missionAgeAdaptationsSchema = z.object({
+  younger: z.string(),
+  older: z.string(),
+})
+
+/**
+ * Misión tal y como se persiste. Los campos jugables son opcionales
+ * para aceptar packs y plantillas creados antes de existir.
+ */
+export const generatedAdventurePackMissionSchema = z.object({
   order: z.number().int().positive(),
   title: z.string(),
   story: z.string(),
   parentGuide: z.string(),
   successCondition: z.string(),
+  challenge: missionChallengeSchema.optional(),
+  hints: z.array(z.string()).optional(),
+  clueCards: z.array(missionClueCardSchema).optional(),
+  materials: z.array(z.string()).optional(),
+  ageAdaptations: missionAgeAdaptationsSchema.optional(),
+  estimatedMinutes: z.number().int().positive().optional(),
 })
 
-const generatedAdventurePackConclusionSchema = z.object({
+export const generatedAdventurePackConclusionSchema = z.object({
   story: z.string(),
   celebrationTip: z.string(),
 })
@@ -28,7 +59,8 @@ const generatedAdventurePackConclusionSchema = z.object({
 export const generatedAdventurePackSchema = z.object({
   id: z.string().uuid().optional(),
   title: z.string(),
-  image: generatedAdventurePackImageSchema,
+  image: generatedAdventurePackImageSchema.optional(),
+  narrator: generatedAdventurePackNarratorSchema.optional(),
   estimatedDurationMinutes: z.number().int().positive(),
   ageRange: z.object({
     min: z.number().int().positive(),

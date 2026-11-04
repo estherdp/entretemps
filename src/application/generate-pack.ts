@@ -3,6 +3,7 @@
 import type { WizardData } from '@/domain/wizard-data'
 import type { GeneratedAdventurePack } from '@/domain/generated-adventure-pack'
 import type { IAdventureProvider } from '@/domain/services'
+import { buildAdventureConstraints } from './adventure-constraints'
 
 interface GeneratePackResult {
   ok: boolean
@@ -30,11 +31,7 @@ export async function generatePack(
   provider: IAdventureProvider
 ): Promise<GeneratePackResult> {
   try {
-    const pack = await provider.generateAdventure(wizardData, 'es', {
-      phases: 3,
-      puzzlesPerPhase: 2,
-      screenFree: true,
-    })
+    const pack = await provider.generateAdventure(wizardData, 'es', buildAdventureConstraints(wizardData))
 
     return { ok: true, pack }
   } catch (error) {

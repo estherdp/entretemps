@@ -9,3 +9,4 @@
 
 export type { IAdventurePackRepository } from './adventure-pack-repository.interface'
 export type { IImageCacheRepository } from './image-cache-repository.interface'
+export type { IGenerationUsageRepository, GenerationKind } from './generation-usage-repository.interface'

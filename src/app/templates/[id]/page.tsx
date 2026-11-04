@@ -7,6 +7,7 @@ import { Button } from '@/ui/components/button'
 import { getTemplateById } from '@/application/get-template-by-id'
 import { useSaveTemplateAsMyPack } from '@/ui/hooks/use-save-template'
 import type { GeneratedAdventurePack } from '@/domain/generated-adventure-pack'
+import { MissionPlayDetails } from '@/ui/components/mission-play-details'
 import {
   ADVENTURE_TYPE_LABELS,
   TONE_LABELS,
@@ -216,6 +217,8 @@ export default function TemplateDetailPage() {
                       {mission.successCondition}
                     </p>
                   </div>
+
+                  <MissionPlayDetails mission={mission} />
                 </CardContent>
               </Card>
             ))}

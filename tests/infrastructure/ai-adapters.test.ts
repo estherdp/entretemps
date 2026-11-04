@@ -1,6 +1,7 @@
 // tests/infrastructure/ai-adapters.test.ts
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { createAIAdventureOutput } from '../fixtures/ai-adventure-output'
 import { OpenAIAdapter, GeminiAdapter, NanobananaAdapter, PollinationsImageAdapter } from '@/infrastructure/ai/adapters'
 import type { WizardData } from '@/domain/wizard-data'
 
@@ -51,8 +52,8 @@ describe('OpenAIAdapter', () => {
 
     // Verificar imagen
     expect(pack.image).toBeDefined()
-    expect(pack.image.url).toBeTruthy()
-    expect(pack.image.prompt).toBeTruthy()
+    expect(pack.image?.url).toBeTruthy()
+    expect(pack.image?.prompt).toBeTruthy()
 
     // Verificar metadatos
     expect(pack.estimatedDurationMinutes).toBeGreaterThan(0)
@@ -113,54 +114,7 @@ describe('GeminiAdapter', () => {
   beforeEach(() => {
     // Configurar mock para devolver aventura válida
     mockGenerateContentIntegration.mockResolvedValue({
-      text: JSON.stringify({
-        id: crypto.randomUUID(),
-        title: 'El Secreto de la Selva Esmeralda',
-        image: {
-          url: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800',
-          prompt: 'Selva tropical vibrante con cascadas y animales exóticos, arte digital para niños',
-        },
-        estimatedDurationMinutes: 60,
-        ageRange: { min: 6, max: 10 },
-        participants: 4,
-        difficulty: 'medium',
-        tone: 'exciting',
-        adventureType: 'adventure',
-        place: 'home',
-        materials: ['Hojas de papel', 'Pinturas', 'Telas verdes'],
-        introduction: {
-          story: 'En el corazón de la Selva Esmeralda...',
-          setupForParents: 'Transforma tu hogar...',
-        },
-        missions: [
-          {
-            order: 1,
-            title: 'El Guardián Tucán',
-            story: 'El sabio Tucán guardián...',
-            parentGuide: 'Proporciona materiales...',
-            successCondition: 'El equipo completa un mapa...',
-          },
-          {
-            order: 2,
-            title: 'La Cascada de los Deseos',
-            story: 'Una cascada mágica...',
-            parentGuide: 'Prepara plantillas...',
-            successCondition: 'Cada niño crea mariposas...',
-          },
-          {
-            order: 3,
-            title: 'El Árbol de los Mil Colores',
-            story: 'El árbol aparece...',
-            parentGuide: 'Guía a los niños...',
-            successCondition: 'Los niños cantan la canción...',
-          },
-        ],
-        conclusion: {
-          story: 'El Árbol florece en toda su gloria...',
-          celebrationTip: 'Realiza una ceremonia...',
-        },
-        createdAt: new Date().toISOString(),
-      }),
+      text: JSON.stringify(createAIAdventureOutput(3)),
     })
   })
 
@@ -181,7 +135,7 @@ describe('GeminiAdapter', () => {
     expect(pack).toBeDefined()
     expect(pack.id).toBeDefined()
     expect(pack.title).toBeTruthy()
-    expect(pack.image).toBeDefined()
+    expect(pack.narrator).toBeDefined()
     expect(pack.missions.length).toBe(3)
   })
 
@@ -380,54 +334,7 @@ describe('Interface Compliance', () => {
   beforeEach(() => {
     // Configurar mock para GeminiAdapter igual que en su describe
     mockGenerateContentIntegration.mockResolvedValue({
-      text: JSON.stringify({
-        id: crypto.randomUUID(),
-        title: 'El Secreto de la Selva Esmeralda',
-        image: {
-          url: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800',
-          prompt: 'Selva tropical vibrante con cascadas y animales exóticos, arte digital para niños',
-        },
-        estimatedDurationMinutes: 60,
-        ageRange: { min: 6, max: 10 },
-        participants: 4,
-        difficulty: 'medium',
-        tone: 'exciting',
-        adventureType: 'adventure',
-        place: 'home',
-        materials: ['Hojas de papel', 'Pinturas', 'Telas verdes'],
-        introduction: {
-          story: 'En el corazón de la Selva Esmeralda...',
-          setupForParents: 'Transforma tu hogar...',
-        },
-        missions: [
-          {
-            order: 1,
-            title: 'El Guardián Tucán',
-            story: 'El sabio Tucán guardián...',
-            parentGuide: 'Proporciona materiales...',
-            successCondition: 'El equipo completa un mapa...',
-          },
-          {
-            order: 2,
-            title: 'La Cascada de los Deseos',
-            story: 'Una cascada mágica...',
-            parentGuide: 'Prepara plantillas...',
-            successCondition: 'Cada niño crea mariposas...',
-          },
-          {
-            order: 3,
-            title: 'El Árbol de los Mil Colores',
-            story: 'El árbol aparece...',
-            parentGuide: 'Guía a los niños...',
-            successCondition: 'Los niños cantan la canción...',
-          },
-        ],
-        conclusion: {
-          story: 'El Árbol florece en toda su gloria...',
-          celebrationTip: 'Realiza una ceremonia...',
-        },
-        createdAt: new Date().toISOString(),
-      }),
+      text: JSON.stringify(createAIAdventureOutput(3)),
     })
   })
 
@@ -452,7 +359,7 @@ describe('Interface Compliance', () => {
       // Todos deberían retornar la misma estructura
       expect(pack).toHaveProperty('id')
       expect(pack).toHaveProperty('title')
-      expect(pack).toHaveProperty('image')
+      expect(pack).toHaveProperty('introduction')
       expect(pack).toHaveProperty('missions')
       expect(pack.missions).toHaveLength(3)
     }

@@ -115,7 +115,7 @@ describe('updateMyPackText', () => {
       }),
     }))
     expect(result.pack.title).toBe('Updated Title')
-    expect(result.pack.image.url).toBe('https://example.com/new-image.jpg')
+    expect(result.pack.image?.url).toBe('https://example.com/new-image.jpg')
     expect(result.pack.introduction.story).toBe('Updated intro story')
     expect(result.pack.missions[0].story).toBe('Updated mission 1 story')
     expect(result.pack.conclusion.story).toBe('Updated conclusion story')

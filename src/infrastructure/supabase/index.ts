@@ -3,3 +3,4 @@
 export { supabase } from './supabase-client'
 export { AdventurePackRepository } from './adventure-pack-repository'
 export { ImageCacheRepository } from './image-cache-repository'
+export { GenerationUsageRepository } from './generation-usage-repository'

@@ -28,7 +28,7 @@ async function example1_N8N_Standalone(userId: string, wizardData: WizardData) {
 
   if (result.ok && result.pack) {
     console.log('✅ Aventura generada:', result.pack.title)
-    console.log('🖼️ Imagen URL:', result.pack.image.url)
+    console.log('🖼️ Imagen URL:', result.pack.image?.url)
 
     // Guardar en Supabase
     const repository = new AdventurePackRepository()
@@ -54,8 +54,8 @@ async function example2_OpenAI_Plus_Nanobanana(userId: string, wizardData: Wizar
 
   if (result.ok && result.pack) {
     console.log('✅ Aventura generada:', result.pack.title)
-    console.log('🖼️ Imagen generada con prompt:', result.pack.image.prompt)
-    console.log('🖼️ Imagen URL:', result.pack.image.url)
+    console.log('🖼️ Imagen generada con prompt:', result.pack.image?.prompt)
+    console.log('🖼️ Imagen URL:', result.pack.image?.url)
 
     if (result.warnings) {
       console.warn('⚠️ Warnings:', result.warnings)
@@ -84,7 +84,7 @@ async function example3_Gemini_Plus_Nanobanana(userId: string, wizardData: Wizar
 
   if (result.ok && result.pack) {
     console.log('✅ Aventura generada:', result.pack.title)
-    console.log('🖼️ Imagen URL:', result.pack.image.url)
+    console.log('🖼️ Imagen URL:', result.pack.image?.url)
 
     // Guardar en Supabase
     const repository = new AdventurePackRepository()
@@ -119,7 +119,7 @@ async function example4_Resilience(userId: string, wizardData: WizardData) {
 
   if (result.ok && result.pack) {
     console.log('✅ Aventura generada (con placeholder de imagen):', result.pack.title)
-    console.log('🖼️ Imagen placeholder:', result.pack.image.url)
+    console.log('🖼️ Imagen placeholder:', result.pack.image?.url)
     console.warn('⚠️ Warnings:', result.warnings)
 
     // ¡La aventura se guarda igualmente!

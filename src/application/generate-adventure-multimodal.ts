@@ -2,93 +2,60 @@
 
 import type { WizardData } from '@/domain/wizard-data'
 import type { GeneratedAdventurePack } from '@/domain/generated-adventure-pack'
-import type { IAdventureProvider, IImageGenerator, IImageSearcher } from '@/domain/services'
+import type { IAdventureProvider, IImageGenerator, IImageSearcher, ImageSearchResult } from '@/domain/services'
+import type { ImageCache } from '@/domain/image-cache'
 import type { IImageCacheRepository } from '@/domain/repositories'
+import { AIProviderQuotaError } from '@/domain/errors'
+import { buildAdventureConstraints } from './adventure-constraints'
 
 interface GenerateAdventureMultimodalResult {
   ok: boolean
   error?: string
+  errorCode?: 'ai_quota'
   pack?: GeneratedAdventurePack
   warnings?: string[]
 }
 
 /**
- * Construye una query de búsqueda optimizada para Pexels.
- * Extrae keywords relevantes del pack para obtener mejores resultados.
- *
- * @param pack - Pack generado con información de la aventura
- * @returns Query en inglés con 4-6 keywords
+ * Construye una query de búsqueda para Pexels a partir de los metadatos del pack.
  */
 function buildImageSearchQuery(pack: GeneratedAdventurePack): string {
-  const keywords: string[] = []
+  const titleWords = pack.title
+    .toLowerCase()
+    .split(/\s+/)
+    .filter((word) => word.length > 3)
+    .slice(0, 2)
 
-  // Agregar tipo de aventura (importante para el tema)
-  if (pack.adventureType) {
-    keywords.push(pack.adventureType)
-  }
-
-  // Agregar lugar (contexto espacial)
-  if (pack.place) {
-    keywords.push(pack.place)
-  }
-
-  // Agregar tono (atmósfera)
-  if (pack.tone) {
-    keywords.push(pack.tone)
-  }
-
-  // Si existe prompt de imagen, extraer primeras 2-3 palabras clave
-  if (pack.image?.prompt) {
-    const promptWords = pack.image.prompt
-      .toLowerCase()
-      .split(/\s+/)
-      .filter((word) => word.length > 3) // Solo palabras significativas
-      .slice(0, 3)
-    keywords.push(...promptWords)
-  }
-
-  // Agregar "children adventure" para mejorar resultados child-safe
-  keywords.push('children', 'adventure')
-
-  // Limitar a 6 keywords y construir query
-  return keywords.slice(0, 6).join(' ')
+  return [pack.adventureType, pack.place, ...titleWords, 'children', 'adventure'].slice(0, 6).join(' ')
 }
 
 /**
- * Caso de Uso: Generar una aventura con multimodalidad (Texto + Imagen).
+ * Construye el prompt de portada para un generador de imágenes por IA.
+ */
+function buildCoverImagePrompt(pack: GeneratedAdventurePack): string {
+  const narrator = pack.narrator ? `, featuring ${pack.narrator.name}` : ''
+  return `Children's book illustration for an adventure called "${pack.title}"${narrator}. ` +
+    `Theme: ${pack.adventureType}, setting: ${pack.place}, mood: ${pack.tone}. Warm, friendly, no text.`
+}
+
+/**
+ * Caso de Uso: Generar una aventura, con portada opcional.
  *
- * ORQUESTADOR MULTIMODAL:
- * Este caso de uso coordina proveedores de IA y búsqueda de imágenes:
- * 1. IAdventureProvider: Genera el texto de la aventura y el prompt de imagen
- * 2. IImageGenerator: Genera imágenes por IA (prioritario si está configurado)
- * 3. IImageSearcher: Busca imágenes reales en Pexels (fallback si generador falla)
+ * El texto es lo esencial y siempre se genera. La portada es OPCIONAL:
+ * solo se intenta si se inyecta un IImageGenerator o un IImageSearcher.
+ * Por defecto la aplicación no los inyecta (coste y calidad), y la UI
+ * muestra una ilustración propia según el tipo de aventura.
  *
- * FLUJO SECUENCIAL CON ESTRATEGIA DE IMAGEN:
- * 1. Genera la aventura (texto + prompt de imagen)
- * 2. Si hay imageGenerator configurado, intenta generación por IA (prioridad):
- *    - Genera imagen con Pollinations/Nanobanana
- *    - Si falla (ej. sin créditos), continúa con búsqueda
- * 3. Si generación falla o no hay generador, intenta búsqueda (Pexels):
- *    - Consulta caché primero (24h)
- *    - Si no hay en caché, busca en Pexels y guarda resultado
- * 4. Si todo falla, usa placeholder
- * 5. Retorna el pack completo listo para persistir en Supabase
- *
- * RESILIENCIA:
- * - Si la generación/búsqueda de imagen falla, mantiene un placeholder
- * - Registra warnings pero no falla toda la operación
- * - La aventura (texto) siempre se guarda, incluso sin imagen
- *
- * COMPATIBILIDAD CON SUPABASE:
- * - El objeto retornado cumple con GeneratedAdventurePack
- * - Puede ser guardado directamente con save-adventure-pack.ts
+ * Estrategia de portada cuando está activada:
+ * 1. IImageGenerator (IA) si está configurado.
+ * 2. IImageSearcher (Pexels) como alternativa, con caché.
+ * 3. Si ambos fallan, el pack se devuelve sin imagen y con un warning.
  *
  * @param wizardData - Datos del wizard
  * @param adventureProvider - Proveedor de generación de texto
- * @param imageSearcher - Buscador de imágenes (Pexels, fallback opcional)
- * @param imageCacheRepo - Repositorio de caché (opcional, mejora performance)
- * @param imageGenerator - Generador de imágenes por IA (prioridad si está configurado)
- * @returns Resultado con el pack completo o error
+ * @param imageSearcher - Buscador de imágenes (opcional)
+ * @param imageCacheRepo - Caché de búsquedas de imágenes (opcional)
+ * @param imageGenerator - Generador de imágenes por IA (opcional)
  */
 export async function generateAdventureMultimodal(
   wizardData: WizardData,
@@ -100,59 +67,36 @@ export async function generateAdventureMultimodal(
   const warnings: string[] = []
 
   try {
-    // PASO 1: Generar la aventura (texto + prompt de imagen)
-    const pack = await adventureProvider.generateAdventure(wizardData, 'es', {
-      phases: 3,
-      puzzlesPerPhase: 2,
-      screenFree: true,
-    })
+    const pack = await adventureProvider.generateAdventure(
+      wizardData,
+      'es',
+      buildAdventureConstraints(wizardData)
+    )
 
+    const coversEnabled = Boolean(imageGenerator || imageSearcher)
     let imageObtained = false
 
-    // PASO 2: PRIORIDAD - Intentar generación de imagen por IA (si está configurado)
-    if (imageGenerator && pack.image?.prompt) {
+    if (imageGenerator) {
       try {
-        console.log('[generateAdventureMultimodal] Generando imagen por IA (prioridad)...')
-        const newImage = await imageGenerator.generateImage(pack.image.prompt)
-
-        pack.image = {
-          url: newImage.url,
-          prompt: newImage.prompt,
-        }
+        const newImage = await imageGenerator.generateImage(buildCoverImagePrompt(pack))
+        pack.image = { url: newImage.url, prompt: newImage.prompt }
         imageObtained = true
-        console.log('[generateAdventureMultimodal] Imagen generada exitosamente por IA')
       } catch (imageError) {
-        const errorMessage =
-          imageError instanceof Error ? imageError.message : 'Error desconocido'
-
-        console.error('[generateAdventureMultimodal] Error en generación de imagen:', imageError)
-        warnings.push(`Generación de imagen falló: ${errorMessage}. Intentando búsqueda...`)
+        const errorMessage = imageError instanceof Error ? imageError.message : 'Error desconocido'
+        warnings.push(`Generación de imagen falló: ${errorMessage}`)
       }
     }
 
-    // PASO 3: FALLBACK - Si no se obtuvo imagen por IA, intentar búsqueda en Pexels
     if (!imageObtained && imageSearcher) {
       try {
-        // Construir query optimizada para búsqueda
         const searchQuery = buildImageSearchQuery(pack)
-        console.log(`[generateAdventureMultimodal] Buscando imagen con query: "${searchQuery}"`)
+        let searchResult: ImageCache | ImageSearchResult | null = imageCacheRepo
+          ? await imageCacheRepo.get(searchQuery)
+          : null
 
-        let searchResult = null
-
-        // 3.1: Intentar obtener de caché primero
-        if (imageCacheRepo) {
-          searchResult = await imageCacheRepo.get(searchQuery)
-          if (searchResult) {
-            console.log('[generateAdventureMultimodal] Imagen encontrada en caché')
-          }
-        }
-
-        // 3.2: Si no hay en caché, buscar en Pexels
         if (!searchResult) {
-          console.log('[generateAdventureMultimodal] Buscando en Pexels...')
           searchResult = await imageSearcher.searchCoverImage(searchQuery)
 
-          // 3.3: Guardar en caché si se encontró resultado
           if (searchResult && imageCacheRepo) {
             await imageCacheRepo.save({
               query: searchQuery,
@@ -160,11 +104,9 @@ export async function generateAdventureMultimodal(
               photographer: searchResult.attribution?.photographer ?? null,
               sourceUrl: searchResult.attribution?.sourceUrl ?? null,
             })
-            console.log('[generateAdventureMultimodal] Resultado guardado en caché')
           }
         }
 
-        // 3.4: Si se encontró imagen, actualizar el pack
         if (searchResult) {
           pack.image = {
             url: searchResult.url,
@@ -173,29 +115,18 @@ export async function generateAdventureMultimodal(
           }
           imageObtained = true
 
-          // ImageSearchResult tiene 'attribution', ImageCache no
           if ('attribution' in searchResult && searchResult.attribution) {
-            warnings.push(
-              `Imagen por ${searchResult.attribution.photographer} (Pexels, usado como fallback)`
-            )
+            warnings.push(`Imagen por ${searchResult.attribution.photographer} (Pexels)`)
           }
         }
       } catch (searchError) {
-        const errorMessage =
-          searchError instanceof Error ? searchError.message : 'Error desconocido'
-        console.error('[generateAdventureMultimodal] Error en búsqueda de imagen:', searchError)
+        const errorMessage = searchError instanceof Error ? searchError.message : 'Error desconocido'
         warnings.push(`Búsqueda de imagen falló: ${errorMessage}`)
       }
     }
 
-    // PASO 4: ÚLTIMO RECURSO - Placeholder si todo falló
-    if (!imageObtained || !pack.image || !pack.image.url) {
-      console.warn('[generateAdventureMultimodal] No se pudo obtener imagen, usando placeholder')
-      pack.image = {
-        url: 'https://placehold.co/800x600/1a1a1a/ffffff?text=Imagen+No+Disponible',
-        prompt: pack.image?.prompt || 'Sin prompt de imagen disponible',
-      }
-      warnings.push('No se pudo obtener imagen. Usando placeholder.')
+    if (coversEnabled && !imageObtained) {
+      warnings.push('No se pudo obtener portada. Se usará la ilustración por defecto.')
     }
 
     return {
@@ -204,6 +135,10 @@ export async function generateAdventureMultimodal(
       warnings: warnings.length > 0 ? warnings : undefined,
     }
   } catch (error) {
+    if (error instanceof AIProviderQuotaError) {
+      return { ok: false, errorCode: 'ai_quota', error: error.message }
+    }
+
     const errorMessage = error instanceof Error ? error.message : 'Error desconocido'
     console.error('[generateAdventureMultimodal] Error general:', error)
     return {

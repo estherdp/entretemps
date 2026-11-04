@@ -15,6 +15,7 @@
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:report": "playwright show-report",
     "test:ai": "pnpm tsx scripts/test-multimodal.ts",
+    "smoke:gemini": "pnpm dlx tsx --env-file=.env.local scripts/smoke-gemini.ts",
     "test:images": "pnpm tsx scripts/test-pollinations.ts"
   },
   "dependencies": {

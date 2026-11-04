@@ -11,6 +11,7 @@ import { Textarea } from '@/ui/components/textarea'
 import { Skeleton } from '@/ui/components/skeleton'
 import { GripVertical, RefreshCw, ChevronDown, ChevronUp } from 'lucide-react'
 import type { GeneratedAdventurePackMission } from '@/domain/generated-adventure-pack'
+import { MissionPlayDetails } from '@/ui/components/mission-play-details'
 
 interface MissionCardProps {
   mission: GeneratedAdventurePackMission
@@ -182,6 +183,8 @@ export function MissionCard({
                   {mission.successCondition}
                 </p>
               </div>
+
+              <MissionPlayDetails mission={mission} />
             </>
           )}
         </CardContent>

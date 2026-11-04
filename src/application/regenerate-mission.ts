@@ -66,6 +66,7 @@ export async function regenerateMission(
     tone: pack.tone,
     place: pack.place,
     difficulty: pack.difficulty,
+    narrator: pack.narrator,
     existingMissions: pack.missions
       .filter((m) => m.order !== missionOrder)
       .map((m) => ({
