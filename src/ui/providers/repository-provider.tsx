@@ -3,6 +3,8 @@
 import { createContext, useContext, useMemo, type ReactNode } from 'react'
 import { AdventurePackRepository } from '@/infrastructure/supabase/adventure-pack-repository'
 import { createAuthService, type AuthService } from '@/infrastructure/services/auth-service'
+import { SupabaseAccountService } from '@/infrastructure/supabase/account-service'
+import type { IAccountService } from '@/domain/services'
 
 /**
  * Contexto de inyección de dependencias
@@ -13,6 +15,7 @@ import { createAuthService, type AuthService } from '@/infrastructure/services/a
 interface RepositoryContextValue {
   adventurePackRepository: AdventurePackRepository
   authService: AuthService
+  accountService: IAccountService
 }
 
 const RepositoryContext = createContext<RepositoryContextValue | null>(null)
@@ -26,6 +29,7 @@ export function RepositoryProvider({ children }: RepositoryProviderProps) {
   const contextValue = useMemo<RepositoryContextValue>(() => ({
     adventurePackRepository: new AdventurePackRepository(),
     authService: createAuthService(),
+    accountService: new SupabaseAccountService(),
   }), [])
 
   return (

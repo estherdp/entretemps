@@ -8,6 +8,13 @@ import { RepositoryProvider } from '@/ui/providers/repository-provider'
 const mockPush = vi.fn()
 const mockParams = { id: 'test-pack-id' }
 
+vi.mock('@/infrastructure/supabase/account-service', () => ({
+  SupabaseAccountService: class {
+    updateDisplayName = vi.fn()
+    deleteAccount = vi.fn()
+  },
+}))
+
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush }),
   useParams: () => mockParams,

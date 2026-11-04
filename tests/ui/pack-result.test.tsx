@@ -7,6 +7,13 @@ import type { GeneratedAdventurePack } from '@/domain/generated-adventure-pack'
 vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'https://test.supabase.co')
 vi.stubEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY', 'test-anon-key')
 
+vi.mock('@/infrastructure/supabase/account-service', () => ({
+  SupabaseAccountService: class {
+    updateDisplayName = vi.fn()
+    deleteAccount = vi.fn()
+  },
+}))
+
 vi.mock('@/infrastructure/services/auth-service', () => ({
   createAuthService: vi.fn(() => ({
     getCurrentUser: vi.fn().mockResolvedValue(null),

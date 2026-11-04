@@ -5,11 +5,14 @@ import { Button } from '@/ui/components/button'
 import { Card, CardContent } from '@/ui/components/card'
 import { AdventureCard } from '@/ui/components/adventure-card'
 import { useHomeData } from '@/ui/hooks/use-home-data'
+import { useAuth } from '@/ui/hooks/use-auth'
+import { getUserGreetingName } from '@/domain/user'
 import { Star, Heart, Compass, Wand2 } from 'lucide-react'
 
 export default function Home() {
   const router = useRouter()
   const { data, isLoading } = useHomeData(6)
+  const { user } = useAuth()
 
   const { templates, myAdventures, hasUser } = data
 
@@ -137,7 +140,7 @@ export default function Home() {
         // Authenticated user - home page
         <section className="px-4 pt-24 pb-16 md:pt-32 md:pb-20 text-center">
           <h1 className="text-5xl md:text-6xl font-extrabold mb-6 text-slate-900 dark:text-slate-50 tracking-tight">
-            ¡Hola, explorador! 🗺️
+            ¡Hola, {user ? getUserGreetingName(user) : 'explorador'}! 🗺️
           </h1>
           <p className="text-xl text-slate-600 dark:text-slate-400 mb-10 max-w-2xl mx-auto leading-relaxed">
             ¿Qué aventura viviremos hoy? Crea una nueva o continúa con tus favoritas.

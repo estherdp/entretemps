@@ -1,7 +1,7 @@
 // tests/application/generation-quota.test.ts
 
 import { describe, it, expect, vi } from 'vitest'
-import { assertGenerationQuota, parseQuotaLimit } from '@/application/generation-quota'
+import { assertGenerationQuota, getGenerationUsage, parseQuotaLimit } from '@/application/generation-quota'
 import { UserQuotaExceededError } from '@/domain/errors'
 import type { IGenerationUsageRepository } from '@/domain/repositories'
 
@@ -30,6 +30,20 @@ describe('assertGenerationQuota', () => {
     await assertGenerationQuota('user-1', 'mission', 20, repo, now)
 
     expect(repo.countSince).toHaveBeenCalledWith('user-1', 'mission', new Date('2026-11-03T12:00:00Z'))
+  })
+})
+
+describe('getGenerationUsage', () => {
+  it('should return usage per kind without negative remaining', async () => {
+    const repo: IGenerationUsageRepository = {
+      countSince: vi.fn().mockImplementation(async (_userId, kind) => (kind === 'adventure' ? 7 : 3)),
+      record: vi.fn(),
+    }
+
+    const usage = await getGenerationUsage('user-1', { adventure: 5, mission: 20 }, repo)
+
+    expect(usage.adventure).toEqual({ used: 7, limit: 5, remaining: 0 })
+    expect(usage.mission).toEqual({ used: 3, limit: 20, remaining: 17 })
   })
 })
 

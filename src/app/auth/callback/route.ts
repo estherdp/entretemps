@@ -2,6 +2,7 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { getSafeRedirectPath } from '@/lib/safe-redirect'
 
 /**
  * Route Handler para procesar el callback de autenticación de Supabase.
@@ -16,6 +17,7 @@ export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url)
   const code = requestUrl.searchParams.get('code')
   const origin = requestUrl.origin
+  const nextPath = getSafeRedirectPath(requestUrl.searchParams.get('next'))
 
   console.log('[Auth Callback] Processing callback with code:', code ? 'present' : 'missing')
 
@@ -72,8 +74,8 @@ export async function GET(request: NextRequest) {
       if (data.session) {
         console.log('[Auth Callback] Session established successfully for user:', data.user.email)
 
-        // Successful authentication - redirect to home
-        return NextResponse.redirect(`${origin}/`)
+        // Successful authentication - redirect to the page the user wanted
+        return NextResponse.redirect(`${origin}${nextPath}`)
       }
 
       console.warn('[Auth Callback] No session returned after code exchange')

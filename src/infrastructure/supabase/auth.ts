@@ -1,11 +1,17 @@
 import { supabase } from './supabase-client'
 import { User } from '@/domain/user'
+import { toDomainUser } from './user-mapper'
+import { buildAuthCallbackUrl } from '@/lib/safe-redirect'
 
-export async function signInWithEmail(email: string): Promise<void> {
+function siteOrigin(): string {
+  return process.env.NEXT_PUBLIC_SITE_URL ?? window.location.origin
+}
+
+export async function signInWithEmail(email: string, nextPath?: string | null): Promise<void> {
   const { error } = await supabase.auth.signInWithOtp({
     email,
     options: {
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
+      emailRedirectTo: buildAuthCallbackUrl(siteOrigin(), nextPath),
       // Disable PKCE for magic link flow to avoid verifier issues
       // Magic links are already secure and don't need PKCE
       shouldCreateUser: true,
@@ -40,9 +46,25 @@ export async function getCurrentUser(): Promise<User | null> {
     return null
   }
 
-  return {
-    id: session.user.id,
-    email: session.user.email || '',
+  return toDomainUser(session.user)
+}
+
+/**
+ * Inicia sesión con Google (OAuth). Redirige al proveedor y vuelve a
+ * /auth/callback, que intercambia el código por la sesión.
+ *
+ * Requiere activar el proveedor Google en Supabase -> Authentication -> Providers.
+ */
+export async function signInWithGoogle(nextPath?: string | null): Promise<void> {
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: buildAuthCallbackUrl(siteOrigin(), nextPath),
+    },
+  })
+
+  if (error) {
+    throw new Error(`Error al iniciar sesión con Google: ${error.message}`)
   }
 }
 
@@ -60,15 +82,7 @@ export function onAuthStateChange(
   const {
     data: { subscription },
   } = supabase.auth.onAuthStateChange((_event, session) => {
-    const user = session?.user
-    if (user) {
-      callback({
-        id: user.id,
-        email: user.email || '',
-      })
-    } else {
-      callback(null)
-    }
+    callback(session?.user ? toDomainUser(session.user) : null)
   })
 
   return () => {

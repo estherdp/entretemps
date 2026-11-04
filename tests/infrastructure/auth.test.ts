@@ -87,6 +87,8 @@ describe('Auth Helper', () => {
       expect(user).toEqual({
         id: 'user-123',
         email: 'test@example.com',
+        displayName: null,
+        provider: 'email',
       })
     })
 
@@ -147,6 +149,8 @@ describe('Auth Helper', () => {
       expect(mockCallback).toHaveBeenCalledWith({
         id: 'user-123',
         email: 'test@example.com',
+        displayName: null,
+        provider: 'email',
       })
 
       unsubscribe()

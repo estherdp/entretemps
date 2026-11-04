@@ -12,6 +12,10 @@ vi.mock('next/navigation', () => ({
 
 // Mock the useHomeData hook
 const mockUseHomeData = vi.fn()
+vi.mock('@/ui/hooks/use-auth', () => ({
+  useAuth: () => ({ user: null, isLoading: false, signOut: vi.fn() }),
+}))
+
 vi.mock('@/ui/hooks/use-home-data', () => ({
   useHomeData: () => mockUseHomeData(),
 }))

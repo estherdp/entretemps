@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react'
 import { Menu, X, LogOut, User } from 'lucide-react'
 import { Button } from './button'
 import { useAuth } from '@/ui/hooks/use-auth'
+import { getUserGreetingName } from '@/domain/user'
 
 export function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
@@ -79,10 +80,14 @@ export function Navbar() {
                   <Button onClick={() => router.push('/wizard/step-1')} size="sm">
                     Nueva aventura
                   </Button>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Link
+                    href="/account"
+                    className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
+                    title="Mi cuenta"
+                  >
                     <User className="w-4 h-4" />
-                    <span className="max-w-[150px] truncate">{user.email}</span>
-                  </div>
+                    <span className="max-w-[150px] truncate">{getUserGreetingName(user)}</span>
+                  </Link>
                   <Button variant="ghost" size="sm" onClick={handleSignOut}>
                     <LogOut className="w-4 h-4" />
                   </Button>
@@ -141,10 +146,13 @@ export function Navbar() {
                     >
                       Nueva aventura
                     </Button>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground px-2">
+                    <Link
+                      href="/account"
+                      className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary px-2"
+                    >
                       <User className="w-4 h-4" />
-                      <span className="truncate">{user.email}</span>
-                    </div>
+                      <span className="truncate">Mi cuenta · {getUserGreetingName(user)}</span>
+                    </Link>
                     <Button variant="outline" onClick={handleSignOut} className="w-full">
                       <LogOut className="w-4 h-4 mr-2" />
                       Cerrar sesión

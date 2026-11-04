@@ -10,6 +10,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { User } from '@/domain/user'
+import { toDomainUser } from './user-mapper'
 import type { SupabaseClient } from '@supabase/supabase-js'
 
 /**
@@ -51,18 +52,18 @@ export async function getCurrentUserServer(): Promise<User | null> {
     },
   })
 
+  // getUser() valida el token contra Supabase Auth. getSession() solo lee la
+  // cookie sin verificarla, y aquí se decide el acceso a endpoints con coste.
   const {
-    data: { session },
-  } = await supabaseServer.auth.getSession()
+    data: { user },
+    error,
+  } = await supabaseServer.auth.getUser()
 
-  if (!session) {
+  if (error || !user) {
     return null
   }
 
-  return {
-    id: session.user.id,
-    email: session.user.email || '',
-  }
+  return toDomainUser(user)
 }
 
 /**

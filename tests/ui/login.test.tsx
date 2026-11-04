@@ -101,7 +101,7 @@ describe('LoginPage', () => {
     fireEvent.click(button)
 
     await waitFor(() => {
-      expect(mockSignInWithEmail).toHaveBeenCalledWith('test@example.com')
+      expect(mockSignInWithEmail).toHaveBeenCalledWith('test@example.com', null)
     })
   })
 })
